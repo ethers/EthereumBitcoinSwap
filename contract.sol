@@ -22,14 +22,14 @@ contract EthereumBitcoinSwap {
 	
 	mapping (uint => Ticket) gTicket;
 	
-	function createTicket(address btcAddr, uint80 numWei, bytes2 weiPerSatoshi) returns (uint) {
+	function createTicket(address btcAddr, uint80 numWei, bytes2 weiPerSatoshi) external returns (uint) {
 		gTicket[gTicketId].ticketData.btcAddr = btcAddr;
 		gTicket[gTicketId].ticketData.numWei = numWei;
 		gTicket[gTicketId].ticketData.weiPerSatoshi = weiPerSatoshi;
 		// claimData left as zeros
 	}
 
-	function reserveTicket(uint ticketId, bytes32 txHash) returns (bytes1) {
+	function reserveTicket(uint ticketId, bytes32 txHash) external returns (bytes1) {
 		if (block.timestamp <= gTicket[ticketId].claimData.claimExpiry ||
 			msg.value < gTicket[ticketId].ticketData.numWei / 20) {  // required deposit is 5% numWei
 			return 0;
@@ -39,5 +39,11 @@ contract EthereumBitcoinSwap {
 		gTicket[ticketId].claimData.claimExpiry = uint16(block.timestamp + 3600 * 4);
 		gTicket[ticketId].claimData.claimTxHash = txHash;
 		return 1;
+	}
+
+	function claimTicket(uint ticketId, bytes txStr, bytes32 txHash, uint64 txIndex, bytes32[] sibling, bytes32 txBlockHash) external returns (bytes1) {
+		if (txHash != gTicket[ticketId].claimData.claimTxHash) {
+			return 0;
+		}
 	}
 }
