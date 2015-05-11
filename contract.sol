@@ -19,11 +19,12 @@ contract EthereumBitcoinSwap {
 	}
 	
 	// try saving with uint64 ?
-	uint private gTicketId = 1;  // start out at 1 to minimize issues where an uninitialized variable leads to a valid ticket
+	uint private gTicketId = 0;
 	
 	mapping (uint => Ticket) gTicket;
 	
 	function createTicket(address btcAddr, uint80 numWei, bytes2 weiPerSatoshi) external returns (uint) {
+		gTicketId++;
 		gTicket[gTicketId].ticketData.btcAddr = btcAddr;
 		gTicket[gTicketId].ticketData.numWei = numWei;
 		gTicket[gTicketId].ticketData.weiPerSatoshi = weiPerSatoshi;
