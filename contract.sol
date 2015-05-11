@@ -1,4 +1,5 @@
 contract EthereumBitcoinSwap {
+	address constant specialTxContract = 0xbeefbeefbeefbeefbeefbeefbeefbeefbeefbeef;
 	
 	struct TicketData {
 		address btcAddr;
@@ -41,9 +42,13 @@ contract EthereumBitcoinSwap {
 		return 1;
 	}
 
+	// TODO Mix non byte arrays not yet implemented
 	function claimTicket(uint ticketId, bytes txStr, bytes32 txHash, uint64 txIndex, bytes32[] sibling, bytes32 txBlockHash) external returns (bytes1) {
 		if (txHash != gTicket[ticketId].claimData.claimTxHash) {
 			return 0;
 		}
+
+		specialTxContract.call("verifyTx", txHash, txIndex, sibling, txBlockHash);
 	}
+
 }
