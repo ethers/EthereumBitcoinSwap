@@ -61,7 +61,7 @@ class TestEthBtcSwap(object):
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
-        assert 1 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=tester.k1)
+        assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=tester.k1)
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
             'btcAddr': btcAddr,

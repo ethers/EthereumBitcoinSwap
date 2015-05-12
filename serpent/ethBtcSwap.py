@@ -89,21 +89,16 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         indexScriptTwo = outputData[3]
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
-        # log(ethAddr)  # exp 848063048424552597789830156546485564325215747452L
 
-        # expEthAddr = text("948c765a6914d43f2a7ac177da2c2f6b52de3d7c")
+        encodedFee = (satoshiIn2ndOutput % 10000)  # encodedFee of 1234 means 12.34%
+        weiToClaimer = self.gTicket[ticketId]._numWei * encodedFee / 10000
 
-        # TODO need to get the satoshis of output1 to calc miner fee
-
-        # res = send(ethAddr, ETH_TO_SEND)
-
-        # log(msg.sender, data=[res])
-
+        res1 = send(msg.sender, weiToClaimer)
+        res2 = send(ethAddr, self.gTicket[ticketId]._numWei - weiToClaimer)
 
         log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
-        res = 1
-        return(res)
+        return(res1 + res2)
 
     return(0)
 
