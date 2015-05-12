@@ -3,7 +3,7 @@ inset('btcSpecialTx.py')
 # TODO
 # claimer 20bytes, claimExpiry 2bytes
 # claimTxHash are 32bytes each
-# btcAddr 20 bytes, numWei 10bytes, weiPerSatoshi 2bytes
+# btcAddr 20 bytes, numWei 10bytes, double-check weiPerSatoshi 2bytes
 
 
 extern relayContract: [verifyTx:iiai:i]
@@ -13,11 +13,20 @@ data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _
 
 data gTicketId  # first valid gTicketId is 0
 
-data gBtcRelayContract
+data trustedBtcRelay
 
 
 macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
+
+
+# trustedRelayContract is the address of the trusted btcrelay contract
+def setTrustedBtcRelay(trustedRelayContract):
+    # TODO ensure only callable one time
+    if trustedRelayContract:
+        self.trustedBtcRelay = trustedRelayContract
+        return(1)
+    return(0)
 
 
 def createTicket(btcAddr, numWei, weiPerSatoshi):
@@ -44,6 +53,8 @@ def reserveTicket(ticketId, txHash):
     return(0)
 
 
+event claimSuccess(btcAddr, numSatoshi, ethAddr)
+event oned(data)
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (txHash != self.gTicket[ticketId]._claimTxHash):
         return(0)
@@ -53,6 +64,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if outputData == 0:
         log(msg.sender, data=[-30])
         return(0)
+
 
     numSatoshi = outputData[0]
     satoshiNeeded = self.gTicket[ticketId]._numWei / self.gTicket[ticketId]._weiPerSatoshi
@@ -71,7 +83,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         return(0)
 
 
-    if gBtcRelayContract.verifyTx(txHash, txIndex, sibling, txBlockHash):
+    if self.trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
 
         indexScriptTwo = outputData[2]
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
@@ -83,11 +95,14 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         # res = send(ethAddr, ETH_TO_SEND)
 
-        log(msg.sender, data=[res])
+        # log(msg.sender, data=[res])
+
+
+        log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr)
+
+        res = 1
         return(res)
 
-
-    log(msg.sender, data=[-100])
     return(0)
 
 
