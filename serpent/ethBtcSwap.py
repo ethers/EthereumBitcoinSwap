@@ -53,36 +53,11 @@ def reserveTicket(ticketId, txHash):
     return(0)
 
 
-event moose(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash)
+event claimSuccess(btcAddr, numSatoshi, ethAddr)
 event oned(data)
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
-
-    # return(1)
-    #
-    #
-    # log(22222222)
-    # log(ticketId)
-    # log(datastr=txStr)
-    # log(txHash)
-    # log(txIndex)
-    # log(data=sibling)
-    # log(txBlockHash)
-    #
-    #
-    # log(333333333333333)
-
     if (txHash != self.gTicket[ticketId]._claimTxHash):
-
-        # log(ticketId)
-        # log(datastr=txStr)
-        #
-        # log(txHash)
-        # log(txIndex)
-        # log(35)
-        # log(self.gTicket[ticketId]._claimTxHash)
         return(0)
-
-    log(type=oned, 22)
 
     outputData = self.getFirst2Outputs(txStr, outitems=3)
 
@@ -90,14 +65,12 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(msg.sender, data=[-30])
         return(0)
 
-    log(type=oned, 33)
 
     numSatoshi = outputData[0]
     satoshiNeeded = self.gTicket[ticketId]._numWei / self.gTicket[ticketId]._weiPerSatoshi
     if numSatoshi < satoshiNeeded:
         return(0)
 
-    log(type=oned, 44)
 
     indexScriptOne = outputData[1]
 
@@ -110,11 +83,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         return(0)
 
 
-    log(type=oned, 55)
-
-
     if self.trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
-        return(1)
 
         indexScriptTwo = outputData[2]
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
@@ -126,14 +95,14 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         # res = send(ethAddr, ETH_TO_SEND)
 
-        log(msg.sender, data=[res])
+        # log(msg.sender, data=[res])
+
+
+        log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr)
+
+        res = 1
         return(res)
 
-
-    log(type=oned, 99)
-    #
-    #
-    # log(msg.sender, data=[-100])
     return(0)
 
 

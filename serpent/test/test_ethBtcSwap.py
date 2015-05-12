@@ -44,13 +44,11 @@ class TestEthBtcSwap(object):
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 0
 
-        print('@@@ txhash: ', self.TX_HASH)
         assert 1 == self.c.reserveTicket(ticketId, self.TX_HASH, value=depositRequired)
 
 
-
-        o = []
-        self.s.block.log_listeners.append(lambda x: o.append(self.c._translator.listen(x)))
+        eventArr = []
+        self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
         txIndex = 1
@@ -59,14 +57,17 @@ class TestEthBtcSwap(object):
 
         assert 1 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
 
-
+        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
+            'ethAddr': 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c,
+            'btcAddr': btcAddr}]
+        eventArr.pop()
 
         MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
         assert 0 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
 
 
-        print(o)
+        # print(eventArr)
 
 
 
