@@ -50,7 +50,7 @@ def reserveTicket(ticketId, txHash):
         self.gTicket[ticketId]._claimTxHash = txHash
         return(1)
 
-    send(msg.sender, msg.value)  # sender may have sent insufficient deposit, so return it
+    send(msg.sender, msg.value)  # refund whatever deposit provided
     return(0)
 
 

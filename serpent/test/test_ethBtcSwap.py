@@ -166,23 +166,38 @@ class TestEthBtcSwap(object):
         postBal = self.coinbaseBalance()
         assert postBal == preBal - depositRequired
 
-        # deposit > required, need to use unclaimed ticketId0
+        # deposit > required ok since using unclaimed ticketId0
+        preBal = self.coinbaseBalance()
         assert 1 == self.c.reserveTicket(0, txHash, value=depositRequired + 1)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal - depositRequired - 1
 
         # deposit > required, but ticketId1 still reserved
+        preBal = self.coinbaseBalance()
         assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired + 1)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal
 
         # deposit == required and previous ticketId1 reservation has expired
+        preBal = self.coinbaseBalance()
         self.s.block.timestamp += 3600 * 5
         assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal - depositRequired
 
         # close but not yet expired
         self.s.block.timestamp += 3600 * 4
+        preBal = self.coinbaseBalance()
         assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal
 
         # expired reservation can now be reserved
         self.s.block.timestamp += 100
+        preBal = self.coinbaseBalance()
         assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal - depositRequired
 
 
     def coinbaseBalance(self):
