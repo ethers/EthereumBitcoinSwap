@@ -131,9 +131,9 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
 
     log(type=oned, 99)
-
-
-    log(msg.sender, data=[-100])
+    #
+    #
+    # log(msg.sender, data=[-100])
     return(0)
 
 

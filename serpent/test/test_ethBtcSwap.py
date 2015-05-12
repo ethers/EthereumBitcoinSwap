@@ -38,8 +38,8 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 2*10**10  # from tx1  5*10**8 / numWei
         depositRequired = numWei / 20
 
-        BTC_RELAY = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
-        self.c.setTrustedBtcRelay(BTC_RELAY.address)
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 0
@@ -58,6 +58,13 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506
 
         assert 1 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
+
+
+
+        MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
+        self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
+        assert 0 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
+
 
         print(o)
 
