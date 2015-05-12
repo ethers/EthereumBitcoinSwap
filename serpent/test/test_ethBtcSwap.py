@@ -35,7 +35,7 @@ class TestEthBtcSwap(object):
     def testHappy(self):
         btcAddr = 0xc398efa9c392ba6013c5e04ee729755ef7f58b32
         numWei = self.ETHER
-        weiPerSatoshi = 5 * 10**8
+        weiPerSatoshi = 2*10**10  # from tx1  5*10**8 / numWei
         depositRequired = numWei / 20
 
         BTC_RELAY = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')

@@ -54,34 +54,35 @@ def reserveTicket(ticketId, txHash):
 
 
 event moose(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash)
+event oned(data)
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
-    log(type=moose, ticketId, txStr, txHash, txIndex, sibling, txBlockHash)
 
-    return(1)
-
-
-    log(22222222)
-    log(ticketId)
-    log(datastr=txStr)
-    log(txHash)
-    log(txIndex)
-    log(data=sibling)
-    log(txBlockHash)
-
-
-    log(333333333333333)
+    # return(1)
+    #
+    #
+    # log(22222222)
+    # log(ticketId)
+    # log(datastr=txStr)
+    # log(txHash)
+    # log(txIndex)
+    # log(data=sibling)
+    # log(txBlockHash)
+    #
+    #
+    # log(333333333333333)
 
     if (txHash != self.gTicket[ticketId]._claimTxHash):
-        log(ticketId)
-        log(datastr=txStr)
 
-        log(txHash)
-        log(txIndex)
-        log(35)
-        log(self.gTicket[ticketId]._claimTxHash)
+        # log(ticketId)
+        # log(datastr=txStr)
+        #
+        # log(txHash)
+        # log(txIndex)
+        # log(35)
+        # log(self.gTicket[ticketId]._claimTxHash)
         return(0)
 
-    log(444)
+    log(type=oned, 22)
 
     outputData = self.getFirst2Outputs(txStr, outitems=3)
 
@@ -89,11 +90,14 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(msg.sender, data=[-30])
         return(0)
 
+    log(type=oned, 33)
+
     numSatoshi = outputData[0]
     satoshiNeeded = self.gTicket[ticketId]._numWei / self.gTicket[ticketId]._weiPerSatoshi
     if numSatoshi < satoshiNeeded:
         return(0)
 
+    log(type=oned, 44)
 
     indexScriptOne = outputData[1]
 
@@ -104,6 +108,9 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
     if addrBtcWasSentTo != self.gTicket[ticketId]._btcAddr:
         return(0)
+
+
+    log(type=oned, 55)
 
 
     if trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
@@ -121,6 +128,9 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         log(msg.sender, data=[res])
         return(res)
+
+
+    log(type=oned, 99)
 
 
     log(msg.sender, data=[-100])
