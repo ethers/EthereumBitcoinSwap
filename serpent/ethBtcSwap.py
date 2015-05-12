@@ -3,7 +3,7 @@ inset('btcSpecialTx.py')
 # TODO
 # claimer 20bytes, claimExpiry 2bytes
 # claimTxHash are 32bytes each
-# btcAddr 20 bytes, numWei 10bytes, weiPerSatoshi 2bytes
+# btcAddr 20 bytes, numWei 10bytes, double-check weiPerSatoshi 2bytes
 
 
 extern relayContract: [verifyTx:iiai:i]
@@ -113,7 +113,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     log(type=oned, 55)
 
 
-    if trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
+    if self.trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
         return(1)
 
         indexScriptTwo = outputData[2]
