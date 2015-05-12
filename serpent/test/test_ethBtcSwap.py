@@ -54,14 +54,18 @@ class TestEthBtcSwap(object):
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 0
 
-        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=tester.k1)
+        claimer = tester.k1
+        addrClaimer = tester.a1
+        claimerPreBalance = self.s.block.get_balance(addrClaimer)
+
+        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer)
 
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
-        assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=tester.k1)
+        assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
             'btcAddr': btcAddr,
@@ -71,13 +75,14 @@ class TestEthBtcSwap(object):
         eventArr.pop()
 
 
-        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
-        claimerBalance = self.s.block.get_balance(tester.a1)
-        # assert claimerBalance == claimerFeePercent * numWei incorrect since claimer has used up some ether by requesting and claiming ticket
+        claimerPostBalance = self.s.block.get_balance(addrClaimer)
+        print("Claimer profit in ether: %s" % ((claimerPostBalance - claimerPreBalance)/1e18))
+
 
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
         ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
         buyerEthBalance = self.s.block.get_balance(ethAddrBin)
+        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
 
