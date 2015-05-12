@@ -1,4 +1,4 @@
-from pyethereum import tester
+from ethereum import tester
 
 from bitcoin import *
 
@@ -30,20 +30,17 @@ class TestEthBtcSwap(object):
         tester.seed = self.seed
 
 
-    # def listener(msg):
-    #     if msg['event'] == 'LOG':
-    #         # ...
-    #         slogging.log_listeners.listeners.append(listener)
-
-
     def testCreateTicket(self):
-        btcAddr = self.ETHER
-        numWei = 0
-        weiPerSatoshi = 0
+        btcAddr = 9
+        numWei = self.ETHER
+        weiPerSatoshi = 8
         assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
 
         assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert btcAddr == self.s.block.get_balance(self.c.address)
+        assert numWei == self.s.block.get_balance(self.c.address)
+
+        assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert 2*numWei == self.s.block.get_balance(self.c.address)
 
 
     def testHappy(self):
