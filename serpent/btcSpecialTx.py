@@ -53,7 +53,7 @@ def getFirst2Outputs(txStr:str):
 
     ###########################################################
     # 2nd output
-    # cursor += scriptSize + 8  # skip script and 2nd output's satoshis (8)
+    cursor += scriptSize
 
     tmpArr = getUInt64LE(txStr, cursor)
     cursor += 8
