@@ -136,13 +136,27 @@ class TestEthBtcSwap(object):
         btcAddr = 9
         numWei = self.ETHER
         weiPerSatoshi = 8
+
+        # ticket missing value
+        preBal = self.coinbaseBalance()
         assert -1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal
 
         assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert numWei == self.s.block.get_balance(self.c.address)
 
         assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert 2*numWei == self.s.block.get_balance(self.c.address)
+
+        # ticket insufficient value sent, value should be refunded
+        preBal = self.coinbaseBalance()
+        contractBalance = self.s.block.get_balance(self.c.address)
+        assert -1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei - 1)
+        assert self.s.block.get_balance(self.c.address) == contractBalance
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal
+
 
         txHash = 7
         depositRequired = numWei / 20
@@ -200,5 +214,6 @@ class TestEthBtcSwap(object):
         assert postBal == preBal - depositRequired
 
 
+    # actor/user/claimer balance (as opposed to contract's balance)
     def coinbaseBalance(self):
         return self.s.block.get_balance(self.s.block.coinbase)

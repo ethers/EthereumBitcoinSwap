@@ -31,6 +31,7 @@ def setTrustedBtcRelay(trustedRelayContract):
 
 def createTicket(btcAddr, numWei, weiPerSatoshi):
     if msg.value < numWei || numWei == 0:
+        send(msg.sender, msg.value)
         return(-1)
 
     # use var for gTicketId ?
