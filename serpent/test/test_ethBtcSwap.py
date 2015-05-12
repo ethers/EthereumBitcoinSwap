@@ -65,6 +65,15 @@ class TestEthBtcSwap(object):
         self.s.block.timestamp += 3600 * 5
         assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
 
+        # close but not yet expired
+        self.s.block.timestamp += 3600 * 4
+        assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired)
+
+        # expired reservation can now be reserved
+        self.s.block.timestamp += 100
+        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+
+
 
     def testHappy(self):
         btcAddr = 0
