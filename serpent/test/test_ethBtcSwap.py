@@ -44,6 +44,8 @@ class TestEthBtcSwap(object):
         btcAddr = 0x956bfc5575c0a7134c7effef268e51d887ba7015
         numWei = self.ETHER
         weiPerSatoshi = satoshiOutputOne / numWei  # from tx1  5*10**8 / numWei
+        ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
+
         depositRequired = numWei / 20
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
@@ -52,21 +54,32 @@ class TestEthBtcSwap(object):
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 0
 
-        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired)
+        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=tester.k1)
 
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
-        assert 1 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash)
+        assert 1 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=tester.k1)
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
             'btcAddr': btcAddr,
-            'ethAddr': 0x587488c119f40666b4a0c807b0d7a1acfe3b6917,
+            'ethAddr': ethAddr,
             'satoshiIn2ndOutput': satoshiOutputTwo
             }]
         eventArr.pop()
+
+
+        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
+        claimerBalance = self.s.block.get_balance(tester.a1)
+        # assert claimerBalance == claimerFeePercent * numWei incorrect since claimer has used up some ether by requesting and claiming ticket
+
+        indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
+        ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
+        buyerEthBalance = self.s.block.get_balance(ethAddrBin)
+        assert buyerEthBalance == (1 - claimerFeePercent) * numWei
+
 
 
     def testHappy(self):
