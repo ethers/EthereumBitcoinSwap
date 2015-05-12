@@ -76,6 +76,10 @@ class TestEthBtcSwap(object):
 
 
         claimerPostBalance = self.s.block.get_balance(addrClaimer)
+
+        # deposit should be fully refunded
+        assert claimerPostBalance > claimerPreBalance
+
         print("Claimer profit in ether: %s" % ((claimerPostBalance - claimerPreBalance)/1e18))
 
 
@@ -144,14 +148,23 @@ class TestEthBtcSwap(object):
         depositRequired = numWei / 20
 
         # no deposit
+        preBal = self.coinbaseBalance()
         assert 0 == self.c.reserveTicket(0, txHash)
         assert 0 == self.c.reserveTicket(1, txHash)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal
 
         # deposit < required
+        preBal = self.coinbaseBalance()
         assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired - 1)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal
 
         # deposit == required
+        preBal = self.coinbaseBalance()
         assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        postBal = self.coinbaseBalance()
+        assert postBal == preBal - depositRequired
 
         # deposit > required, need to use unclaimed ticketId0
         assert 1 == self.c.reserveTicket(0, txHash, value=depositRequired + 1)
@@ -172,4 +185,5 @@ class TestEthBtcSwap(object):
         assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
 
 
-    # testClaimTicketZero
+    def coinbaseBalance(self):
+        return self.s.block.get_balance(self.s.block.coinbase)
