@@ -34,13 +34,33 @@ class TestEthBtcSwap(object):
         btcAddr = 9
         numWei = self.ETHER
         weiPerSatoshi = 8
-        assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
+        assert -1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
 
-        assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert numWei == self.s.block.get_balance(self.c.address)
 
-        assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert 2*numWei == self.s.block.get_balance(self.c.address)
+
+        txHash = 7
+        depositRequired = numWei / 20
+
+        # no deposit
+        assert 0 == self.c.reserveTicket(0, txHash)
+        assert 0 == self.c.reserveTicket(1, txHash)
+
+        # deposit < required
+        assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired - 1)
+
+        # deposit == required
+        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+
+        # deposit > required, need to use unclaimed ticketId0
+        assert 1 == self.c.reserveTicket(0, txHash, value=depositRequired + 1)
+
+        # deposit > required, but ticketId1 still reserved
+        assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired + 1)
+
 
 
     def testHappy(self):
@@ -50,3 +70,6 @@ class TestEthBtcSwap(object):
         self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
 
         # self.c.reserveTicket()
+
+
+    # testClaimTicketZero

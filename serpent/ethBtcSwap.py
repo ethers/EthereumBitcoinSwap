@@ -11,7 +11,7 @@ extern relayContract: [verifyTx:iiai:i]
 
 data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _claimTxHash)
 
-data gTicketId  # lowest possible is 1
+data gTicketId  # first valid gTicketId is 0
 
 data gBtcRelayContract
 
@@ -22,26 +22,26 @@ macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
 def createTicket(btcAddr, numWei, weiPerSatoshi):
     if msg.value < numWei || numWei == 0:
-        return(0)
+        return(-1)
 
-    self.gTicketId += 1
     # use var for gTicketId ?
     self.gTicket[self.gTicketId]._btcAddr = btcAddr
     self.gTicket[self.gTicketId]._numWei = numWei
     self.gTicket[self.gTicketId]._weiPerSatoshi = weiPerSatoshi
+    self.gTicketId += 1
     # claimData left as zeros
 
-    return(self.gTicketId)
+    return(self.gTicketId - 1)
 
 
 def reserveTicket(ticketId, txHash):
-    if (m_ticketIsUnexpired(ticketId) || m_ticketHasDeposit(ticketId)):
-        return(0)
+    if (m_ticketAvailable(ticketId) && m_ticketHasDeposit(ticketId)):
+        self.gTicket[ticketId]._claimer = msg.sender
+        self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
+        self.gTicket[ticketId]._claimTxHash = txHash
+        return(1)
 
-    self.gTicket[ticketId]._claimer = msg.sender
-    self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
-    self.gTicket[ticketId]._claimTxHash = txHash
-    return(1)
+    return(0)
 
 
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
@@ -91,13 +91,17 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     return(0)
 
 
+#
+#  macros, they assume that ticketId0 has valid data instead of zeros
+#  (otherwise they will return wrong values when ticketId 0 is passed in)
+#
 
 # required deposit is 5% numWei
 macro m_ticketHasDeposit($ticketId):
-    msg.value < self.gTicket[$ticketId]._numWei / 20
+    msg.value >= self.gTicket[$ticketId]._numWei / 20
 
-macro m_ticketIsUnexpired($ticketId):
-    block.timestamp <= self.gTicket[$ticketId]._claimExpiry
+macro m_ticketAvailable($ticketId):
+    block.timestamp > self.gTicket[$ticketId]._claimExpiry
 
 
 
