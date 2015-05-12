@@ -13,11 +13,20 @@ data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _
 
 data gTicketId  # first valid gTicketId is 0
 
-data gBtcRelayContract
+data trustedBtcRelay
 
 
 macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
+
+
+# trustedRelayContract is the address of the trusted btcrelay contract
+def setTrustedBtcRelay(trustedRelayContract):
+    # TODO ensure only callable one time
+    if trustedRelayContract:
+        self.trustedBtcRelay = trustedRelayContract
+        return(1)
+    return(0)
 
 
 def createTicket(btcAddr, numWei, weiPerSatoshi):
@@ -45,8 +54,28 @@ def reserveTicket(ticketId, txHash):
 
 
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
+    log(22222222)
+    log(ticketId)
+    log(datastr=txStr)
+    log(txHash)
+    log(txIndex)
+    log(data=sibling)
+    log(txBlockHash)
+
+
+    log(333333333333333)
+
     if (txHash != self.gTicket[ticketId]._claimTxHash):
+        log(ticketId)
+        log(datastr=txStr)
+
+        log(txHash)
+        log(txIndex)
+        log(35)
+        log(self.gTicket[ticketId]._claimTxHash)
         return(0)
+
+    log(444)
 
     outputData = self.getFirst2Outputs(txStr, outitems=3)
 
@@ -71,7 +100,8 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         return(0)
 
 
-    if gBtcRelayContract.verifyTx(txHash, txIndex, sibling, txBlockHash):
+    if trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
+        return(1)
 
         indexScriptTwo = outputData[2]
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
