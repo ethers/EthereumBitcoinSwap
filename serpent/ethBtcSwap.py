@@ -11,7 +11,7 @@ extern relayContract: [verifyTx:iiai:i]
 
 data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _claimTxHash)
 
-data gTicketId
+data gTicketId  # lowest possible is 1
 
 data gBtcRelayContract
 
@@ -21,12 +21,17 @@ macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
 
 def createTicket(btcAddr, numWei, weiPerSatoshi):
+    if msg.value < numWei || numWei == 0:
+        return(0)
+
     self.gTicketId += 1
     # use var for gTicketId ?
     self.gTicket[self.gTicketId]._btcAddr = btcAddr
     self.gTicket[self.gTicketId]._numWei = numWei
     self.gTicket[self.gTicketId]._weiPerSatoshi = weiPerSatoshi
     # claimData left as zeros
+
+    return(self.gTicketId)
 
 
 def reserveTicket(ticketId, txHash):
