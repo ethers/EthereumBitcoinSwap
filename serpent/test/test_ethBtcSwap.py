@@ -61,6 +61,9 @@ class TestEthBtcSwap(object):
         # deposit > required, but ticketId1 still reserved
         assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired + 1)
 
+        # deposit == required and previous ticketId1 reservation has expired
+        self.s.block.timestamp += 3600 * 5
+        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
 
 
     def testHappy(self):
