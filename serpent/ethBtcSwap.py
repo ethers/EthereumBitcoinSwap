@@ -53,13 +53,13 @@ def reserveTicket(ticketId, txHash):
     return(0)
 
 
-event claimSuccess(btcAddr, numSatoshi, ethAddr)
+event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
 event oned(data)
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (txHash != self.gTicket[ticketId]._claimTxHash):
         return(0)
 
-    outputData = self.getFirst2Outputs(txStr, outitems=3)
+    outputData = self.getFirst2Outputs(txStr, outitems=4)
 
     if outputData == 0:
         log(msg.sender, data=[-30])
@@ -85,7 +85,9 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
     if self.trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
 
-        indexScriptTwo = outputData[2]
+        satoshiIn2ndOutput = outputData[2]
+
+        indexScriptTwo = outputData[3]
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
         # log(ethAddr)  # exp 848063048424552597789830156546485564325215747452L
 
@@ -98,7 +100,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         # log(msg.sender, data=[res])
 
 
-        log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr)
+        log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
         res = 1
         return(res)

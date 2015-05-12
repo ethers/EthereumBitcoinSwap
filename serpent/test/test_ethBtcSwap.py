@@ -58,8 +58,10 @@ class TestEthBtcSwap(object):
         assert 1 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
+            'btcAddr': btcAddr,
             'ethAddr': 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c,
-            'btcAddr': btcAddr}]
+            'satoshiIn2ndOutput': int(44.44e8)
+            }]
         eventArr.pop()
 
         MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')

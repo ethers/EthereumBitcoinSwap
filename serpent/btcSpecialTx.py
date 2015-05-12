@@ -1,8 +1,5 @@
-# from https://github.com/ethers/dapp-bin/blob/505c292ef6c7088464ad826d554510ef3a481ef5/btcrelay/btcSpecialTx.py
-
 # This file is an optimized version of btcTx.py for retrieving
 # the first 2 outputs of a Bitcoin transaction.
-# It is tested via test_btc-eth.py
 
 # read the VarInt and advance the cursor
 macro parseVarInt($txStr, $cursor):
@@ -50,13 +47,17 @@ def getFirst2Outputs(txStr:str):
         return
 
     out1stScriptIndex = cursor
-    cursor += scriptSize + 8  # skip script and 2nd output's satoshis (8)
     ###########################################################
 
 
 
     ###########################################################
-    # 2nd output (satoshis were already skipped in previous line)
+    # 2nd output
+    # cursor += scriptSize + 8  # skip script and 2nd output's satoshis (8)
+
+    tmpArr = getUInt64LE(txStr, cursor)
+    cursor += 8
+    out2ndSatoshis = tmpArr[1]
 
     scriptSize = parseVarInt(txStr, cursor)
     # log(scriptSize)
@@ -67,7 +68,7 @@ def getFirst2Outputs(txStr:str):
     out2ndScriptIndex = cursor
     ###########################################################
 
-    return([out1stSatoshis, out1stScriptIndex, out2ndScriptIndex], items=3)
+    return([out1stSatoshis, out1stScriptIndex, out2ndSatoshis, out2ndScriptIndex], items=4)
 
 
 
