@@ -47,10 +47,18 @@ class TestEthBtcSwap(object):
         print('@@@ txhash: ', self.TX_HASH)
         assert 1 == self.c.reserveTicket(ticketId, self.TX_HASH, value=depositRequired)
 
+
+
+        o = []
+        self.s.block.log_listeners.append(lambda x: o.append(self.c._translator.listen(x)))
+
+
         txIndex = 1
         sibling = [0x8c14f0db3df150123e6f3dbbf30f8b955a8249b62ac1d1ff16284aefa3d06d87, 0x8e30899078ca1813be036a073bbf80b86cdddde1c96e9e9c99e9e3782df4ae49]
         txBlockHash = 0x000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506
         assert 1 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
+
+        print(o)
 
 
 

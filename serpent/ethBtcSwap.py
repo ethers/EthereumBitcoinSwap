@@ -53,7 +53,13 @@ def reserveTicket(ticketId, txHash):
     return(0)
 
 
+event moose(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash)
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
+    log(type=moose, ticketId, txStr, txHash, txIndex, sibling, txBlockHash)
+
+    return(1)
+
+
     log(22222222)
     log(ticketId)
     log(datastr=txStr)
