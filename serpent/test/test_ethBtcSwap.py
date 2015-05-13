@@ -115,8 +115,27 @@ class TestEthBtcSwap(object):
         claimer = tester.k1
         addrClaimer = tester.a1
 
-        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer)
+        claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
+        gasPrice = int(10e12)  # 10 szabo
+        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        print('GAS: '+str(res['gas']))
+        assert res['output'] == 1
 
+        # since the gas from profiling is seems approximate, assert that the
+        # balance is within 1% of approxTxCost
+        approxTxCost = res['gas']
+        assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - depositRequired - approxTxCost
+        assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - depositRequired - 1.01*approxTxCost
+
+
+        # assert self.s.block.get_balance(addrClaimer) == claimerBalPreReserve - depositRequired - txCost
+
+        print('@@ line1 pre bal: ', claimerBalPreReserve)
+        print('@@ 2 value that was sent (will decrease balance): ', depositRequired)
+        print('@@ 3 postBal: ', self.s.block.get_balance(addrClaimer))
+        print('@@ 4 postBal minus preBal: ', (self.s.block.get_balance(addrClaimer) - claimerBalPreReserve))
+        print('@@ 5 delta with value: ', (self.s.block.get_balance(addrClaimer) - claimerBalPreReserve) + depositRequired)
+        print('but GAS used according to profiling is: '+str(res['gas']))
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
