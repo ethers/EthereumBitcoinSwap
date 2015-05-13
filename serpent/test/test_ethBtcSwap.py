@@ -80,7 +80,7 @@ class TestEthBtcSwap(object):
         # gas from profiling claimTicket() is inaccurate so assert that the
         # balance is within 40% of approxTxCost
         approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(1.8*approxCostToClaim)
+        boundedCostToClaim = int(1.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
@@ -150,6 +150,27 @@ class TestEthBtcSwap(object):
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == 0
+
+        # gas from profiling claimTicket() is inaccurate so assert that the
+        # balance is within 40% of approxTxCost
+        approxCostToClaim = claimRes['gas']
+        boundedCostToClaim = int(1.4*approxCostToClaim)
+
+        endClaimerBal = self.s.block.get_balance(addrClaimer)
+        assert endClaimerBal < balPreClaim - approxCostToClaim
+        # TODO assert endClaimerBal > balPreClaim - boundedCostToClaim
+
+        assert endClaimerBal < claimerBalPreReserve - approxCostToClaim - approxCostOfReserve
+        # TODO assert endClaimerBal > claimerBalPreReserve - boundedCostToClaim - boundedCostOfReserve
+
+        indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
+        ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
+        buyerEthBalance = self.s.block.get_balance(ethAddrBin)
+
+        assert buyerEthBalance == 0
+
+        # TODO assert event?
+
 
 
     def testZeroFee(self):
