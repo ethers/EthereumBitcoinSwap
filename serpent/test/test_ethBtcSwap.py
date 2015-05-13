@@ -121,7 +121,7 @@ class TestEthBtcSwap(object):
         print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
-        # since the gas from profiling is seems approximate, assert that the
+        # since the gas from profiling seems approximate, assert that the
         # balance is within 1% of approxTxCost
         approxTxCost = res['gas']
         assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - depositRequired - approxTxCost
@@ -130,17 +130,28 @@ class TestEthBtcSwap(object):
 
         # assert self.s.block.get_balance(addrClaimer) == claimerBalPreReserve - depositRequired - txCost
 
-        print('@@ line1 pre bal: ', claimerBalPreReserve)
-        print('@@ 2 value that was sent (will decrease balance): ', depositRequired)
-        print('@@ 3 postBal: ', self.s.block.get_balance(addrClaimer))
-        print('@@ 4 postBal minus preBal: ', (self.s.block.get_balance(addrClaimer) - claimerBalPreReserve))
-        print('@@ 5 delta with value: ', (self.s.block.get_balance(addrClaimer) - claimerBalPreReserve) + depositRequired)
-        print('but GAS used according to profiling is: '+str(res['gas']))
+        # print('@@ line1 pre bal: ', claimerBalPreReserve)
+        # print('@@ 2 value that was sent (will decrease balance): ', depositRequired)
+        # print('@@ 3 postBal: ', self.s.block.get_balance(addrClaimer))
+        # print('@@ 4 postBal minus preBal: ', (self.s.block.get_balance(addrClaimer) - claimerBalPreReserve))
+        # print('@@ 5 delta with value: ', (self.s.block.get_balance(addrClaimer) - claimerBalPreReserve) + depositRequired)
+        # print('but GAS used according to profiling is: '+str(res['gas']))
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
-        assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
+
+        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
+        assert claimRes['output'] == 2
+
+        # since the gas from profiling seems approximate, assert that the
+        # balance is within 1% of approxTxCost
+        approxTxCost = claimRes['gas']
+        print('GAS claimTicket() ', claimRes['gas'])
+        assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - approxTxCost
+        assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - 1.01*approxTxCost
+
+
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
             'btcAddr': btcAddr,
