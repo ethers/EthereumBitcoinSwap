@@ -118,7 +118,7 @@ class TestEthBtcSwap(object):
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
         gasPrice = int(10e12)  # 10 szabo
         res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
-        print('GAS: '+str(res['gas']))
+        # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
         # since the gas from profiling seems approximate, assert that the
@@ -147,19 +147,20 @@ class TestEthBtcSwap(object):
 
 
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
+        # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == 2
 
         # gas from profiling claimTicket() is inaccurate so assert that the
         # balance is within 40% of approxTxCost
-        approxTxCost = claimRes['gas']
-        print('GAS claimTicket() ', claimRes['gas'])
+        approxCostToClaim = claimRes['gas']
+        boundedCostToClaim = int(1.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
-        assert endClaimerBal < balPreClaim + depositRequired - approxTxCost
-        assert endClaimerBal > balPreClaim + depositRequired - int(1.4*approxTxCost)
+        assert endClaimerBal < balPreClaim + depositRequired - approxCostToClaim
+        assert endClaimerBal > balPreClaim + depositRequired - boundedCostToClaim
 
-        assert endClaimerBal < claimerBalPreReserve - approxTxCost - approxCostOfReserve
-        assert endClaimerBal > claimerBalPreReserve - int(1.4*approxTxCost) - boundedCostOfReserve
+        assert endClaimerBal < claimerBalPreReserve - approxCostToClaim - approxCostOfReserve
+        assert endClaimerBal > claimerBalPreReserve - boundedCostToClaim - boundedCostOfReserve
 
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
