@@ -93,10 +93,12 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
 
         encodedFee = (satoshiIn2ndOutput % 10000)  # encodedFee of 1234 means 12.34%
-        weiToClaimer = self.gTicket[ticketId]._numWei * encodedFee / 10000
+        feeToClaimer = self.gTicket[ticketId]._numWei * encodedFee / 10000
+
+        weiToClaimer = feeToClaimer + self.gTicket[ticketId]._numWei / 20 # fee + refund of deposit
 
         res1 = send(msg.sender, weiToClaimer)
-        res2 = send(ethAddr, self.gTicket[ticketId]._numWei - weiToClaimer)
+        res2 = send(ethAddr, self.gTicket[ticketId]._numWei - feeToClaimer)
 
         log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
