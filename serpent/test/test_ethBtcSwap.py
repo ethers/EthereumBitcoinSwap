@@ -124,8 +124,12 @@ class TestEthBtcSwap(object):
         # since the gas from profiling seems approximate, assert that the
         # balance is within 1% of approxTxCost
         approxTxCost = res['gas']
-        assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - depositRequired - approxTxCost
-        assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - depositRequired - 1.01*approxTxCost
+        balPreClaim = self.s.block.get_balance(addrClaimer)
+        assert balPreClaim < claimerBalPreReserve - depositRequired - approxTxCost
+        assert balPreClaim > claimerBalPreReserve - depositRequired - int(1.05*approxTxCost)
+
+        # assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - depositRequired - 84459
+        # assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - depositRequired - 84461
 
 
         # assert self.s.block.get_balance(addrClaimer) == claimerBalPreReserve - depositRequired - txCost
@@ -148,8 +152,18 @@ class TestEthBtcSwap(object):
         # balance is within 1% of approxTxCost
         approxTxCost = claimRes['gas']
         print('GAS claimTicket() ', claimRes['gas'])
-        assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - approxTxCost
-        assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - 1.01*approxTxCost
+
+        endClaimerBal = self.s.block.get_balance(addrClaimer)
+        assert endClaimerBal < balPreClaim + depositRequired - approxTxCost
+        assert endClaimerBal > balPreClaim + depositRequired - int(1.2*approxTxCost)
+
+        # assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - approxTxCost
+        #
+        # assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - approxTxCost
+        # assert self.s.block.get_balance(addrClaimer) == claimerBalPreReserve - 129107
+        # assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - 129109
+        #
+        # assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - int(1.2*approxTxCost)
 
 
 
