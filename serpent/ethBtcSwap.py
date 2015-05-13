@@ -56,15 +56,18 @@ def reserveTicket(ticketId, txHash):
 
 
 event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
+event claimFail(failCode)
 event oned(data)
+macro CLAIM_FAIL_TX_HASH: 999001
+macro CLAIM_FAIL_FALLTHRU: 999999
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (txHash != self.gTicket[ticketId]._claimTxHash):
+        log(type=claimFail, CLAIM_FAIL_TX_HASH)
         return(0)
 
     outputData = self.getFirst2Outputs(txStr, outitems=4)
 
     if outputData == 0:
-        log(msg.sender, data=[-30])
         return(0)
 
 
@@ -100,10 +103,13 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         res1 = send(msg.sender, weiToClaimer)
         res2 = send(ethAddr, self.gTicket[ticketId]._numWei - feeToClaimer)
 
+        m_deleteTicket(ticketId)
+
         log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
         return(res1 + res2)
 
+    log(type=claimFail, CLAIM_FAIL_FALLTHRU)
     return(0)
 
 
@@ -119,6 +125,13 @@ macro m_ticketHasDeposit($ticketId):
 macro m_ticketAvailable($ticketId):
     block.timestamp > self.gTicket[$ticketId]._claimExpiry
 
+macro m_deleteTicket($ticketId):
+    self.gTicket[$ticketId]._btcAddr = 0
+    self.gTicket[$ticketId]._numWei = 0
+    self.gTicket[$ticketId]._weiPerSatoshi = 0
+    self.gTicket[$ticketId]._claimer = 0
+    self.gTicket[$ticketId]._claimExpiry = 0
+    self.gTicket[$ticketId]._claimTxHash = 0
 
 
 macro getEthAddr($indexStart, $inStr, $size, $offset):

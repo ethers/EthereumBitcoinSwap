@@ -78,10 +78,10 @@ class TestEthBtcSwap(object):
 
 
         # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 70% of approxCostToClaim
-        # TODO why is 70% bound needed when there's a fee but only 40% when zero fee?
+        # balance is within 2.1X of approxCostToClaim
+        # TODO why 2.1X ?
         approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(1.7*approxCostToClaim)
+        boundedCostToClaim = int(2.1*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
@@ -103,6 +103,18 @@ class TestEthBtcSwap(object):
             'satoshiIn2ndOutput': satoshiOutputTwo
             }]
         eventArr.pop()
+
+
+        # re-claim is not allowed
+        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
+        # print('GAS claimTicket() ', claimRes['gas'])
+        assert claimRes['output'] == 0
+
+        assert eventArr == [{'_event_type': 'claimFail',
+            'failCode': 999001
+            }]
+        eventArr.pop()
+
 
 
     def testRejectedClaim(self):
