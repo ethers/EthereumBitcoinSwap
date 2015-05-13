@@ -13,12 +13,6 @@ class TestEthBtcSwap(object):
 
     ETHER = 10 ** 18
 
-    # tx is fff2525b8931402dd09222c50775608f75787bd2b87e56995a7bdd30f79702c4
-    # from block100K
-    TX_STR = '0100000001032e38e9c0a84c6046d687d10556dcacc41d275ec55fc00779ac88fdf357a187000000008c493046022100c352d3dd993a981beba4a63ad15c209275ca9470abfcd57da93b58e4eb5dce82022100840792bc1f456062819f15d33ee7055cf7b5ee1af1ebcc6028d9cdb1c3af7748014104f46db5e9d61a9dc27b8d64ad23e7383a4e6ca164593c2527c038c0857eb67ee8e825dca65046b82c9331586c82e0fd1f633f25f87c161bc6f8a630121df2b3d3ffffffff0200e32321000000001976a914c398efa9c392ba6013c5e04ee729755ef7f58b3288ac000fe208010000001976a914948c765a6914d43f2a7ac177da2c2f6b52de3d7c88ac00000000'
-    TX_HASH = int(dbl_sha256(TX_STR.decode('hex')), 16)
-
-
     def setup_class(cls):
         tester.gas_limit = int(2e6)
         cls.s = tester.state()
@@ -56,15 +50,15 @@ class TestEthBtcSwap(object):
 
         claimer = tester.k1
         addrClaimer = tester.a1
-        claimerPreBalance = self.s.block.get_balance(addrClaimer)
 
+        claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
         assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer)
 
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
-
+        claimerBalPreClaim = self.s.block.get_balance(addrClaimer)
         assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
@@ -75,10 +69,16 @@ class TestEthBtcSwap(object):
         eventArr.pop()
 
 
-        claimerPostBalance = self.s.block.get_balance(addrClaimer)
+        claimerPostBal = self.s.block.get_balance(addrClaimer)
+
+
+        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
+
+
+
 
         # deposit should be fully refunded
-        assert claimerPostBalance > claimerPreBalance
+        assert claimerPostBal - claimerBalPreReserve > 3*(claimerFeePercent * numWei)
 
         print("Claimer profit in ether: %s" % ((claimerPostBalance - claimerPreBalance)/1e18))
 
@@ -86,12 +86,21 @@ class TestEthBtcSwap(object):
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
         ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
         buyerEthBalance = self.s.block.get_balance(ethAddrBin)
-        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
+
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
 
 
-    def testHappy(self):
+    def testZeroFee(self):
+        # tx is fff2525b8931402dd09222c50775608f75787bd2b87e56995a7bdd30f79702c4
+        # from block100K
+        txBlockHash = 0x000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506
+        txStr = '0100000001032e38e9c0a84c6046d687d10556dcacc41d275ec55fc00779ac88fdf357a187000000008c493046022100c352d3dd993a981beba4a63ad15c209275ca9470abfcd57da93b58e4eb5dce82022100840792bc1f456062819f15d33ee7055cf7b5ee1af1ebcc6028d9cdb1c3af7748014104f46db5e9d61a9dc27b8d64ad23e7383a4e6ca164593c2527c038c0857eb67ee8e825dca65046b82c9331586c82e0fd1f633f25f87c161bc6f8a630121df2b3d3ffffffff0200e32321000000001976a914c398efa9c392ba6013c5e04ee729755ef7f58b3288ac000fe208010000001976a914948c765a6914d43f2a7ac177da2c2f6b52de3d7c88ac00000000'
+        txHash = int(dbl_sha256(txStr.decode('hex')), 16)
+        txIndex = 1
+        sibling = [0x8c14f0db3df150123e6f3dbbf30f8b955a8249b62ac1d1ff16284aefa3d06d87, 0x8e30899078ca1813be036a073bbf80b86cdddde1c96e9e9c99e9e3782df4ae49]
+
+
         btcAddr = 0xc398efa9c392ba6013c5e04ee729755ef7f58b32
         numWei = self.ETHER
         weiPerSatoshi = 2*10**10  # from tx1  5*10**8 / numWei
@@ -103,18 +112,16 @@ class TestEthBtcSwap(object):
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 0
 
-        assert 1 == self.c.reserveTicket(ticketId, self.TX_HASH, value=depositRequired)
+        claimer = tester.k1
+        addrClaimer = tester.a1
+
+        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer)
 
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
-
-        txIndex = 1
-        sibling = [0x8c14f0db3df150123e6f3dbbf30f8b955a8249b62ac1d1ff16284aefa3d06d87, 0x8e30899078ca1813be036a073bbf80b86cdddde1c96e9e9c99e9e3782df4ae49]
-        txBlockHash = 0x000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506
-
-        assert 1 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
+        assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
             'btcAddr': btcAddr,
@@ -123,9 +130,17 @@ class TestEthBtcSwap(object):
             }]
         eventArr.pop()
 
-        MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
-        self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
-        assert 0 == self.c.claimTicket(ticketId, self.TX_STR, self.TX_HASH, txIndex, sibling, txBlockHash)
+
+        indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
+        ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
+        buyerEthBalance = self.s.block.get_balance(ethAddrBin)
+
+        assert buyerEthBalance == numWei
+
+
+        # MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
+        # self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
+        # assert 0 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash)
 
 
         # print(eventArr)
