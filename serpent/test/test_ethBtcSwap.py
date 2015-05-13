@@ -122,7 +122,7 @@ class TestEthBtcSwap(object):
         assert res['output'] == 1
 
         # since the gas from profiling seems approximate, assert that the
-        # balance is within 1% of approxTxCost
+        # balance is within 5% of approxTxCost
         approxTxCost = res['gas']
         balPreClaim = self.s.block.get_balance(addrClaimer)
         assert balPreClaim < claimerBalPreReserve - depositRequired - approxTxCost
@@ -148,22 +148,15 @@ class TestEthBtcSwap(object):
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         assert claimRes['output'] == 2
 
-        # since the gas from profiling seems approximate, assert that the
-        # balance is within 1% of approxTxCost
+        # gas from profiling claimTicket() is inaccurate so assert that the
+        # balance is within 40% of approxTxCost
         approxTxCost = claimRes['gas']
         print('GAS claimTicket() ', claimRes['gas'])
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim + depositRequired - approxTxCost
-        assert endClaimerBal > balPreClaim + depositRequired - int(1.2*approxTxCost)
+        assert endClaimerBal > balPreClaim + depositRequired - int(1.4*approxTxCost)
 
-        # assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - approxTxCost
-        #
-        # assert self.s.block.get_balance(addrClaimer) < claimerBalPreReserve - approxTxCost
-        # assert self.s.block.get_balance(addrClaimer) == claimerBalPreReserve - 129107
-        # assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - 129109
-        #
-        # assert self.s.block.get_balance(addrClaimer) > claimerBalPreReserve - int(1.2*approxTxCost)
 
 
 
