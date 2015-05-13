@@ -52,36 +52,42 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        assert 1 == self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer)
+        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        # print('GAS: '+str(res['gas']))
+        assert res['output'] == 1
+
+        approxCostOfReserve = res['gas']
+        boundedCostOfReserve = int(1.05*approxCostOfReserve)
+        balPreClaim = self.s.block.get_balance(addrClaimer)
+        assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
+        assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
 
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
-        claimerBalPreClaim = self.s.block.get_balance(addrClaimer)
-        assert 2 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
-        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
-            'btcAddr': btcAddr,
-            'ethAddr': ethAddr,
-            'satoshiIn2ndOutput': satoshiOutputTwo
-            }]
-        eventArr.pop()
-
-
-        claimerPostBal = self.s.block.get_balance(addrClaimer)
+        balPreClaim = self.s.block.get_balance(addrClaimer)
+        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
+        # print('GAS claimTicket() ', claimRes['gas'])
+        assert claimRes['output'] == 2
 
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
+        feeToClaimer = int(claimerFeePercent * numWei)  # int() is needed
 
 
+        # gas from profiling claimTicket() is inaccurate so assert that the
+        # balance is within 40% of approxTxCost
+        approxCostToClaim = claimRes['gas']
+        boundedCostToClaim = int(1.8*approxCostToClaim)
 
+        endClaimerBal = self.s.block.get_balance(addrClaimer)
+        assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
+        assert endClaimerBal > balPreClaim + depositRequired + feeToClaimer - boundedCostToClaim
 
-        # deposit should be fully refunded
-        assert claimerPostBal - claimerBalPreReserve > 3*(claimerFeePercent * numWei)
-
-        print("Claimer profit in ether: %s" % ((claimerPostBalance - claimerPreBalance)/1e18))
-
+        assert endClaimerBal < claimerBalPreReserve + feeToClaimer - approxCostToClaim - approxCostOfReserve
+        assert endClaimerBal > claimerBalPreReserve + feeToClaimer - boundedCostToClaim - boundedCostOfReserve
 
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
         ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
@@ -89,6 +95,13 @@ class TestEthBtcSwap(object):
 
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
+
+        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
+            'btcAddr': btcAddr,
+            'ethAddr': ethAddr,
+            'satoshiIn2ndOutput': satoshiOutputTwo
+            }]
+        eventArr.pop()
 
 
     def testZeroFee(self):
@@ -162,6 +175,12 @@ class TestEthBtcSwap(object):
         assert endClaimerBal < claimerBalPreReserve - approxCostToClaim - approxCostOfReserve
         assert endClaimerBal > claimerBalPreReserve - boundedCostToClaim - boundedCostOfReserve
 
+        indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
+        ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
+        buyerEthBalance = self.s.block.get_balance(ethAddrBin)
+
+        assert buyerEthBalance == numWei
+
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
             'btcAddr': btcAddr,
@@ -169,13 +188,6 @@ class TestEthBtcSwap(object):
             'satoshiIn2ndOutput': int(44.44e8)
             }]
         eventArr.pop()
-
-
-        indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
-        ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
-        buyerEthBalance = self.s.block.get_balance(ethAddrBin)
-
-        assert buyerEthBalance == numWei
 
 
         # MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
