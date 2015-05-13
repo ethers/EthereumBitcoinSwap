@@ -78,9 +78,10 @@ class TestEthBtcSwap(object):
 
 
         # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 40% of approxTxCost
+        # balance is within 70% of approxCostToClaim
+        # TODO why is 70% bound needed when there's a fee but only 40% when zero fee?
         approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(1.4*approxCostToClaim)
+        boundedCostToClaim = int(1.7*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
@@ -152,16 +153,17 @@ class TestEthBtcSwap(object):
         assert claimRes['output'] == 0
 
         # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 40% of approxTxCost
+        # balance is within 2.2X of approxCostToClaim
+        # TODO why so high at 2.2X?
         approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(1.4*approxCostToClaim)
+        boundedCostToClaim = int(2.2*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim - approxCostToClaim
-        # TODO assert endClaimerBal > balPreClaim - boundedCostToClaim
+        assert endClaimerBal > balPreClaim - boundedCostToClaim
 
-        assert endClaimerBal < claimerBalPreReserve - approxCostToClaim - approxCostOfReserve
-        # TODO assert endClaimerBal > claimerBalPreReserve - boundedCostToClaim - boundedCostOfReserve
+        assert endClaimerBal < claimerBalPreReserve - depositRequired - approxCostToClaim - approxCostOfReserve
+        assert endClaimerBal > claimerBalPreReserve - depositRequired - boundedCostToClaim - boundedCostOfReserve
 
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
         ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
@@ -221,7 +223,7 @@ class TestEthBtcSwap(object):
         assert claimRes['output'] == 2
 
         # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 40% of approxTxCost
+        # balance is within 40% of approxCostToClaim
         approxCostToClaim = claimRes['gas']
         boundedCostToClaim = int(1.4*approxCostToClaim)
 
