@@ -31,6 +31,7 @@ def setTrustedBtcRelay(trustedRelayContract):
 
 def createTicket(btcAddr, numWei, weiPerSatoshi):
     if msg.value < numWei || numWei == 0:
+        send(msg.sender, msg.value)
         return(-1)
 
     # use var for gTicketId ?
@@ -50,16 +51,17 @@ def reserveTicket(ticketId, txHash):
         self.gTicket[ticketId]._claimTxHash = txHash
         return(1)
 
+    send(msg.sender, msg.value)  # refund whatever deposit provided
     return(0)
 
 
-event claimSuccess(btcAddr, numSatoshi, ethAddr)
+event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
 event oned(data)
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (txHash != self.gTicket[ticketId]._claimTxHash):
         return(0)
 
-    outputData = self.getFirst2Outputs(txStr, outitems=3)
+    outputData = self.getFirst2Outputs(txStr, outitems=4)
 
     if outputData == 0:
         log(msg.sender, data=[-30])
@@ -85,23 +87,22 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
     if self.trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
 
-        indexScriptTwo = outputData[2]
+        satoshiIn2ndOutput = outputData[2]
+
+        indexScriptTwo = outputData[3]
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
-        # log(ethAddr)  # exp 848063048424552597789830156546485564325215747452L
 
-        # expEthAddr = text("948c765a6914d43f2a7ac177da2c2f6b52de3d7c")
+        encodedFee = (satoshiIn2ndOutput % 10000)  # encodedFee of 1234 means 12.34%
+        feeToClaimer = self.gTicket[ticketId]._numWei * encodedFee / 10000
 
-        # TODO need to get the satoshis of output1 to calc miner fee
+        weiToClaimer = feeToClaimer + self.gTicket[ticketId]._numWei / 20 # fee + refund of deposit
 
-        # res = send(ethAddr, ETH_TO_SEND)
+        res1 = send(msg.sender, weiToClaimer)
+        res2 = send(ethAddr, self.gTicket[ticketId]._numWei - feeToClaimer)
 
-        # log(msg.sender, data=[res])
+        log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
-
-        log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr)
-
-        res = 1
-        return(res)
+        return(res1 + res2)
 
     return(0)
 
