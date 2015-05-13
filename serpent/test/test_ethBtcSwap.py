@@ -124,6 +124,7 @@ class TestEthBtcSwap(object):
         # since the gas from profiling seems approximate, assert that the
         # balance is within 5% of approxTxCost
         approxTxCost = res['gas']
+        approxCostOfReserve = res['gas']
         balPreClaim = self.s.block.get_balance(addrClaimer)
         assert balPreClaim < claimerBalPreReserve - depositRequired - approxTxCost
         assert balPreClaim > claimerBalPreReserve - depositRequired - int(1.05*approxTxCost)
@@ -157,7 +158,8 @@ class TestEthBtcSwap(object):
         assert endClaimerBal < balPreClaim + depositRequired - approxTxCost
         assert endClaimerBal > balPreClaim + depositRequired - int(1.4*approxTxCost)
 
-
+        assert endClaimerBal < claimerBalPreReserve - approxTxCost - approxCostOfReserve
+        assert endClaimerBal > claimerBalPreReserve - int(1.4*approxTxCost) - int(1.05*approxCostOfReserve)
 
 
         assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
