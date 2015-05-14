@@ -37,7 +37,7 @@ class TestEthBtcSwap(object):
 
         btcAddr = 0x956bfc5575c0a7134c7effef268e51d887ba7015
         numWei = self.ETHER
-        weiPerSatoshi = satoshiOutputOne / numWei  # from tx1  5*10**8 / numWei
+        weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
         depositRequired = numWei / 20
@@ -78,10 +78,10 @@ class TestEthBtcSwap(object):
 
 
         # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 2.1X of approxCostToClaim
-        # TODO why 2.1X ?
+        # balance is within 2.4X of approxCostToClaim
+        # TODO why 2.4X ?
         approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(2.1*approxCostToClaim)
+        boundedCostToClaim = int(2.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
@@ -129,7 +129,7 @@ class TestEthBtcSwap(object):
 
         btcAddr = 0x956bfc5575c0a7134c7effef268e51d887ba7015
         numWei = self.ETHER
-        weiPerSatoshi = satoshiOutputOne / numWei  # from tx1  5*10**8 / numWei
+        weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
         depositRequired = numWei / 20
@@ -195,11 +195,12 @@ class TestEthBtcSwap(object):
         txHash = int(dbl_sha256(txStr.decode('hex')), 16)
         txIndex = 1
         sibling = [0x8c14f0db3df150123e6f3dbbf30f8b955a8249b62ac1d1ff16284aefa3d06d87, 0x8e30899078ca1813be036a073bbf80b86cdddde1c96e9e9c99e9e3782df4ae49]
-
+        satoshiOutputOne = int(5.56e8)
+        satoshiOutputTwo = int(44.44e8)
 
         btcAddr = 0xc398efa9c392ba6013c5e04ee729755ef7f58b32
         numWei = self.ETHER
-        weiPerSatoshi = 2*10**10  # from tx1  5*10**8 / numWei
+        weiPerSatoshi = numWei / satoshiOutputOne
         depositRequired = numWei / 20
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
@@ -235,9 +236,10 @@ class TestEthBtcSwap(object):
         assert claimRes['output'] == 2
 
         # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 40% of approxCostToClaim
+        # balance is within 1.8X of approxCostToClaim
+        # TODO 2X?
         approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(1.4*approxCostToClaim)
+        boundedCostToClaim = int(2*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal < balPreClaim + depositRequired - approxCostToClaim
@@ -253,10 +255,10 @@ class TestEthBtcSwap(object):
         assert buyerEthBalance == numWei
 
 
-        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': int(5.56e8),
+        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
             'btcAddr': btcAddr,
             'ethAddr': 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c,
-            'satoshiIn2ndOutput': int(44.44e8)
+            'satoshiIn2ndOutput': satoshiOutputTwo
             }]
         eventArr.pop()
 
