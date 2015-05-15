@@ -1,5 +1,5 @@
 - set:
-    EthBtcSwap: "0x4d327bd8ea22af27c077cdc638e0dad917c35cfc"
+    EthBtcSwap: "0xb30cb9c6e54c4a73dc44211e9dad53b1b1555e84"
 
 
 # 1 ether, 0.26BTC
@@ -34,12 +34,32 @@
 
 -
   call:
-    ttLastAvail:
+    ttLastTid:
       gas: 500000
       gas_price: 10000000000000
       to: $EthBtcSwap
-      fun_name: ttLastAvail
+      fun_name: ttLastTid
       sig: ''
+
+-
+  transact:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+      wait: True
+
+-
+  call:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+
 
 -
   call:
@@ -49,6 +69,7 @@
       to: $EthBtcSwap
       fun_name: ttLastHasDeposit
       sig: ''
+      value: 50000000000000000
 
 -
   call:

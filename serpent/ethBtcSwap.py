@@ -33,6 +33,9 @@ def ttLastAvail():
 def ttLastHasDeposit():
     return(m_ticketHasDeposit(LAST_TID))
 
+def ttLastTid():
+    return(LAST_TID)
+
 
 
 
