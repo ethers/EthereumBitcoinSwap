@@ -22,16 +22,16 @@ macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 # TODO disable testingOnly methods
 macro LAST_TID: self.gTicketId - 1
 def testingOnlyReserveLatestTicket(txHash):
-    return(self.reserveTicket(LAST_TID, txHash))
+    return(self.reserveTicket(value=msg.value, LAST_TID, txHash))
 
 def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     return(self.claimTicket(LAST_TID, txStr, txHash, txIndex, sibling, txBlockHash))
 
-def ttLastAvail():
-    return(m_ticketAvailable(LAST_TID))
-
-def ttLastHasDeposit():
-    return(m_ticketHasDeposit(LAST_TID))
+# def ttLastAvail():
+#     return(m_ticketAvailable(LAST_TID))
+#
+# def ttLastHasDeposit():
+#     return(m_ticketHasDeposit(LAST_TID))
 
 def ttLastTid():
     return(LAST_TID)
