@@ -11,7 +11,7 @@ extern relayContract: [verifyTx:iiai:i]
 
 data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _claimTxHash)
 
-data gTicketId  # first valid gTicketId is 0
+data gTicketId  # first valid gTicketId is 0.  latest ticket has id gTicketId-1
 
 data trustedBtcRelay
 
@@ -21,10 +21,10 @@ macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
 # TODO disable testingOnly methods
 def testingOnlyReserveLatestTicket(txHash):
-    return(self.reserveTicket(self.gTicketId, txHash))
+    return(self.reserveTicket(self.gTicketId-1, txHash))
 
 def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
-    return(self.claimTicket(self.gTicketId, txStr, txHash, txIndex, sibling, txBlockHash))
+    return(self.claimTicket(self.gTicketId-1, txStr, txHash, txIndex, sibling, txBlockHash))
 
 
 # trustedRelayContract is the address of the trusted btcrelay contract
