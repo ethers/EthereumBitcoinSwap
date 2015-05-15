@@ -3,6 +3,8 @@
 
 
 # 1 ether, 0.26BTC
+
+# expected: 0
 -
   call:
     CreateTicket:
@@ -31,7 +33,8 @@
         - 38461538461
       wait: True
 
-
+# expected: 0
+# but workaround below in case it isn't yet
 -
   call:
     ttLastTid:
@@ -41,7 +44,7 @@
       fun_name: ttLastTid
       sig: ''
 
-# workaround for the prior tx to take effect
+# workaround for the prior transact to take effect
 -
   transact:
     ttLastTid:
@@ -70,6 +73,7 @@
       sig: ''
       wait: True
 
+# expected: 0
 -
   call:
     ttLastTid:
@@ -99,6 +103,9 @@
 #       sig: ''
 #       value: 50000000000000000
 
+
+
+# expected: 1.  Otherwise need to wait more (eg more transacts to ttLastTid)
 -
   call:
     testingOnlyReserveLatestTicket:
@@ -126,8 +133,8 @@
 
 
 
-# workaround for the prior tx to take effect
-
+# expected: 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+# but workaround below in case it isn't yet
 -
   call:
     ttClaimHash:
@@ -138,6 +145,7 @@
       sig: ''
       wait: True
 
+# workaround for the prior transact to take effect
 -
   transact:
     ttClaimHash:
@@ -157,6 +165,7 @@
       sig: ''
       wait: True
 
+# expected: 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
 -
   call:
     ttClaimHash:
@@ -169,7 +178,7 @@
 
 
 
-
+# expected: 2
 -
   call:
     testingOnlyClaimTicketLatestTicket:
@@ -185,6 +194,8 @@
         - 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
       wait: True
 
+
+# expected: balance of 0x587488c119f40666b4a0c807b0d7a1acfe3b6917 increases by 845400000000000000 wei
 -
   transact:
     testingOnlyClaimTicketLatestTicket:
