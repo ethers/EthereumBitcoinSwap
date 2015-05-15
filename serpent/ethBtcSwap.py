@@ -19,6 +19,13 @@ data trustedBtcRelay
 macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
+# TODO disable testingOnly methods
+def testingOnlyReserveLatestTicket(txHash):
+    return(self.reserveTicket(self.gTicketId, txHash))
+
+def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
+    return(self.claimTicket(self.gTicketId, txStr, txHash, txIndex, sibling, txBlockHash))
+
 
 # trustedRelayContract is the address of the trusted btcrelay contract
 def setTrustedBtcRelay(trustedRelayContract):

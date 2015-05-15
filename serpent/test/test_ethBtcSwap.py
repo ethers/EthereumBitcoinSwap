@@ -13,7 +13,7 @@ class TestEthBtcSwap(object):
     ETHER = 10 ** 18
 
     def setup_class(cls):
-        tester.gas_limit = int(2.2e6)
+        tester.gas_limit = int(2.4e6)  # 2.2e6 should be ok if testingOnly methods are commented out
         cls.s = tester.state()
         cls.c = cls.s.abi_contract(cls.CONTRACT)
         cls.snapshot = cls.s.snapshot()
