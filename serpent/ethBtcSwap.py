@@ -33,6 +33,9 @@ def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, 
 # def ttLastHasDeposit():
 #     return(m_ticketHasDeposit(LAST_TID))
 
+def ttClaimHash():
+    return(self.gTicket[LAST_TID]._claimTxHash)
+
 def ttLastTid():
     return(LAST_TID)
 
