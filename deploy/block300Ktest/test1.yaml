@@ -1,0 +1,32 @@
+- set:
+    EthBtcSwap: "0x5d756b5073bf9cd72e6f641b6f39f8b44ff5b944"
+
+
+# 1 ether, 0.26BTC
+-
+  transact:
+    CreateTicket:
+      gas: 500000
+      to: $EthBtcSwap
+      fun_name: createTicket
+      sig: iii
+      value: 1000000000000000000
+      data:
+        - 0x956bfc5575c0a7134c7effef268e51d887ba7015
+        - 1000000000000000000
+        - 38461538461
+      wait: True
+
+# deposit is 1 ether / 20
+-
+  transact:
+    ReserveTicket:
+      gas: 500000
+      to: $EthBtcSwap
+      fun_name: reserveTicket
+      sig: ii
+      value: 50000000000000000
+      data:
+        - $CreateTicket
+        - 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+      wait: True
