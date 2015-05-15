@@ -1,5 +1,5 @@
 - set:
-    EthBtcSwap: "0xf4eb647fcb3d180788db507be06ba7df4769c463"
+    EthBtcSwap: "0xe288246f0d30d65b7e163c919a3a1746d72bc2ca"
 
 
 # 1 ether, 0.26BTC
@@ -42,6 +42,15 @@
       sig: ''
 
 # workaround for the prior tx to take effect
+-
+  transact:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+      wait: True
 -
   transact:
     ttLastTid:
@@ -109,15 +118,17 @@
 
 
 # workaround for the prior tx to take effect
--
-  transact:
-    ttLastTid:
-      gas: 500000
-      gas_price: 10000000000000
-      to: $EthBtcSwap
-      fun_name: ttLastTid
-      sig: ''
-      wait: True
+# -
+#   transact:
+#     ttLastTid:
+#       gas: 500000
+#       gas_price: 10000000000000
+#       to: $EthBtcSwap
+#       fun_name: ttLastTid
+#       sig: ''
+#       wait: True
+
+
 
 
 -
@@ -127,7 +138,6 @@
       to: $EthBtcSwap
       fun_name: testingOnlyClaimTicketLatestTicket
       sig: siiai
-      value: 50000000000000000
       data:
         - "0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000"
         - 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
@@ -143,7 +153,6 @@
       to: $EthBtcSwap
       fun_name: testingOnlyClaimTicketLatestTicket
       sig: siiai
-      value: 50000000000000000
       data:
       - "0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000"
       - 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
