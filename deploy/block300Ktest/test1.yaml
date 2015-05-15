@@ -1,5 +1,5 @@
 - set:
-    EthBtcSwap: "0xe288246f0d30d65b7e163c919a3a1746d72bc2ca"
+    EthBtcSwap: "0x6d18ef2c61a67eddd315118f3702514a7ced9e2b"
 
 
 # 1 ether, 0.26BTC
@@ -42,6 +42,15 @@
       sig: ''
 
 # workaround for the prior tx to take effect
+-
+  transact:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+      wait: True
 -
   transact:
     ttLastTid:
@@ -118,16 +127,33 @@
 
 
 # workaround for the prior tx to take effect
-# -
-#   transact:
-#     ttLastTid:
-#       gas: 500000
-#       gas_price: 10000000000000
-#       to: $EthBtcSwap
-#       fun_name: ttLastTid
-#       sig: ''
-#       wait: True
-
+-
+  transact:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+      wait: True
+-
+  transact:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+      wait: True
+-
+  transact:
+    ttLastTid:
+      gas: 500000
+      gas_price: 10000000000000
+      to: $EthBtcSwap
+      fun_name: ttLastTid
+      sig: ''
+      wait: True
 
 
 
