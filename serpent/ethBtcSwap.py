@@ -20,11 +20,20 @@ macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
 # TODO disable testingOnly methods
+macro LAST_TID: self.gTicketId - 1
 def testingOnlyReserveLatestTicket(txHash):
-    return(self.reserveTicket(self.gTicketId-1, txHash))
+    return(self.reserveTicket(LAST_TID, txHash))
 
 def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
-    return(self.claimTicket(self.gTicketId-1, txStr, txHash, txIndex, sibling, txBlockHash))
+    return(self.claimTicket(LAST_TID, txStr, txHash, txIndex, sibling, txBlockHash))
+
+def ttLastAvail():
+    return(m_ticketAvailable(LAST_TID))
+
+def ttLastHasDeposit():
+    return(m_ticketHasDeposit(LAST_TID))
+
+
 
 
 # trustedRelayContract is the address of the trusted btcrelay contract
