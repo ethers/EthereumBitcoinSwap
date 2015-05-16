@@ -45,6 +45,9 @@ function lookup() {
   $('#btcAddr').text(btcAddr);
   $('#numWei').text(numWei);
   $('#weiPerSatoshi').text(weiPerSatoshi);
+
+  var depositRequired = web3.toBigNumber(numWei).div(20).toString(10);
+  $('#depositRequired').text(depositRequired);
 }
 
 function callContract() {
@@ -154,7 +157,7 @@ $(function() {
       <h5>Ether amount: <strong id="numWei"></strong></h5>
       <h5>Wei per satoshi: <strong id="weiPerSatoshi"></strong></h5>
       <br>
-      <h5>Deposit required: <strong id="latestBlockHash"></strong></h5>
+      <h5>Deposit required: <strong id="depositRequired"></strong></h5>
       <h5>Fee percentage offered: <strong id="encodedFee"></strong></h5>
       <h5>Computed fee: <strong id="computedFee"></strong></h5>
       <br>
