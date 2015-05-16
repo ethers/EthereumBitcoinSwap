@@ -11,7 +11,7 @@ extern relayContract: [verifyTx:iiai:i]
 
 data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _claimTxHash)
 
-data gTicketId  # first valid gTicketId is 0.  latest ticket has id gTicketId-1
+data gTicketId  # last ticket id.  first valid id is 1
 
 data trustedBtcRelay
 
@@ -20,7 +20,7 @@ macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
 # TODO disable testingOnly methods
-macro LAST_TID: self.gTicketId - 1
+macro LAST_TID: self.gTicketId
 def testingOnlyReserveLatestTicket(txHash):
     return(self.reserveTicket(value=msg.value, LAST_TID, txHash))
 
@@ -54,20 +54,21 @@ def setTrustedBtcRelay(trustedRelayContract):
 def createTicket(btcAddr, numWei, weiPerSatoshi):
     if msg.value < numWei || numWei == 0:
         send(msg.sender, msg.value)
-        return(-1)
+        return(0)
 
-    # use var for gTicketId ?
+    self.gTicketId += 1
+    # TODO use var for gTicketId ?
     self.gTicket[self.gTicketId]._btcAddr = btcAddr
     self.gTicket[self.gTicketId]._numWei = numWei
     self.gTicket[self.gTicketId]._weiPerSatoshi = weiPerSatoshi
-    self.gTicketId += 1
-    # claimData left as zeros
+    self.gTicket[self.gTicketId]._claimExpiry = 1 # allow to be reserved; see m_ticketAvailable()
 
-    return(self.gTicketId - 1)
+    return(self.gTicketId)
 
 
 def reserveTicket(ticketId, txHash):
-    if (m_ticketAvailable(ticketId) && m_ticketHasDeposit(ticketId)):
+    # required deposit is 5% numWei
+    if (m_ticketAvailable(ticketId) && (msg.value >= self.gTicket[ticketId]._numWei / 20)):
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
@@ -136,16 +137,12 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
 
 #
-#  macros, they assume that ticketId0 has valid data instead of zeros
-#  (otherwise they will return wrong values when ticketId 0 is passed in)
+#  macros
 #
 
-# required deposit is 5% numWei
-macro m_ticketHasDeposit($ticketId):
-    msg.value >= self.gTicket[$ticketId]._numWei / 20
-
 macro m_ticketAvailable($ticketId):
-    block.timestamp > self.gTicket[$ticketId]._claimExpiry
+    with $claimExpiry = self.gTicket[$ticketId]._claimExpiry:
+        $claimExpiry > 0 && block.timestamp > $claimExpiry  # claimExpiry 0 means ticket doesn't exist
 
 macro m_deleteTicket($ticketId):
     self.gTicket[$ticketId]._btcAddr = 0

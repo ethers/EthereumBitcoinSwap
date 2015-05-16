@@ -45,7 +45,7 @@ class TestEthBtcSwap(object):
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert ticketId == 0
+        assert ticketId == 1
 
         claimer = tester.k1
         addrClaimer = tester.a1
@@ -137,7 +137,7 @@ class TestEthBtcSwap(object):
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert ticketId == 0
+        assert ticketId == 1
 
         claimer = tester.k1
         addrClaimer = tester.a1
@@ -206,7 +206,7 @@ class TestEthBtcSwap(object):
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert ticketId == 0
+        assert ticketId == 1
 
         claimer = tester.k1
         addrClaimer = tester.a1
@@ -262,6 +262,10 @@ class TestEthBtcSwap(object):
         eventArr.pop()
 
 
+    def testReserveInvalidTicket(self):
+        assert self.c.reserveTicket(2, 0xbeef) == 0
+
+
     def testCreateTicket(self):
         btcAddr = 9
         numWei = self.ETHER
@@ -269,77 +273,77 @@ class TestEthBtcSwap(object):
 
         # ticket missing value
         preBal = self.coinbaseBalance()
-        assert -1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
+        assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
-        assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert numWei == self.s.block.get_balance(self.c.address)
 
-        assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert 2*numWei == self.s.block.get_balance(self.c.address)
 
         # ticket insufficient value sent, value should be refunded
         preBal = self.coinbaseBalance()
         contractBalance = self.s.block.get_balance(self.c.address)
-        assert -1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei - 1)
+        assert 0 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei - 1)
         assert self.s.block.get_balance(self.c.address) == contractBalance
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
 
-        txHash = 7
+        txHash = 0xbeef
         depositRequired = numWei / 20
 
         # no deposit
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(0, txHash)
         assert 0 == self.c.reserveTicket(1, txHash)
+        assert 0 == self.c.reserveTicket(2, txHash)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # deposit < required
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired - 1)
+        assert 0 == self.c.reserveTicket(2, txHash, value=depositRequired - 1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # deposit == required
         preBal = self.coinbaseBalance()
-        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        assert 1 == self.c.reserveTicket(2, txHash, value=depositRequired)
         postBal = self.coinbaseBalance()
         assert postBal == preBal - depositRequired
 
         # deposit > required ok since using unclaimed ticketId0
         preBal = self.coinbaseBalance()
-        assert 1 == self.c.reserveTicket(0, txHash, value=depositRequired + 1)
+        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired + 1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal - depositRequired - 1
 
         # deposit > required, but ticketId1 still reserved
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired + 1)
+        assert 0 == self.c.reserveTicket(2, txHash, value=depositRequired + 1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # deposit == required and previous ticketId1 reservation has expired
         preBal = self.coinbaseBalance()
         self.s.block.timestamp += 3600 * 5
-        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        assert 1 == self.c.reserveTicket(2, txHash, value=depositRequired)
         postBal = self.coinbaseBalance()
         assert postBal == preBal - depositRequired
 
         # close but not yet expired
         self.s.block.timestamp += 3600 * 4
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        assert 0 == self.c.reserveTicket(2, txHash, value=depositRequired)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # expired reservation can now be reserved
         self.s.block.timestamp += 100
         preBal = self.coinbaseBalance()
-        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired)
+        assert 1 == self.c.reserveTicket(2, txHash, value=depositRequired)
         postBal = self.coinbaseBalance()
         assert postBal == preBal - depositRequired
 
