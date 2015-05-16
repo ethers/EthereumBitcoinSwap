@@ -262,6 +262,22 @@ class TestEthBtcSwap(object):
         eventArr.pop()
 
 
+    def testClaimInvalidTicket(self):
+        txStr = '1'
+        txHash = 0xbeef
+        txIndex = 1
+        sibling = []
+        txBlockHash = 0xbeef2
+        assert self.c.claimTicket(-1, txStr, txHash, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(0, txStr, txHash, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(1, txStr, txHash, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(1000, txStr, txHash, txIndex, sibling, txBlockHash) == 0
+
+        assert self.c.claimTicket(0, txStr, 0, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(0, txStr, 1, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(1, txStr, 1, txIndex, sibling, txBlockHash) == 0
+
+
     def testReserveInvalidTicket(self):
         assert self.c.reserveTicket(-1, 0xbeef) == 0
         assert self.c.reserveTicket(0, 0xbeef) == 0
