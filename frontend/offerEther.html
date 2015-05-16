@@ -118,20 +118,20 @@ $(function() {
 
     <p class="lead">Ticket contract at <span id="ticketContractAddr"></span></p>
 
-
-    <form>
-      <div class="form-group">
+    <form class="form">
+      <fieldset>
         <label for="btcAddr">Your Bitcoin address</label>
-        <input type="text" class="form-control" id="btcAddr" size="30" maxlength="30"></input>
+        <input type="text" class="form-control" id="btcAddr"></input>
 
         <label for="numWei">Number of ethers</label>
-        <input type="text" class="form-control" id="numWei" size="30" maxlength="30"></input>
+        <input type="text" class="form-control" id="numWei"></input>
 
         <label for="weiPerSatoshi">Wei per Satoshi</label>
-        <input type="text" class="form-control" id="weiPerSatoshi" size="30" maxlength="30"></input>
-      </div>
-      <br><br>
-      <button type="button" class="btn btn-default" onclick="callContract();">Submit offer</button>
+        <input type="text" class="form-control" id="weiPerSatoshi"></input>
+
+        <br>
+        <button type="submit" class="btn" onclick="callContract();">Submit offer</button>
+      </fieldset>
     </form>
 
 

@@ -10,6 +10,6 @@
   margin: 0 auto;
 }
 
-#mProof {
-  font-size: smaller;
+.form {
+  width: 500px;
 }
