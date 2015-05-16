@@ -37,6 +37,16 @@ else {
 var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
 
 
+function lookup() {
+  var btcAddr = '61cf5af7bb84348df3fd695672e53c7d5b3f3db9';
+  var numWei = web3.toWei(1, 'ether');
+  var weiPerSatoshi = '38461538461';
+
+  $('#btcAddr').text(btcAddr);
+  $('#numWei').text(numWei);
+  $('#weiPerSatoshi').text(weiPerSatoshi);
+}
+
 function callContract() {
   // TODO ticket Abi
   console.log('@@@ in callContract')
@@ -131,12 +141,24 @@ $(function() {
         <input type="text" class="form-control" id="weiDeposit"></input>
 
         <br>
-        <button type="button" class="btn btn-default" onclick="callContract();">Submit offer</button>
+        <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
+        <button type="button" class="btn" onclick="callContract();">Submit offer</button>
       </fieldset>
     </form>
 
 
     <div id="result"></div>
+
+    <div class="jumbotron">
+      <h5>Bitcoin Address: <strong id="btcAddr"></strong></h5>
+      <h5>Ether amount: <strong id="numWei"></strong></h5>
+      <h5>Wei per satoshi: <strong id="weiPerSatoshi"></strong></h5>
+      <br>
+      <h5>Deposit required: <strong id="latestBlockHash"></strong></h5>
+      <h5>Fee percentage offered: <strong id="encodedFee"></strong></h5>
+      <h5>Computed fee: <strong id="computedFee"></strong></h5>
+      <br>
+    </div>
 
     <div class="footer-logo">
       <img src="./images/ETH_DEV_LOGO_LARGE.svg"/>
