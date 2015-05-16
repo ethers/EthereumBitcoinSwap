@@ -40,7 +40,7 @@ var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
 function lookup() {
   var btcAddr = '61cf5af7bb84348df3fd695672e53c7d5b3f3db9';
   var numWei = web3.toWei(1, 'ether');
-  var weiPerSatoshi = '38461538461';
+  var weiPerSatoshi = '38461538461.53846';
 
   $('#btcAddr').text(btcAddr);
   $('#numWei').text(numWei);
@@ -57,7 +57,19 @@ function lookup() {
   $.getJSON(urlJsonTx, function(data) {
     console.log('@@@ rawtx data: ', data)
 
-    // TODO check # outputs
+    if (!data || !data.out || data.out.length < 2) {
+      console.log('@@@ err btc tx not enough outputs')
+      return;
+    }
+
+    var bnSatoshi = web3.toBigNumber(data.out[0].value)
+    $('#satoshiPayment').text(bnSatoshi.toString(10));
+
+    var weiBuyable = new BigNumber(weiPerSatoshi).mul(bnSatoshi).toString(10);
+    $('#weiBuyable').text(weiBuyable);
+
+
+
     var bnEncodedFee = web3.toBigNumber(data.out[1].value).mod(10000);
     $('#encodedFee').text(bnEncodedFee.div(100).toString(10));
 
@@ -153,7 +165,7 @@ $(function() {
         <label for="ticketId">Ticket ID</label>
         <input type="text" class="form-control" id="ticketId"></input>
 
-        <label for="txHash">Transaction Hash</label>
+        <label for="txHash">Bitcoin Transaction Hash</label>
         <input type="text" class="form-control" id="txHash"></input>
 
         <label for="weiDeposit">Deposit amount</label>
@@ -161,7 +173,7 @@ $(function() {
 
         <br>
         <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
-        <button type="button" class="btn" onclick="callContract();">Submit offer</button>
+        <button type="button" class="btn" onclick="callContract();">Reserve Ticket</button>
       </fieldset>
     </form>
 
@@ -169,10 +181,17 @@ $(function() {
     <div id="result"></div>
 
     <div class="jumbotron">
+      <h3>Ticket Details</h3>
       <h5>Bitcoin Address: <strong id="btcAddr"></strong></h5>
       <h5>Ether amount: <strong id="numWei"></strong></h5>
       <h5>Wei per satoshi: <strong id="weiPerSatoshi"></strong></h5>
       <br>
+      <h3>Does Bitcoin transaction meet requirements?</h3>
+      <h5>Number of bitcoins...: <strong id="satoshiPayment"></strong></h5>
+      <h5>... sent to address: <strong id="satoshiAddr"></strong></h5>
+      <h5>Ethers that will be purchased: <strong id="weiBuyable"></strong></h5>
+      <br>
+      <h3>Consider these before Reserving Ticket</h3>
       <h5>Deposit required: <strong id="depositRequired"></strong></h5>
       <h5>Fee percentage offered: <strong id="encodedFee"></strong></h5>
       <h5>Computed fee: <strong id="computedFee"></strong></h5>
