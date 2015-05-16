@@ -234,6 +234,8 @@ class TestEthBtcSwap(object):
         assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
         assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
 
+        contractBalance = self.s.block.get_balance(self.c.address)
+
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
@@ -262,8 +264,12 @@ class TestEthBtcSwap(object):
         buyerEthBalance = self.s.block.get_balance(ethAddrBin)
 
         assert buyerEthBalance == 0
+        assert self.s.block.get_balance(self.c.address) == contractBalance
 
-        # TODO assert event?
+        assert eventArr == [{'_event_type': 'claimFail',
+            'failCode': 99999999
+            }]
+        eventArr.pop()
 
 
 
