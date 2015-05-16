@@ -59,17 +59,19 @@ function callContract() {
   console.log('@@@@ contract: ', contract)
 
 
-  var btcAddr = $('#btcAddr').val();
+  var btcAddr = '0x' + $('#btcAddr').val();
   var numWei = $('#numWei').val();
   var weiPerSatoshi = $('#weiPerSatoshi').val();
 
+
+  // TODO confirmation to deposit ether, from account, gasprice
+  var objParam = {value: numWei, from:gFromAccount, gas: 100000};
 
   if (callOnly) {
     console.log('@@@@ callOnly')
     var startTime = Date.now();
 
 
-    var objParam = {from:gFromAccount, gas: 3000000};
     var res = contract.createTicket.call(btcAddr, numWei, weiPerSatoshi, objParam);
 
 
@@ -82,7 +84,6 @@ function callContract() {
 
 
   // var startTime = Date.now();
-  // var objParam = {from:gFromAccount, gas: 3000000-10, gasPrice: 0};
   //
   // contract.createTicket.sendTransaction(btcAddr, numWei, weiPerSatoshi, objParam);
   // document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
@@ -130,7 +131,7 @@ $(function() {
         <input type="text" class="form-control" id="weiPerSatoshi"></input>
 
         <br>
-        <button type="submit" class="btn" onclick="callContract();">Submit offer</button>
+        <button type="button" class="btn btn-default" onclick="callContract();">Submit offer</button>
       </fieldset>
     </form>
 
