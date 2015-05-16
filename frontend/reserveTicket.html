@@ -46,8 +46,24 @@ function lookup() {
   $('#numWei').text(numWei);
   $('#weiPerSatoshi').text(weiPerSatoshi);
 
-  var depositRequired = web3.toBigNumber(numWei).div(20).toString(10);
+  var bnWei = web3.toBigNumber(numWei);
+
+  var depositRequired = bnWei.div(20).toString(10);
   $('#depositRequired').text(depositRequired);
+
+
+  var txHash = $('#txHash').val();
+  var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
+  $.getJSON(urlJsonTx, function(data) {
+    console.log('@@@ rawtx data: ', data)
+
+    // TODO check # outputs
+    var bnEncodedFee = web3.toBigNumber(data.out[1].value).mod(10000);
+    $('#encodedFee').text(bnEncodedFee.div(100).toString(10));
+
+    var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
+    $('#computedFee').text(bnComputedFee.toString(10));
+  });
 }
 
 function callContract() {
