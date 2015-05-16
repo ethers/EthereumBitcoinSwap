@@ -81,9 +81,14 @@ def reserveTicket(ticketId, txHash):
 event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
 event claimFail(failCode)
 event oned(data)
-macro CLAIM_FAIL_TX_HASH: 999001
-macro CLAIM_FAIL_FALLTHRU: 999999
+macro CLAIM_FAIL_CLAIMER:  99990100
+macro CLAIM_FAIL_TX_HASH:  99990200
+macro CLAIM_FAIL_FALLTHRU: 99999999
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
+    if (msg.sender != self.gTicket[ticketId]._claimer):
+        log(type=claimFail, CLAIM_FAIL_CLAIMER)
+        return(0)
+
     if (txHash != self.gTicket[ticketId]._claimTxHash):
         log(type=claimFail, CLAIM_FAIL_TX_HASH)
         return(0)
