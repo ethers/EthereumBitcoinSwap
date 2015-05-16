@@ -263,7 +263,10 @@ class TestEthBtcSwap(object):
 
 
     def testReserveInvalidTicket(self):
-        assert self.c.reserveTicket(2, 0xbeef) == 0
+        assert self.c.reserveTicket(-1, 0xbeef) == 0
+        assert self.c.reserveTicket(0, 0xbeef) == 0
+        assert self.c.reserveTicket(1, 0xbeef) == 0
+        assert self.c.reserveTicket(1000, 0xbeef) == 0
 
 
     def testCreateTicket(self):
