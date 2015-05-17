@@ -29,7 +29,7 @@ if (gBtcTestnet) {
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
 }
 else {
-  gTicketContractAddr = '0x26c95ad29af97db07cfa8087bebf804d6411c1a0';
+  gTicketContractAddr = '0x6477cd0412df260de1010a76f4c5144ff77fec99';
 
   gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
 }
@@ -112,7 +112,7 @@ function callContract() {
 
 
   var callOnly;
-  callOnly = true;  // if commented, it will do sendTransaction
+  // callOnly = true;  // if commented, it will do sendTransaction
 
 
   // TODO don't forget to update the ABI
@@ -151,8 +151,17 @@ function callContract() {
 
 
   // var startTime = Date.now();
-  //
-  // contract.reserveTicket.sendTransaction(ticketId, txHash, objParam);
+
+  contract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, result) {
+    if (err) {
+      console.log('@@@ err: ', err)
+      return;
+    }
+
+    // result is a txhash
+    console.log('@@@ reserveTicket result: ', result)
+
+  });
   // document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
 
