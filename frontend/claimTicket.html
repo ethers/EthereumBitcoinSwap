@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Ethereum: get ether with bitcoin</title>
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/dapp.css">
+  <script src="./js/jquery-2.1.3.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+
+  <script src="./js/ethBtcSwapAbi.js"></script>
+
+  <script src="./js/bignumber.js"></script>
+  <script src="./js/web3.min.js"></script>
+
+
+  <script src="./js/btcproof.js"></script>
+
+<script type="text/javascript">
+var web3 = require('web3');
+    web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+
+var btcproof = require('btcproof');
+
+var gTicketContractAddr;
+var gBtcTestnet;
+var gOurBtcAddr;
+
+
+// gBtcTestnet = true;
+if (gBtcTestnet) {
+  gTicketContractAddr = '';
+
+  gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
+}
+else {
+  gTicketContractAddr = '';
+
+  gOurBtcAddr = 'TODO'  // tx1 of block300K
+}
+
+var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
+
+
+var gMerkleProof;
+var gBlockHashOfTx;
+var gRawTx;
+function callContract() {
+  console.log('@@@ in callContract')
+  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
+  console.log('@@@ gFromAccount: ', gFromAccount)
+
+
+  var verifyTx;
+  // verifyTx = true;  // if commented, it will call relayTx
+
+
+  // TODO don't forget to update the ABI
+  var bethAddress = gTicketContractAddr;
+  var abiToUse;
+  abiToUse = externalEthBtcSwapAbi;
+
+
+  var TicketContract = web3.eth.contract(abiToUse);
+  var contract = TicketContract.at(bethAddress);
+  console.log('@@@@ contract: ', contract)
+
+  // block300K tx1
+  // var tx1300K = '7301b595279ece985f0c415e420e425451fcf7f684fcce087ba14d10ffec1121';
+
+  var transHex = $('#transHex').val();
+  // TODO check if transHex is prefixed with 0x
+  var txHash = new BigNumber('0x' + transHex);
+
+  var txBlockHash = new BigNumber('0x'+gBlockHashOfTx);
+
+  // web3.js wants 0x prepended
+  var merkleSibling = gMerkleProof.sibling.map(function(sib) {
+    return '0x' + sib;
+    // return new BigNumber('0x' + sib);
+  });
+
+  if (verifyTx) {
+    console.log('@@@@ going to call() verifyTx')
+    var startTime = Date.now();
+
+    // OLD ways
+    // var res = contract.call({from:gFromAccount, gas: 3000000}).computeMerkle(txHash, proofLen, merkleSibling, merklePath);
+    // var res = contract.call({from:gFromAccount, gas: 3000000}).verifyTx(txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash);
+
+    var objParam = {from:gFromAccount, gas: 3000000};
+    var res = contract.verifyTx.call(txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam);
+
+
+    var endTime = Date.now();
+    var durationSec = (endTime - startTime) / 1000;
+    console.log('@@@@ verifyTx res: ', res, ' duration: ', durationSec)
+    document.getElementById('result').innerText = res.toString(10) + "    " + durationSec+ "secs";
+    return;
+  }
+
+
+
+  var txHex = gRawTx;
+  // var words = CryptoJS.enc.Hex.parse(txHex);
+  // var txBinaryStr = CryptoJS.enc.Latin1.stringify(words);
+
+  var exchangeContractAddr = new BigNumber(gTicketContractAddr);
+
+  var startTime = Date.now();
+  var objParam = {from:gFromAccount, gas: 3000000-10, gasPrice: 0};
+
+  // OLD way
+  // contract.sendTransaction(objParam).relayTx(txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, exchangeContractAddr);
+
+  contract.relayTx.sendTransaction(txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, exchangeContractAddr, objParam);
+  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+}
+
+
+function getTxInfo() {
+  var txid = $('#transHex').val();
+  console.log('@@@ txid: ', txid);
+
+  var urlJsonTx;
+  if (gBtcTestnet) {
+      urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/" + txid;
+  }
+  else {
+      urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/" + txid;
+  }
+  $.getJSON(urlJsonTx, function(data) {
+      console.log('@@@ data: ', data)
+
+      gRawTx = data.data.tx.hex;
+      $('#txHexText').val(gRawTx);
+
+      var blockNum = data.data.tx.blockhash; // blockr does not easily provide block height
+      $('#txBlockNum').text('n/a for blockr.io');
+      // $('#txBlockNum').text(blockNum);
+
+      var blockInfoUrl;
+      if (gBtcTestnet) {
+          blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
+      }
+      else {
+          blockInfoUrl = "http://btc.blockr.io/api/v1/block/raw/"+blockNum;
+      }
+      $.getJSON(blockInfoUrl, function(res) {
+          console.log('@@@ res: ', res)
+
+          gBlockHashOfTx = res.data.hash;
+          $('#txBlockHash').text(gBlockHashOfTx)
+
+          var txIndex;
+          for (var key in res.data.tx) {
+            if (res.data.tx[key] == txid) {
+              txIndex = key;
+              break;
+            }
+          }
+
+          // var txIndex = Object.keys(res.data.tx).indexOf(txid);
+          console.log('@@@@ txIndex: ', txIndex)
+
+          gMerkleProof = btcproof.getProof(res.data.tx, txIndex);
+          console.log('@@@ mp: ', gMerkleProof)
+          $('#mProof').val(JSON.stringify(gMerkleProof));
+      })
+
+  })
+}
+
+
+// fff2525b8931402dd09222c50775608f75787bd2b87e56995a7bdd30f79702c4
+function bci_getTxInfo() {
+  var txid = $('#transHex').val();
+  console.log('@@@ txid: ', txid);
+
+  var urlHexTx = "https://blockchain.info/rawtx/"+txid+"?format=hex&cors=true";
+  $.ajax(urlHexTx).done(function(data) {
+      // console.log('@@@ hex: ', data)
+      gRawTx = data;
+      $('#txHexText').val(gRawTx);
+  });
+
+
+  var urlJsonTx = "https://blockchain.info/rawtx/"+txid+"?format=json&cors=true";
+  $.getJSON(urlJsonTx, function(data) {
+      console.log('@@@ bd: ', data)
+      var blockNum = data.block_height;
+      $('#txBlockNum').text(blockNum);
+
+      var blockInfoUrl = "http://btc.blockr.io/api/v1/block/raw/"+blockNum;
+      $.getJSON(blockInfoUrl, function(res) {
+          console.log('@@@ res: ', res)
+
+          gBlockHashOfTx = res.data.hash;
+          $('#txBlockHash').text(gBlockHashOfTx)
+
+          var txIndex;
+          for (var key in res.data.tx) {
+            if (res.data.tx[key] == txid) {
+              txIndex = key;
+              break;
+            }
+          }
+
+          // var txIndex = Object.keys(res.data.tx).indexOf(txid);
+          console.log('@@@@ txIndex: ', txIndex)
+
+          gMerkleProof = btcproof.getProof(res.data.tx, txIndex);
+          console.log('@@@ mp: ', gMerkleProof)
+          $('#mProof').val(JSON.stringify(gMerkleProof));
+      })
+
+  })
+}
+
+$(function() {
+  var ethBalance = web3.fromWei(web3.eth.getBalance(gTicketContractAddr), 'ether');
+  $('#exchBal').text(ethBalance);
+
+  if (!gBtcTestnet) {
+    // tx1 300K
+    $('#transHex').val('141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566');
+  }
+
+  $('#btn-get-tx').click(getTxInfo);
+
+  $('#exchAddr').text(gTicketContractAddr);
+  $('#ourBtcAddr').text(gOurBtcAddr)
+});
+
+
+
+</script>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <img src="./images/ethereum-logo-small.png"/>
+    </div>
+
+    <h2>Get ether with bitcoin
+      <small>&nbsp;&nbsp;&nbsp; BITCOIN TESTNET 13 wei per 1.7mBTC</small>
+      <!-- <small>&nbsp;&nbsp;&nbsp; 1000 ether per 1BTC</small> -->
+    </h2>
+
+    <p class="lead">Contract at <span id="exchAddr"></span> has
+      <span id="exchBal"></span> ether.
+      <br>
+      To get ether: <a class="btn btn-primary btn-default" href="https://github.com/ethers/btcToEther" role="button" target="_blank">Simple</a>&nbsp;&nbsp;&nbsp;
+      <button type="button" class="btn btn-xs" data-toggle="modal" data-target="#myModal">
+        Advanced alternative
+      </button>
+
+    <p>After running finalize, <strong>Lookup</strong> the hash of your
+      Bitcoin transaction here, and then click
+      <strong>Claim Ether</strong> below.
+    </p>
+
+    <form class="form-inline">
+      <div class="form-group">
+        <label for="transHex">Transaction Hash</label>
+        <input type="text" class="form-control" id="transHex" size="64" maxlength="64"></input>
+      </div>
+      <button type="button" class="btn btn-default" id="btn-get-tx">Lookup</button>
+    </form>
+
+    <hr>
+
+    <!-- <form>
+      <div class="form-group">
+        <label for="blockNum">Choose block number</label>
+        <input type="text" class="form-control" id="blockNum"></input>
+        <button type="button" class="btn btn-default" id="btn-get-tx">Submit</button>
+      </div>
+    </form> -->
+
+    <form>
+      <div class="form-group">
+        <label for="txHexText">Raw Transaction</label>
+        <textarea readonly class="form-control" name="textarea" id="txHexText" rows="6" cols="50"></textarea>
+
+        <label for="mProof">Merkle Proof</label>
+        <textarea readonly class="form-control" name="textarea" id="mProof" rows="6" cols="50"></textarea>
+
+        <label class="col-md-1 control-label">Block Number</label>
+        <div class="col-md-1">
+          <p class="form-control-static" id="txBlockNum">0</p>
+        </div>
+
+        <label class="col-md-1 control-label">Block Hash</label>
+        <div class="col-md-9">
+          <p class="form-control-static" id="txBlockHash">0</p>
+        </div>
+      </div>
+      <br><br>
+      <button type="button" class="btn btn-default" onclick="callContract();">Claim Ether</button>
+    </form>
+
+
+    <div id="result"></div>
+
+    <!-- <div class="jumbotron">
+      <h5>Coinbase Address: <strong id="coinbase"></strong></h5>
+      <h5>Balance: <strong id="balance"></strong></h5>
+      <h5>Latest Block Number: <strong id="latestBlock"></strong></h5>
+      <h5>Latest Block Timestamp: <strong id="latestBlockTimestamp"></strong></h5>
+      <h5>Latest Block Hash: <strong id="latestBlockHash"></strong></h5>
+      <br>
+    </div> -->
+
+    <div class="footer-logo">
+      <img src="./images/ETH_DEV_LOGO_LARGE.svg"/>
+    </div>
+  </div>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Advanced manual instructions</h4>
+        </div>
+        <div class="modal-body">
+          Ethereum is not responsible for any loss of Bitcoins: you are on your own for trying advanced methods.
+          You are recommended to try the Simple method first and understand the Bitcoin transaction it creates.
+          If you want to experiment manually, try with small amounts first, and
+          to get ether, submit 1 Bitcoin transaction with 2 outputs:</p>
+          <ul>
+            <li>1st sending BTC to <strong id="ourBtcAddr"></strong></li>
+            <li>2nd sending 0.0001 BTC to <strong>your</strong> Ethereum Address</li>
+          </ul>
+          <p>After sending the BTC, <strong>Lookup</strong> the hash of your
+            Bitcoin transaction here, and then click
+            <strong>Claim Ether</strong> below.
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
