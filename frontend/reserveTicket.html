@@ -42,6 +42,7 @@ function lookup() {
   var numWei = web3.toWei(1, 'ether');
   var weiPerSatoshi = '38461538461';
 
+  // TODO base58check
   $('#btcAddr').text(btcAddr);
   $('#numWei').text(numWei);
   $('#weiPerSatoshi').text(weiPerSatoshi);
@@ -65,7 +66,7 @@ function lookup() {
     var bnSatoshi = web3.toBigNumber(data.out[0].value)
     $('#satoshiPayment').text(bnSatoshi.toString(10));
 
-    // TODO addresses
+    $('#satoshiAddr').text(data.out[0].addr);
 
     // TODO check addr slice
     var tx1Script = data.out[1].script;
@@ -81,18 +82,15 @@ function lookup() {
     $('#etherAddr').text(etherAddr);
 
     var bnWeiBuyable = new BigNumber(weiPerSatoshi).mul(bnSatoshi);
-    $('#weiBuyable').text(bnWeiBuyable.toString(10));
+    // $('#weiBuyable').text(bnWeiBuyable.toString(10));
 
     var txQuality;
     var bnExtraWei = bnWeiBuyable.sub(bnWei);
     if (bnExtraWei.lt(0)) {
-      txQuality = 'BAD.  Transaction does not send enough Bitcoin.'
-    }
-    else if (bnExtraWei.gt(0)) {
-      txQuality = 'OK.'
+      txQuality = 'NO, transaction does not send enough bitcoin.'
     }
     else {
-      txQuality = 'Perfect.  Exact number of ether will be transferred.'
+      txQuality = 'YES, transaction can claim the ethers in the ticket.'
     }
     $('#txQuality').text(txQuality);
 
@@ -218,7 +216,7 @@ $(function() {
       <h5>Number of bitcoins...: <strong id="satoshiPayment"></strong></h5>
       <h5>... sent to address: <strong id="satoshiAddr"></strong></h5>
       <h5>Ether address: <strong id="etherAddr"></strong></h5>
-      <h5>Ethers that will be transferred: <strong id="weiBuyable"></strong></h5>
+      <!-- <h5>Ethers that will be transferred: <strong id="weiBuyable"></strong></h5> -->
       <h5><strong id="txQuality"></strong></h5>
       <br>
       <h3>Considerations for ticket Claimer</h3>
