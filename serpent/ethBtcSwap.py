@@ -85,6 +85,9 @@ macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
 macro CLAIM_FAIL_FALLTHRU: 99999999
+
+# a ticket can only be claimed once, and thus the Bitcoin tx should send enough
+# bitcoins so that all the ether can be claimed
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (msg.sender != self.gTicket[ticketId]._claimer):
         log(type=claimFail, CLAIM_FAIL_CLAIMER)
@@ -105,7 +108,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if weiBuyable < self.gTicket[ticketId]._numWei:
         log(type=claimFail, CLAIM_FAIL_INSUFFICIENT_SATOSHI)
         return(0)
-
+    weiBuyable = self.gTicket[ticketId]._numWei
 
     indexScriptOne = outputData[1]
 
@@ -126,12 +129,12 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         ethAddr = getEthAddr(indexScriptTwo, txStr, 20, 6)
 
         encodedFee = (satoshiIn2ndOutput % 10000)  # encodedFee of 1234 means 12.34%
-        feeToClaimer = self.gTicket[ticketId]._numWei * encodedFee / 10000
+        feeToClaimer = weiBuyable * encodedFee / 10000
 
-        weiToClaimer = feeToClaimer + self.gTicket[ticketId]._numWei / 20 # fee + refund of deposit
+        weiToClaimer = feeToClaimer + weiBuyable / 20 # fee + refund of deposit
 
         res1 = send(msg.sender, weiToClaimer)
-        res2 = send(ethAddr, self.gTicket[ticketId]._numWei - feeToClaimer)
+        res2 = send(ethAddr, weiBuyable - feeToClaimer)
 
         m_deleteTicket(ticketId)
 
