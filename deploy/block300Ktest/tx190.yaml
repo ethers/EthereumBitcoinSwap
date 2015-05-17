@@ -1,5 +1,5 @@
 - set:
-    EthBtcSwap: "0x26c95ad29af97db07cfa8087bebf804d6411c1a0"
+    EthBtcSwap: "0x6477cd0412df260de1010a76f4c5144ff77fec99"
 
 
 # tx[190] of block 300k
@@ -31,7 +31,7 @@
       data:
         - 0x956bfc5575c0a7134c7effef268e51d887ba7015
         - 1000000000000000000
-        - 38461538461
+        - 38461538462
       wait: True
 
 -
@@ -45,7 +45,7 @@
       data:
         - 0x956bfc5575c0a7134c7effef268e51d887ba7015
         - 1000000000000000000
-        - 38461538461
+        - 38461538462
       wait: True
 
 # expected: 0
