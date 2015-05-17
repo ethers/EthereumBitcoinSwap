@@ -50,8 +50,8 @@ function callContract() {
   console.log('@@@ gFromAccount: ', gFromAccount)
 
 
-  var verifyTx;
-  // verifyTx = true;  // if commented, it will call relayTx
+  var callOnly;
+  callOnly = true;  // if commented, it will call sendTransaction
 
 
   // TODO don't forget to update the ABI
@@ -64,8 +64,9 @@ function callContract() {
   var contract = TicketContract.at(bethAddress);
   console.log('@@@@ contract: ', contract)
 
-  // block300K tx1
-  // var tx1300K = '7301b595279ece985f0c415e420e425451fcf7f684fcce087ba14d10ffec1121';
+
+  var ticketId = $('#ticketId').val();
+  var txHex = gRawTx;
 
   var transHex = $('#transHex').val();
   // TODO check if transHex is prefixed with 0x
@@ -79,16 +80,13 @@ function callContract() {
     // return new BigNumber('0x' + sib);
   });
 
-  if (verifyTx) {
-    console.log('@@@@ going to call() verifyTx')
+
+  var objParam = {from:gFromAccount, gas: 3000000};
+  if (callOnly) {
+    console.log('@@@@ callOnly')
     var startTime = Date.now();
 
-    // OLD ways
-    // var res = contract.call({from:gFromAccount, gas: 3000000}).computeMerkle(txHash, proofLen, merkleSibling, merklePath);
-    // var res = contract.call({from:gFromAccount, gas: 3000000}).verifyTx(txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash);
-
-    var objParam = {from:gFromAccount, gas: 3000000};
-    var res = contract.verifyTx.call(txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam);
+    var res = contract.claimTicket.call(ticketId, txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam);
 
 
     var endTime = Date.now();
@@ -98,22 +96,17 @@ function callContract() {
     return;
   }
 
+  contract.claimTicket.sendTransaction(ticketId, txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
+    if (err) {
+      console.log('@@@ err: ', err)
+      return;
+    }
 
+    // result is a txhash
+    console.log('@@@ claimTicket result: ', result)
 
-  var txHex = gRawTx;
-  // var words = CryptoJS.enc.Hex.parse(txHex);
-  // var txBinaryStr = CryptoJS.enc.Latin1.stringify(words);
-
-  var exchangeContractAddr = new BigNumber(gTicketContractAddr);
-
-  var startTime = Date.now();
-  var objParam = {from:gFromAccount, gas: 3000000-10, gasPrice: 0};
-
-  // OLD way
-  // contract.sendTransaction(objParam).relayTx(txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, exchangeContractAddr);
-
-  contract.relayTx.sendTransaction(txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, exchangeContractAddr, objParam);
-  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+  });
+  // document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
 
 
@@ -264,6 +257,9 @@ $(function() {
 
     <form class="form-inline">
       <div class="form-group">
+        <label for="ticketId">Ticket Id</label>
+        <input type="text" class="form-control" id="ticketId" size="64" maxlength="64"></input>
+
         <label for="transHex">Transaction Hash</label>
         <input type="text" class="form-control" id="transHex" size="64" maxlength="64"></input>
       </div>
