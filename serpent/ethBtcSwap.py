@@ -83,6 +83,7 @@ event claimFail(failCode)
 event oned(data)
 macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
+macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
 macro CLAIM_FAIL_FALLTHRU: 99999999
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (msg.sender != self.gTicket[ticketId]._claimer):
@@ -100,8 +101,9 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
 
     numSatoshi = outputData[0]
-    satoshiNeeded = self.gTicket[ticketId]._numWei / self.gTicket[ticketId]._weiPerSatoshi
-    if numSatoshi < satoshiNeeded:
+    weiBuyable = numSatoshi * self.gTicket[ticketId]._weiPerSatoshi
+    if weiBuyable < self.gTicket[ticketId]._numWei:
+        log(type=claimFail, CLAIM_FAIL_INSUFFICIENT_SATOSHI)
         return(0)
 
 
