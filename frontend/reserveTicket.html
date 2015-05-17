@@ -40,7 +40,7 @@ var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
 function lookup() {
   var btcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015';
   var numWei = web3.toWei(1, 'ether');
-  var weiPerSatoshi = '38461538461.53846';
+  var weiPerSatoshi = '38461538461';
 
   $('#btcAddr').text(btcAddr);
   $('#numWei').text(numWei);
@@ -65,13 +65,41 @@ function lookup() {
     var bnSatoshi = web3.toBigNumber(data.out[0].value)
     $('#satoshiPayment').text(bnSatoshi.toString(10));
 
-    var weiBuyable = new BigNumber(weiPerSatoshi).mul(bnSatoshi).toString(10);
-    $('#weiBuyable').text(weiBuyable);
+    // TODO addresses
+
+    // TODO check addr slice
+    var tx1Script = data.out[1].script;
+    var etherAddr;
+    if (tx1Script && tx1Script.length === 50 &&
+        tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
+      etherAddr = data.out[1].script.slice(6, -4);
+    }
+    else {
+      etherAddr = 'INVALID'
+      console.log('@@ invalid ether addr: ', data.out[1])
+    }
+    $('#etherAddr').text(etherAddr);
+
+    var bnWeiBuyable = new BigNumber(weiPerSatoshi).mul(bnSatoshi);
+    $('#weiBuyable').text(bnWeiBuyable.toString(10));
+
+    var txQuality;
+    var bnExtraWei = bnWeiBuyable.sub(bnWei);
+    if (bnExtraWei.lt(0)) {
+      txQuality = 'BAD.  Transaction does not send enough Bitcoin.'
+    }
+    else if (bnExtraWei.gt(0)) {
+      txQuality = 'OK.'
+    }
+    else {
+      txQuality = 'Perfect.  Exact number of ether will be transferred.'
+    }
+    $('#txQuality').text(txQuality);
 
 
 
     var bnEncodedFee = web3.toBigNumber(data.out[1].value).mod(10000);
-    $('#encodedFee').text(bnEncodedFee.div(100).toString(10));
+    $('#encodedFee').text(bnEncodedFee.div(100).toString(10) + '%');
 
     var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
     $('#computedFee').text(bnComputedFee.toString(10));
@@ -189,11 +217,13 @@ $(function() {
       <h3>Does Bitcoin transaction meet requirements?</h3>
       <h5>Number of bitcoins...: <strong id="satoshiPayment"></strong></h5>
       <h5>... sent to address: <strong id="satoshiAddr"></strong></h5>
-      <h5>Ethers that will be purchased: <strong id="weiBuyable"></strong></h5>
+      <h5>Ether address: <strong id="etherAddr"></strong></h5>
+      <h5>Ethers that will be transferred: <strong id="weiBuyable"></strong></h5>
+      <h5><strong id="txQuality"></strong></h5>
       <br>
-      <h3>Consider these before Reserving Ticket</h3>
+      <h3>Considerations for ticket Claimer</h3>
       <h5>Deposit required: <strong id="depositRequired"></strong></h5>
-      <h5>Fee percentage offered: <strong id="encodedFee"></strong></h5>
+      <h5>Fee % to claimer: <strong id="encodedFee"></strong></h5>
       <h5>Computed fee: <strong id="computedFee"></strong></h5>
       <br>
     </div>
