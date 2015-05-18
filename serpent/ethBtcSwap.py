@@ -66,6 +66,13 @@ def createTicket(btcAddr, numWei, weiPerSatoshi):
     return(self.gTicketId)
 
 
+def lookupTicket(ticketId):
+    if (ticketId > self.gTicketId || ticketId <= 0):
+        return([]:arr)
+
+    return([self.gTicket[ticketId]._btcAddr, self.gTicket[ticketId]._numWei, self.gTicket[ticketId]._weiPerSatoshi]:arr)
+
+
 def reserveTicket(ticketId, txHash):
     # required deposit is 5% numWei
     if (m_ticketAvailable(ticketId) && (msg.value >= self.gTicket[ticketId]._numWei / 20)):

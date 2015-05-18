@@ -519,6 +519,13 @@ class TestEthBtcSwap(object):
         assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert 2*numWei == self.s.block.get_balance(self.c.address)
 
+        assert self.c.lookupTicket(0) == []
+        assert self.c.lookupTicket(1) == [btcAddr, numWei, weiPerSatoshi]
+        assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi]
+        assert self.c.lookupTicket(3) == []
+        assert self.c.lookupTicket(100) == []
+        assert self.c.lookupTicket(-1) == []
+
         # ticket insufficient value sent, value should be refunded
         preBal = self.coinbaseBalance()
         contractBalance = self.s.block.get_balance(self.c.address)
