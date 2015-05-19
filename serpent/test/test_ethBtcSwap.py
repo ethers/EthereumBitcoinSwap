@@ -57,8 +57,6 @@ class TestEthBtcSwap(object):
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
-        approxCostOfReserve = res['gas']
-        boundedCostOfReserve = int(1.05*approxCostOfReserve)
         balPreClaim = self.s.block.get_balance(addrClaimer)
         assert balPreClaim == claimerBalPreReserve - depositRequired
 
@@ -75,13 +73,6 @@ class TestEthBtcSwap(object):
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
         feeToClaimer = int(claimerFeePercent * numWei)  # int() is needed
-
-
-        # gas from profiling claimTicket() is inaccurate so assert that the
-        # balance is within 2.4X of approxCostToClaim
-        # TODO why 2.4X ?
-        approxCostToClaim = claimRes['gas']
-        boundedCostToClaim = int(2.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
         assert endClaimerBal == balPreClaim + depositRequired + feeToClaimer
