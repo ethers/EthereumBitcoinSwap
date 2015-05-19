@@ -588,6 +588,9 @@ class TestEthBtcSwap(object):
 
         expExpiry = self.s.block.timestamp + 3600*4
         expSender = int(self.s.block.coinbase.encode('hex'), 16)
+        txHash = 0xbeef
+
+        assert self.c.getOpenTickets() == []
 
         assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -595,6 +598,31 @@ class TestEthBtcSwap(object):
         baseTicket = [btcAddr, numWei, weiPerSatoshi, 1, 0, 0]
         exp = baseTicket * 2
         assert self.c.getOpenTickets() == exp
+
+        assert 3 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert self.c.getOpenTickets() == baseTicket * 3
+
+        timePreReserve = self.s.block.timestamp
+        assert 1 == self.c.reserveTicket(2, txHash, value=numWei/20, sender=tester.k0)
+        assert self.c.getOpenTickets() == baseTicket * 2
+
+        self.s.block.timestamp += 3600 * 4 + 1
+        assert self.c.getOpenTickets() == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+
+        assert 4 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert self.c.getOpenTickets() == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket*2
+
+        assert 1 == self.c.reserveTicket(3, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert self.c.getOpenTickets() == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+
+        assert 1 == self.c.reserveTicket(1, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert self.c.getOpenTickets() == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+
+        assert 1 == self.c.reserveTicket(4, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert self.c.getOpenTickets() == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
+
+        assert 1 == self.c.reserveTicket(2, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert self.c.getOpenTickets() == []
 
 
     # test Create Lookup Reserve ticket

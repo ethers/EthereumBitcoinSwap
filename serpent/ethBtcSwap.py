@@ -160,7 +160,7 @@ def getOpenTickets():
     j = 0
     i = 1
     while i <= self.gTicketId:
-        if self.gTicket[i]._claimExpiry == 1:
+        if m_ticketAvailable(i):
             ticketArr[j]   = self.gTicket[i]._btcAddr
             ticketArr[j+1] = self.gTicket[i]._numWei
             ticketArr[j+2] = self.gTicket[i]._weiPerSatoshi
@@ -171,7 +171,7 @@ def getOpenTickets():
 
         i += 1
 
-    # shrink(ticketArr, j/6)
+    shrink(ticketArr, j)
     return(ticketArr:arr)
 
 
