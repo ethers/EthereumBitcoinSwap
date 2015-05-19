@@ -581,6 +581,22 @@ class TestEthBtcSwap(object):
         assert self.c.reserveTicket(1000, 0xbeef) == 0
 
 
+    def testOpenTickets(self):
+        btcAddr = 9
+        numWei = self.ETHER
+        weiPerSatoshi = 8
+
+        expExpiry = self.s.block.timestamp + 3600*4
+        expSender = int(self.s.block.coinbase.encode('hex'), 16)
+
+        assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+
+        baseTicket = [btcAddr, numWei, weiPerSatoshi, 1, 0, 0]
+        exp = baseTicket * 2
+        assert self.c.getOpenTickets() == exp
+
+
     # test Create Lookup Reserve ticket
     #
     # the sender is always the coinbase so that the gas for reserveTicket does not
