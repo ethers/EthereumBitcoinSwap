@@ -70,7 +70,7 @@ def lookupTicket(ticketId):
     if (ticketId > self.gTicketId || ticketId <= 0):
         return([]:arr)
 
-    return([self.gTicket[ticketId]._btcAddr, self.gTicket[ticketId]._numWei, self.gTicket[ticketId]._weiPerSatoshi]:arr)
+    return([self.gTicket[ticketId]._btcAddr, self.gTicket[ticketId]._numWei, self.gTicket[ticketId]._weiPerSatoshi, self.gTicket[ticketId]._claimExpiry, self.gTicket[ticketId]._claimer, self.gTicket[ticketId]._claimTxHash]:arr)
 
 
 def reserveTicket(ticketId, txHash):
