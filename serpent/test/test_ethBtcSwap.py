@@ -597,32 +597,32 @@ class TestEthBtcSwap(object):
 
         baseTicket = [btcAddr, numWei, weiPerSatoshi, 1, 0, 0]
         exp = baseTicket * 2
-        assert self.c.getOpenTickets() == exp
+        assert self.c.getOpenTickets(1, 2) == exp
 
         assert 3 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert self.c.getOpenTickets() == baseTicket * 3
+        assert self.c.getOpenTickets(1, 10) == baseTicket * 3
 
         timePreReserve = self.s.block.timestamp
         assert 1 == self.c.reserveTicket(2, txHash, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets() == baseTicket * 2
+        assert self.c.getOpenTickets(1, 10) == baseTicket * 2
 
         self.s.block.timestamp += 3600 * 4 + 1
-        assert self.c.getOpenTickets() == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
 
         assert 4 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert self.c.getOpenTickets() == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket*2
+        assert self.c.getOpenTickets(1, 10) == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket*2
 
         assert 1 == self.c.reserveTicket(3, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets() == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
 
         assert 1 == self.c.reserveTicket(1, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets() == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
 
         assert 1 == self.c.reserveTicket(4, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets() == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
+        assert self.c.getOpenTickets(1, 10) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         assert 1 == self.c.reserveTicket(2, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets() == []
+        assert self.c.getOpenTickets(1, 10) == []
 
 
     # test Create Lookup Reserve ticket

@@ -153,13 +153,16 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     return(0)
 
 
-def getOpenTickets():
-    maxSize = self.gTicketId * 6
+def getOpenTickets(startTicketId, endTicketId):
+    if endTicketId > self.gTicketId:
+        endTicketId = self.gTicketId
+
+    maxSize = (endTicketId - startTicketId + 1) * 6
     ticketArr = array(maxSize)
 
     j = 0
-    i = 1
-    while i <= self.gTicketId:
+    i = startTicketId
+    while i <= endTicketId:
         if m_ticketAvailable(i):
             ticketArr[j]   = self.gTicket[i]._btcAddr
             ticketArr[j+1] = self.gTicket[i]._numWei
