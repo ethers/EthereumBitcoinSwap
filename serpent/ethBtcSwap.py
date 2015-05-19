@@ -153,6 +153,29 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     return(0)
 
 
+def getOpenTickets():
+    maxSize = self.gTicketId * 6
+    ticketArr = array(maxSize)
+
+    j = 0
+    i = 1
+    while i <= self.gTicketId:
+        if self.gTicket[ticketId]._claimExpiry == 1:
+            ticketArr[j]   = self.gTicket[ticketId]._btcAddr
+            ticketArr[j+1] = self.gTicket[ticketId]._numWei
+            ticketArr[j+2] = self.gTicket[ticketId]._weiPerSatoshi
+            ticketArr[j+3] = self.gTicket[ticketId]._claimExpiry
+            ticketArr[j+4] = self.gTicket[ticketId]._claimer
+            ticketArr[j+5] = self.gTicket[ticketId]._claimTxHash
+            j += 6
+
+        i += 1
+
+    shrink(ticketArr, j/6)
+
+    return(ticketArr:arr)
+
+
 #
 #  macros
 #
