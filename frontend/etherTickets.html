@@ -87,7 +87,10 @@ function writeRow(ticketArr, index) {
   var claimer = ticketArr[index + 5].toString(16)
   var claimTxHash = ticketArr[index + 6].toString(16)
 
-  var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
+  var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td>' +
+    '<td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td>' +
+    '<td>{claimer}</td><td>{claimTxHash}</td>' +
+    ticketAction(ticketId) + '</tr>';
 
   tr = tr.replace('{ticketId}', ticketId);
   tr = tr.replace('{btcAddr}', btcAddr);
@@ -114,6 +117,11 @@ $(function() {
     callContract()
   }
 });
+
+
+function ticketAction(ticketId) {
+  return '<td><button class="btn">Reserve</button></td>'
+}
 
 
 function formatEtherAmount(nWei) {
@@ -152,6 +160,7 @@ function formatUnitPrice(nWeiPerSatoshi) {
           <th>Reserved until</th>
           <th>Claimer</th>
           <th>Transaction Hash</th>
+          <th></th>
         </tr>
       </thead>
       <tbody></tbody>
