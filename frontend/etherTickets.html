@@ -43,7 +43,7 @@ function callContract() {
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {from:gFromAccount, gas: 500000};
 
-  var ticketArr = contract.getOpenTickets.call(19, 40, objParam);  // TODO may need objParam
+  var ticketArr = contract.getOpenTickets.call(1, 40, objParam);  // TODO may need objParam
 
   writeTable(ticketArr);
 }
@@ -66,7 +66,7 @@ function writeRow(ticketArr, index) {
 
   var claimExpiry = ticketArr[index + 4].toString(10)
   var claimer = ticketArr[index + 5].toString(16)
-  var claimTxHash = ticketArr[index + 6].toString(16)
+  var bnClaimTxHash = ticketArr[index + 6]
 
   var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td>' +
     '<td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td>' +
@@ -85,7 +85,7 @@ function writeRow(ticketArr, index) {
   tr = tr.replace('{totalPrice}', bnEtherAmount.mul(bnUnitPrice));
   tr = tr.replace('{claimExpiry}', formatState(claimExpiry));
   tr = tr.replace('{claimer}', formatClaimer(claimer));
-  tr = tr.replace('{claimTxHash}', formatClaimTx(claimTxHash));
+  tr = tr.replace('{claimTxHash}', formatClaimTx(bnClaimTxHash));
 
   $('#ticketTable > tbody').append(tr);
 }
@@ -108,7 +108,7 @@ function ticketAction(ticketId, claimExpiry) {
   else {
     btnLabel = 'Claim';
   }
-  return '<td><button class="btn">Reserve</button></td>'
+  return '<td><button class="btn">' + btnLabel + '</button></td>'
 }
 
 function formatState(expiry) {
@@ -122,8 +122,14 @@ function formatClaimer(claimer) {
   return claimer === '0' ? '-' : claimer;
 }
 
-function formatClaimTx(claimTxHash) {
-  return claimTxHash === '0' ? '-' : claimTxHash;
+var TWO_POW_256 = new BigNumber(2).pow(256);
+function formatClaimTx(bnClaimTxHash) {
+  return bnClaimTxHash.eq(0) ? '-' : wrapBn(bnClaimTxHash).toString(16);
+}
+
+// http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
+function wrapBn(bn) {
+  return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256);
 }
 
 
