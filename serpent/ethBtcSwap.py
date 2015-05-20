@@ -154,6 +154,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
 
 macro TICKET_FIELDS: 7
+# all tickets except those that have been claimed
 def getOpenTickets(startTicketId, endTicketId):
     if endTicketId > self.gTicketId:
         endTicketId = self.gTicketId
@@ -164,7 +165,7 @@ def getOpenTickets(startTicketId, endTicketId):
     j = 0
     i = startTicketId
     while i <= endTicketId:
-        if m_ticketAvailable(i):
+        if self.gTicket[i]._claimExpiry:
             ticketArr[j]   = i
             ticketArr[j+1] = self.gTicket[i]._btcAddr
             ticketArr[j+2] = self.gTicket[i]._numWei
