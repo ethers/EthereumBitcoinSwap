@@ -151,18 +151,64 @@ function callContract() {
 
   // var startTime = Date.now();
 
-  contract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, result) {
+
+
+  var rvalFilter = contract.rvalReserveTicket({ ticketId: ticketId });
+  rvalFilter.watch(function(err, res) {
     if (err) {
-      console.log('@@@ err: ', err)
+      console.log('@@@ rvalFilter err: ', err)
+      return;
+    }
+
+    console.log(res)
+
+    var logData = res.data;
+    if (logData === ticketId) {
+      document.getElementById('result').innerText = 'SUCCESS Ticket has been reserved';
+    }
+    else {
+      document.getElementById('result').innerText = 'Failed. Did you send enough deposit or specify correct ticket id?';
+    }
+
+    rvalFilter.stopWatching();
+  });
+
+  contract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+    if (err) {
+      console.log('@@@ reserveTicket sendtx err: ', err)
       return;
     }
 
     // result is a txhash
-    console.log('@@@ reserveTicket result: ', result)
+    console.log('@@@ reserveTicket txHash: ', txHash)
 
+
+    // var latestFilter = web3.eth.filter('latest');
+    // latestFilter.watch(function(err, res){
+    //   if (err) {
+    //     console.log('@@@ latestFilter err: ', err)
+    //     return;
+    //   }
+    //
+    //   web3.eth.getTransaction(txHash, function(err, tx){
+    //     if (err) {
+    //       console.log('@@@ getTx err: ', err)
+    //       return;
+    //     }
+    //
+    //     console.log('@@@ reserveTicket tx: ', tx)
+    //     if (tx && tx.blockNumber) {
+    //       document.getElementById('result').innerText = 'Tx done';
+    //
+    //       latestFilter.stopWatching();
+    //     }
+    //   });
+    // });
   });
-  // document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
+
+
 
 
 $(function() {
