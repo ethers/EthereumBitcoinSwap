@@ -63,7 +63,7 @@ function callContract() {
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {from:gFromAccount, gas: 500000};
 
-  var ticketArr = contract.getOpenTickets.call(9, 40, objParam);  // TODO may need objParam
+  var ticketArr = contract.getOpenTickets.call(19, 40, objParam);  // TODO may need objParam
 
   writeTable(ticketArr);
 }
@@ -103,9 +103,9 @@ function writeRow(ticketArr, index) {
   tr = tr.replace('{weiPerSatoshi}', bnUnitPrice);
 
   tr = tr.replace('{totalPrice}', bnEtherAmount.mul(bnUnitPrice));
-  tr = tr.replace('{claimExpiry}', claimExpiry);
-  tr = tr.replace('{claimer}', claimer);
-  tr = tr.replace('{claimTxHash}', claimTxHash);
+  tr = tr.replace('{claimExpiry}', formatState(claimExpiry));
+  tr = tr.replace('{claimer}', formatClaimer(claimer));
+  tr = tr.replace('{claimTxHash}', formatClaimTx(claimTxHash));
 
   $('#ticketTable > tbody').append(tr);
 }
@@ -124,6 +124,20 @@ function ticketAction(ticketId) {
   return '<td><button class="btn">Reserve</button></td>'
 }
 
+function formatState(expiry) {
+  if (expiry === '1') {
+    return 'OPEN';
+  }
+  return expiry;
+}
+
+function formatClaimer(claimer) {
+  return claimer === '0' ? '-' : claimer;
+}
+
+function formatClaimTx(claimTxHash) {
+  return claimTxHash === '0' ? '-' : claimTxHash;
+}
 
 
 </script>
@@ -148,7 +162,7 @@ function ticketAction(ticketId) {
           <th>Unit Price BTC</th>
           <th>Total Price BTC</th>
           <th>Bitcoin address</th>
-          <th>Reserved until</th>
+          <th>Reserved</th>
           <th>Claimer</th>
           <th>Transaction Hash</th>
           <th></th>
