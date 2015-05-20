@@ -8,3 +8,23 @@ function formatEtherAmount(nWei) {
 function formatUnitPrice(nWeiPerSatoshi) {
   return WEI_PER_SATOSHI.div(nWeiPerSatoshi);
 }
+
+
+var gTicketContractAddr;
+var gBtcTestnet;
+var gOurBtcAddr;
+
+
+// gBtcTestnet = true;
+if (gBtcTestnet) {
+  // gTicketContractAddr = '0xa5bbd4e59bdc2c17e52e7056afe43ba9f52462f2';
+  //
+  // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
+}
+else {
+  gTicketContractAddr = '0x46f9109f0a831668f9967528ef0368c3f5280cb5';
+
+  gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
+}
+
+var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
