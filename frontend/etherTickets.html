@@ -60,12 +60,12 @@ function writeTable(ticketArr) {
 
 function writeRow(ticketArr, index) {
   var ticketId = ticketArr[index + 0].toString(10);
-  var btcAddr = ticketArr[index + 1].toString(16);
-  var numWei = ticketArr[index + 2];
+  var btcAddr = formatHash(ticketArr[index + 1]);
+  var bnWei = ticketArr[index + 2];
   var weiPerSatoshi = ticketArr[index + 3].toString(10);
 
   var claimExpiry = ticketArr[index + 4].toString(10)
-  var claimer = ticketArr[index + 5].toString(16)
+  var claimer = formatHash(ticketArr[index + 5])
   var bnClaimTxHash = ticketArr[index + 6]
 
   var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td>' +
@@ -76,7 +76,7 @@ function writeRow(ticketArr, index) {
   tr = tr.replace('{ticketId}', ticketId);
   tr = tr.replace('{btcAddr}', btcAddr);
 
-  var bnEtherAmount = formatEtherAmount(numWei);
+  var bnEtherAmount = formatEtherAmount(bnWei);
   tr = tr.replace('{numWei}', bnEtherAmount);
 
   var bnUnitPrice = formatUnitPrice(weiPerSatoshi);
@@ -124,12 +124,12 @@ function formatClaimer(claimer) {
 
 var TWO_POW_256 = new BigNumber(2).pow(256);
 function formatClaimTx(bnClaimTxHash) {
-  return bnClaimTxHash.eq(0) ? '-' : wrapBn(bnClaimTxHash).toString(16);
+  return bnClaimTxHash.eq(0) ? '-' : formatHash(bnClaimTxHash);
 }
 
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
-function wrapBn(bn) {
-  return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256);
+function formatHash(bn) {
+  return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
 }
 
 
