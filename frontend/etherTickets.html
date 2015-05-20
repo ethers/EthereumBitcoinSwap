@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Ethereum: offer your ether for bitcoin</title>
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/dapp.css">
+  <script src="./js/jquery-2.1.3.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+
+  <script src="./js/ethBtcSwapAbi.js"></script>
+
+  <script src="./js/bignumber.js"></script>
+  <script src="./js/web3.min.js"></script>
+
+<script type="text/javascript">
+var web3 = require('web3');
+    web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+
+
+var gTicketContractAddr;
+var gBtcTestnet;
+var gOurBtcAddr;
+
+
+// gBtcTestnet = true;
+if (gBtcTestnet) {
+  // gTicketContractAddr = '0xa5bbd4e59bdc2c17e52e7056afe43ba9f52462f2';
+  //
+  // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
+}
+else {
+  gTicketContractAddr = '0x96cd8aa2d6669fb548449df5ce7e90914d68753f';
+
+  gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
+}
+
+var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
+
+
+function callContract() {
+  // TODO ticket Abi
+  console.log('@@@ in callContract')
+  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
+  console.log('@@@ gFromAccount: ', gFromAccount)
+
+
+  // TODO don't forget to update the ABI
+  var bethAddress = gTicketContractAddr;
+  var abiToUse = externalEthBtcSwapAbi;
+
+
+  var TicketContract = web3.eth.contract(abiToUse);
+  var contract = TicketContract.at(bethAddress);
+  console.log('@@@@ contract: ', contract)
+
+
+  var btcAddr = '0x' + $('#btcAddr').val();
+  var numWei = $('#numWei').val();
+  var weiPerSatoshi = $('#weiPerSatoshi').val();
+
+
+  // TODO confirmation to deposit ether, from account, gasprice
+  var objParam = {from:gFromAccount, gas: 500000};
+
+  var ticketArr = contract.getOpenTickets.call(1, 10, objParam);  // TODO may need objParam
+
+  writeTable(ticketArr);
+}
+
+
+function writeTable(ticketArr) {
+  var btcAddr = ticketArr[0].toString(16);
+  var numWei = ticketArr[1];
+  var weiPerSatoshi = ticketArr[2].toString(10);
+
+  var claimExpiry = ticketArr[3].toString(10)
+  var claimer = ticketArr[4].toString(16)
+  var claimTxHash = ticketArr[5].toString(16)
+
+  var tr = '<tr><td>{btcAddr}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
+
+  tr = tr.replace('{btcAddr}', btcAddr);
+  tr = tr.replace('{numWei}', numWei);
+  tr = tr.replace('{weiPerSatoshi}', weiPerSatoshi);
+  tr = tr.replace('{claimExpiry}', claimExpiry);
+  tr = tr.replace('{claimer}', claimer);
+  tr = tr.replace('{claimTxHash}', claimTxHash);
+
+  $('#ticketTable > tbody').append(tr);
+}
+
+
+$(function() {
+  if (!gBtcTestnet) {
+    // $('#ticketContractAddr').text(gTicketContractAddr);
+
+    callContract()
+  }
+});
+
+
+
+</script>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <img src="./images/ethereum-logo-small.png"/>
+    </div>
+
+    <h2>Tickets offering ether for bitcoin
+    </h2>
+
+    <table class="table" id="ticketTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Number of ether</th>
+          <th>ether per bitcoin</th>
+          <th>Claimer</th>
+          <th>Reserved until</th>
+          <th>Transaction Hash</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+
+    <div id="result"></div>
+
+    <div class="footer-logo">
+      <img src="./images/ETH_DEV_LOGO_LARGE.svg"/>
+    </div>
+  </div>
+
+</body>
+
+</html>
