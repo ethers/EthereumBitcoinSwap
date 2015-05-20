@@ -68,15 +68,24 @@ function callContract() {
 }
 
 
+var TICKET_FIELDS = 7;
 function writeTable(ticketArr) {
-  var ticketId = ticketArr[0].toString(10);
-  var btcAddr = ticketArr[1].toString(16);
-  var numWei = ticketArr[2];
-  var weiPerSatoshi = ticketArr[3].toString(10);
+  var len = ticketArr.length;
+  for (var i=0; i < len; i+= TICKET_FIELDS) {
+    writeRow(ticketArr, i);
+  }
+}
 
-  var claimExpiry = ticketArr[4].toString(10)
-  var claimer = ticketArr[5].toString(16)
-  var claimTxHash = ticketArr[6].toString(16)
+
+function writeRow(ticketArr, index) {
+  var ticketId = ticketArr[index + 0].toString(10);
+  var btcAddr = ticketArr[index + 1].toString(16);
+  var numWei = ticketArr[index + 2];
+  var weiPerSatoshi = ticketArr[index + 3].toString(10);
+
+  var claimExpiry = ticketArr[index + 4].toString(10)
+  var claimer = ticketArr[index + 5].toString(16)
+  var claimTxHash = ticketArr[index + 6].toString(16)
 
   var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
 
