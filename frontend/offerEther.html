@@ -7,10 +7,11 @@
   <script src="./js/jquery-2.1.3.min.js"></script>
   <script src="./js/bootstrap.min.js"></script>
 
-  <script src="./js/ethBtcSwapAbi.js"></script>
-
   <script src="./js/bignumber.js"></script>
   <script src="./js/web3.min.js"></script>
+
+  <script src="./js/ethBtcSwapAbi.js"></script>
+  <script src="./js/shared.js"></script>
 
 <script type="text/javascript">
 var web3 = require('web3');
@@ -58,10 +59,12 @@ function callContract() {
   var contract = TicketContract.at(bethAddress);
   console.log('@@@@ contract: ', contract)
 
+  var btcPrice = $('#btcPrice').val();
 
+  // these are passed to contract
   var btcAddr = '0x' + $('#btcAddr').val();
-  var numWei = $('#numWei').val();
-  var weiPerSatoshi = $('#weiPerSatoshi').val();
+  var numWei = web3.toWei($('#numWei').val(), 'ether');
+  var weiPerSatoshi = WEI_PER_SATOSHI.mul($('#weiPerSatoshi').val());
 
 
   // TODO confirmation to deposit ether, from account, gasprice
@@ -104,11 +107,31 @@ $(function() {
     $('#ticketContractAddr').text(gTicketContractAddr);
 
     // tx190 300K
-    $('#btcAddr').val(gOurBtcAddr)
-    $('#numWei').val(web3.toWei(1, 'ether'));
-    $('#weiPerSatoshi').val(38461538462);  // TODO
+    $('#btcAddr').val(gOurBtcAddr);
+
+    var etherAmount = formatEtherAmount(web3.toWei(1, 'ether'));
+    $('#numWei').val(etherAmount);
+
+    var btcPrice = '0.0025999999999688';
+    $('#btcPrice').val(btcPrice);
+
+
+    $('#numWei').keyup(computeWeiPerSatoshi);
+    $('#btcPrice').keyup(computeWeiPerSatoshi);
+
+
+    // var weiPerSatoshi = formatUnitPrice(38461538462);
+    // $('#weiPerSatoshi').val(weiPerSatoshi);  // TODO
   }
 });
+
+function computeWeiPerSatoshi() {
+  var bnWei = new BigNumber($('#numWei').val());
+  var bnBtcPrice = new BigNumber($('#btcPrice').val());
+
+  var weiPerSatoshi = bnBtcPrice.div(bnWei);
+  $('#weiPerSatoshi').val(weiPerSatoshi);
+}
 
 
 
@@ -136,8 +159,11 @@ $(function() {
         <label for="numWei">Number of ethers</label>
         <input type="text" class="form-control" id="numWei"></input>
 
-        <label for="weiPerSatoshi">Wei per Satoshi</label>
-        <input type="text" class="form-control" id="weiPerSatoshi"></input>
+        <label for="btcPrice">Bitcoin Price</label>
+        <input type="text" class="form-control" id="btcPrice"></input>
+
+        <label for="weiPerSatoshi">Unit Price</label>
+        <input type="text" readonly class="form-control" id="weiPerSatoshi"></input>
 
         <br>
         <button type="button" class="btn btn-default" onclick="callContract();">Submit offer</button>
