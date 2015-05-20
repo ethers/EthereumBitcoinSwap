@@ -84,4 +84,9 @@ window.externalEthBtcSwapAbi = [{
     "name": "oned(int256)",
     "type": "event",
     "inputs": [{ "name": "data", "type": "int256", "indexed": false }]
+},
+{
+    "name": "rvalReserveTicket(int256,int256)",
+    "type": "event",
+    "inputs": [{ "name": "ticketId", "type": "int256", "indexed": true }, { "name": "rval", "type": "int256", "indexed": false }]
 }]

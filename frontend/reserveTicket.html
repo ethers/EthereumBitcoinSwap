@@ -160,10 +160,10 @@ function callContract() {
       return;
     }
 
-    console.log(res)
+    console.log('@@@ rvalFilter res: ', res)
 
-    var logData = res.data;
-    if (logData === ticketId) {
+    var eventArgs = res.args;
+    if (eventArgs.rval.toString(10) === ticketId) {
       document.getElementById('result').innerText = 'SUCCESS Ticket has been reserved';
     }
     else {
