@@ -78,12 +78,18 @@ function writeTable(ticketArr) {
   var claimer = ticketArr[5].toString(16)
   var claimTxHash = ticketArr[6].toString(16)
 
-  var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{btcAddr}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
+  var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
 
   tr = tr.replace('{ticketId}', ticketId);
   tr = tr.replace('{btcAddr}', btcAddr);
-  tr = tr.replace('{numWei}', numWei);
-  tr = tr.replace('{weiPerSatoshi}', weiPerSatoshi);
+
+  var bnEtherAmount = formatEtherAmount(numWei);
+  tr = tr.replace('{numWei}', bnEtherAmount);
+
+  var bnUnitPrice = formatUnitPrice(weiPerSatoshi);
+  tr = tr.replace('{weiPerSatoshi}', bnUnitPrice);
+
+  tr = tr.replace('{totalPrice}', bnEtherAmount.mul(bnUnitPrice));
   tr = tr.replace('{claimExpiry}', claimExpiry);
   tr = tr.replace('{claimer}', claimer);
   tr = tr.replace('{claimTxHash}', claimTxHash);
@@ -99,6 +105,16 @@ $(function() {
     callContract()
   }
 });
+
+
+function formatEtherAmount(nWei) {
+  return web3.fromWei(nWei, 'ether');
+}
+
+var SATOSHI_IN_BTC = new BigNumber(10).pow(8);
+function formatUnitPrice(nWeiPerSatoshi) {
+  return SATOSHI_IN_BTC.div(nWeiPerSatoshi);
+}
 
 
 
@@ -121,10 +137,11 @@ $(function() {
         <tr>
           <th>ID</th>
           <th>Number of ether</th>
-          <th>ether per bitcoin</th>
+          <th>Unit Price</th>
+          <th>Total Price</th>
           <th>Bitcoin address</th>
-          <th>Claimer</th>
           <th>Reserved until</th>
+          <th>Claimer</th>
           <th>Transaction Hash</th>
         </tr>
       </thead>
