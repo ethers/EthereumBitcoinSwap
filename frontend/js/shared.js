@@ -6,5 +6,5 @@ function formatEtherAmount(nWei) {
 }
 
 function formatUnitPrice(nWeiPerSatoshi) {
-  return SATOSHI_PER_BTC.div(nWeiPerSatoshi);
+  return WEI_PER_SATOSHI.div(nWeiPerSatoshi);
 }
