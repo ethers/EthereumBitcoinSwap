@@ -73,15 +73,18 @@ def lookupTicket(ticketId):
     return([self.gTicket[ticketId]._btcAddr, self.gTicket[ticketId]._numWei, self.gTicket[ticketId]._weiPerSatoshi, self.gTicket[ticketId]._claimExpiry, self.gTicket[ticketId]._claimer, self.gTicket[ticketId]._claimTxHash]:arr)
 
 
+event rvalReserveTicket(ticketId)
 def reserveTicket(ticketId, txHash):
     # required deposit is 5% numWei
     if (m_ticketAvailable(ticketId) && (msg.value >= self.gTicket[ticketId]._numWei / 20)):
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
-        return(1)
+        log(type=rvalReserveTicket, ticketId)
+        return(ticketId)
 
     send(msg.sender, msg.value)  # refund whatever deposit provided
+    log(type=rvalReserveTicket, 0)
     return(0)
 
 
