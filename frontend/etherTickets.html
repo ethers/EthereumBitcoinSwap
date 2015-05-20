@@ -63,7 +63,7 @@ function callContract() {
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {from:gFromAccount, gas: 500000};
 
-  var ticketArr = contract.getOpenTickets.call(9, 20, objParam);  // TODO may need objParam
+  var ticketArr = contract.getOpenTickets.call(9, 40, objParam);  // TODO may need objParam
 
   writeTable(ticketArr);
 }

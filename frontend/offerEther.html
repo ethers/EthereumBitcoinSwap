@@ -64,7 +64,8 @@ function callContract() {
   // these are passed to contract
   var btcAddr = '0x' + $('#btcAddr').val();
   var numWei = web3.toWei($('#numWei').val(), 'ether');
-  var weiPerSatoshi = WEI_PER_SATOSHI.mul($('#weiPerSatoshi').val());
+  var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0);
+  console.log('@@@@ weiPerSatoshi: ', weiPerSatoshi.toString(10));
 
 
   // TODO confirmation to deposit ether, from account, gasprice
@@ -112,25 +113,25 @@ $(function() {
     var etherAmount = formatEtherAmount(web3.toWei(1, 'ether'));
     $('#numWei').val(etherAmount);
 
-    var btcPrice = '0.0025999999999688';
+    var btcPrice = '0.26';
     $('#btcPrice').val(btcPrice);
 
 
-    $('#numWei').keyup(computeWeiPerSatoshi);
-    $('#btcPrice').keyup(computeWeiPerSatoshi);
+    $('#numWei').keyup(computeUnitPrice);
+    $('#btcPrice').keyup(computeUnitPrice);
 
 
-    // var weiPerSatoshi = formatUnitPrice(38461538462);
-    // $('#weiPerSatoshi').val(weiPerSatoshi);  // TODO
+    // var unitPrice = formatUnitPrice(38461538462);
+    // $('#unitPrice').val(unitPrice);  // TODO
   }
 });
 
-function computeWeiPerSatoshi() {
+function computeUnitPrice() {
   var bnWei = new BigNumber($('#numWei').val());
   var bnBtcPrice = new BigNumber($('#btcPrice').val());
 
-  var weiPerSatoshi = bnBtcPrice.div(bnWei);
-  $('#weiPerSatoshi').val(weiPerSatoshi);
+  var unitPrice = bnBtcPrice.div(bnWei);
+  $('#unitPrice').val(unitPrice)
 }
 
 
@@ -162,8 +163,8 @@ function computeWeiPerSatoshi() {
         <label for="btcPrice">Bitcoin Price</label>
         <input type="text" class="form-control" id="btcPrice"></input>
 
-        <label for="weiPerSatoshi">Unit Price</label>
-        <input type="text" readonly class="form-control" id="weiPerSatoshi"></input>
+        <label for="unitPrice">Unit Price</label>
+        <input type="text" readonly class="form-control" id="unitPrice"></input>
 
         <br>
         <button type="button" class="btn btn-default" onclick="callContract();">Submit offer</button>
