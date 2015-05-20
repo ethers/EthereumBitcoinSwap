@@ -17,9 +17,21 @@ window.externalEthBtcSwapAbi = [{
     "outputs": [{ "name": "out", "type": "int256[]" }]
 },
 {
+    "name": "getOpenTickets(int256,int256)",
+    "type": "function",
+    "inputs": [{ "name": "startTicketId", "type": "int256" }, { "name": "endTicketId", "type": "int256" }],
+    "outputs": [{ "name": "out", "type": "int256[]" }]
+},
+{
     "name": "getUnsignedBitsLE(bytes,int256,int256)",
     "type": "function",
     "inputs": [{ "name": "txStr", "type": "bytes" }, { "name": "pos", "type": "int256" }, { "name": "bits", "type": "int256" }],
+    "outputs": [{ "name": "out", "type": "int256[]" }]
+},
+{
+    "name": "lookupTicket(int256)",
+    "type": "function",
+    "inputs": [{ "name": "ticketId", "type": "int256" }],
     "outputs": [{ "name": "out", "type": "int256[]" }]
 },
 {

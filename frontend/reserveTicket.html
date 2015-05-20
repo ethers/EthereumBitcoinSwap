@@ -29,7 +29,7 @@ if (gBtcTestnet) {
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
 }
 else {
-  gTicketContractAddr = '0x6477cd0412df260de1010a76f4c5144ff77fec99';
+  gTicketContractAddr = '0x96cd8aa2d6669fb548449df5ce7e90914d68753f';
 
   gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
 }
@@ -37,10 +37,29 @@ else {
 var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
 
 
+
 function lookup() {
-  var btcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015';
-  var numWei = web3.toWei(1, 'ether');
-  var weiPerSatoshi = '38461538461';
+  var ticketId = $('#ticketId').val();
+  // TODO don't forget to update the ABI
+  var bethAddress = gTicketContractAddr;
+  var abiToUse = externalEthBtcSwapAbi;
+  var TicketContract = web3.eth.contract(abiToUse);
+  var contract = TicketContract.at(bethAddress);
+  console.log('@@@@ contract: ', contract)
+
+  var ticketInfo = contract.lookupTicket.call(ticketId);
+  console.log('@@@ tinfo: ', ticketInfo);
+  var btcAddr = ticketInfo[0].toString(16);
+  var numWei = ticketInfo[1];
+  var weiPerSatoshi = ticketInfo[2].toString(10);
+  var claimExpiry = ticketInfo[3]
+  var claimer = ticketInfo[4]
+  var claimTxHash = ticketInfo[5]
+
+
+  // var btcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015';
+  // var numWei = web3.toWei(1, 'ether');
+  // var weiPerSatoshi = '38461538461';
 
   // TODO base58check
   $('#btcAddr').text(btcAddr);
