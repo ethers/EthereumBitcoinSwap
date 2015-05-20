@@ -29,7 +29,7 @@ if (gBtcTestnet) {
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
 }
 else {
-  gTicketContractAddr = '0x96cd8aa2d6669fb548449df5ce7e90914d68753f';
+  gTicketContractAddr = '0x39d48bd1714e87a8a0e82e41ef9848c802186902';
 
   gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
 }
@@ -69,16 +69,18 @@ function callContract() {
 
 
 function writeTable(ticketArr) {
-  var btcAddr = ticketArr[0].toString(16);
-  var numWei = ticketArr[1];
-  var weiPerSatoshi = ticketArr[2].toString(10);
+  var ticketId = ticketArr[0].toString(10);
+  var btcAddr = ticketArr[1].toString(16);
+  var numWei = ticketArr[2];
+  var weiPerSatoshi = ticketArr[3].toString(10);
 
-  var claimExpiry = ticketArr[3].toString(10)
-  var claimer = ticketArr[4].toString(16)
-  var claimTxHash = ticketArr[5].toString(16)
+  var claimExpiry = ticketArr[4].toString(10)
+  var claimer = ticketArr[5].toString(16)
+  var claimTxHash = ticketArr[6].toString(16)
 
-  var tr = '<tr><td>{btcAddr}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
+  var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td><td>{btcAddr}</td><td>{claimExpiry}</td><td>{claimer}</td><td>{claimTxHash}</td></tr>';
 
+  tr = tr.replace('{ticketId}', ticketId);
   tr = tr.replace('{btcAddr}', btcAddr);
   tr = tr.replace('{numWei}', numWei);
   tr = tr.replace('{weiPerSatoshi}', weiPerSatoshi);
@@ -120,6 +122,7 @@ $(function() {
           <th>ID</th>
           <th>Number of ether</th>
           <th>ether per bitcoin</th>
+          <th>Bitcoin address</th>
           <th>Claimer</th>
           <th>Reserved until</th>
           <th>Transaction Hash</th>
