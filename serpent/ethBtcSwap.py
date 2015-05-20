@@ -153,24 +153,26 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     return(0)
 
 
+macro TICKET_FIELDS: 7
 def getOpenTickets(startTicketId, endTicketId):
     if endTicketId > self.gTicketId:
         endTicketId = self.gTicketId
 
-    maxSize = (endTicketId - startTicketId + 1) * 6
+    maxSize = (endTicketId - startTicketId + 1) * TICKET_FIELDS
     ticketArr = array(maxSize)
 
     j = 0
     i = startTicketId
     while i <= endTicketId:
         if m_ticketAvailable(i):
-            ticketArr[j]   = self.gTicket[i]._btcAddr
-            ticketArr[j+1] = self.gTicket[i]._numWei
-            ticketArr[j+2] = self.gTicket[i]._weiPerSatoshi
-            ticketArr[j+3] = self.gTicket[i]._claimExpiry
-            ticketArr[j+4] = self.gTicket[i]._claimer
-            ticketArr[j+5] = self.gTicket[i]._claimTxHash
-            j += 6
+            ticketArr[j]   = i
+            ticketArr[j+1] = self.gTicket[i]._btcAddr
+            ticketArr[j+2] = self.gTicket[i]._numWei
+            ticketArr[j+3] = self.gTicket[i]._weiPerSatoshi
+            ticketArr[j+4] = self.gTicket[i]._claimExpiry
+            ticketArr[j+5] = self.gTicket[i]._claimer
+            ticketArr[j+6] = self.gTicket[i]._claimTxHash
+            j += TICKET_FIELDS
 
         i += 1
 

@@ -596,34 +596,33 @@ class TestEthBtcSwap(object):
         assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
 
         baseTicket = [btcAddr, numWei, weiPerSatoshi, 1, 0, 0]
-        assert self.c.getOpenTickets(1, 1) == baseTicket
-        exp = baseTicket * 2
-        assert self.c.getOpenTickets(1, 2) == exp
+        assert self.c.getOpenTickets(1, 1) == [1]+baseTicket
+        assert self.c.getOpenTickets(1, 2) == [1]+baseTicket + [2]+baseTicket
 
         assert 3 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert self.c.getOpenTickets(1, 10) == baseTicket * 3
+        assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2]+baseTicket + [3]+baseTicket
 
         timePreReserve = self.s.block.timestamp
         assert 1 == self.c.reserveTicket(2, txHash, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets(1, 10) == baseTicket * 2
+        assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [3]+baseTicket
 
         self.s.block.timestamp += 3600 * 4 + 1
-        assert self.c.getOpenTickets(1, 10) == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         assert 4 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
-        assert self.c.getOpenTickets(1, 10) == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket*2
-        assert self.c.getOpenTickets(2, 10) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket*2
-        assert self.c.getOpenTickets(2, 4) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket*2
-        assert self.c.getOpenTickets(2, 3) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket + [4]+baseTicket
+        assert self.c.getOpenTickets(2, 10) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket + [4]+baseTicket
+        assert self.c.getOpenTickets(2, 4) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket + [4]+baseTicket
+        assert self.c.getOpenTickets(2, 3) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         assert 1 == self.c.reserveTicket(3, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets(1, 10) == baseTicket + [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [4]+baseTicket
 
         assert 1 == self.c.reserveTicket(1, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets(1, 10) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + baseTicket
+        assert self.c.getOpenTickets(1, 10) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [4]+baseTicket
 
         assert 1 == self.c.reserveTicket(4, 0xbeef, value=numWei/20, sender=tester.k0)
-        assert self.c.getOpenTickets(1, 10) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
+        assert self.c.getOpenTickets(1, 10) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         assert 1 == self.c.reserveTicket(2, 0xbeef, value=numWei/20, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == []
