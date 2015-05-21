@@ -52,7 +52,7 @@ function callContract() {
   console.log('@@@@ contract: ', contract)
 
 
-  var ticketId = $('#ticketId').val();
+  var ticketId = parseInt($('#ticketId').val(), 10);
   var txHex = gRawTx;
 
   var transHex = $('#transHex').val();
@@ -95,7 +95,8 @@ function callContract() {
     console.log('@@@ rvalFilter res: ', res)
 
     var eventArgs = res.args;
-    var rval = eventArgs.rval.toString(10);
+    var rval = eventArgs.rval.toNumber();
+    console.log('@@@ rvalFilter rval: ', rval)
     switch (rval) {
       case ticketId:
         resultText = 'SUCCESS Ticket has been claimed';
@@ -284,7 +285,7 @@ $(function() {
     <form class="form-inline">
       <div class="form-group">
         <label for="ticketId">Ticket Id</label>
-        <input type="text" class="form-control" id="ticketId" size="64" maxlength="64"></input>
+        <input type="number" min="1" step="1" pattern="\d*" class="form-control" id="ticketId" size="64" maxlength="64"></input>
 
         <label for="transHex">Transaction Hash</label>
         <input type="text" class="form-control" id="transHex" size="64" maxlength="64"></input>
