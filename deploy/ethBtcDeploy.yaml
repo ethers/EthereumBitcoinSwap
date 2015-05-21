@@ -1,6 +1,7 @@
 # this deploys the ethBtcSwap contract
 
 # TODO you must update the address of BtcRelay to whatever your BtcRelay was mined to
+# 0xcffaf1199ff8b486a20728424879dd59ecb38a92
 - set:
     BtcRelay: ""
 
