@@ -67,6 +67,26 @@ function callContract() {
   }
 
 
+  var rvalFilter = contract.ticketEvent({ ticketId: 0 });
+  rvalFilter.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ rvalFilter err: ', err)
+      return;
+    }
+
+    console.log('@@@ rvalFilter res: ', res)
+
+    var eventArgs = res.args;
+    if (eventArgs.rval.toNumber() > 0) {
+      document.getElementById('result').innerText = 'SUCCESS Ticket created';
+    }
+    else {
+      document.getElementById('result').innerText = 'Failed. You need to send the ethers to the Ticket contract';
+    }
+
+    rvalFilter.stopWatching();
+  });
+
   // var startTime = Date.now();
   //
   contract.createTicket.sendTransaction(btcAddr, numWei, weiPerSatoshi, objParam, function(err, result) {
@@ -79,7 +99,7 @@ function callContract() {
     console.log('@@@ createTicket result: ', result)
 
   });
-  // document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
 
 
