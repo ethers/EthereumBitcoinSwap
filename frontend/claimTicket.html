@@ -7,11 +7,11 @@
   <script src="./js/jquery-2.1.3.min.js"></script>
   <script src="./js/bootstrap.min.js"></script>
 
-  <script src="./js/ethBtcSwapAbi.js"></script>
-
   <script src="./js/bignumber.js"></script>
   <script src="./js/web3.min.js"></script>
 
+  <script src="./js/ethBtcSwapAbi.js"></script>
+  <script src="./js/shared.js"></script>
 
   <script src="./js/btcproof.js"></script>
 
@@ -21,24 +21,11 @@ var web3 = require('web3');
 
 var btcproof = require('btcproof');
 
-var gTicketContractAddr;
-var gBtcTestnet;
-var gOurBtcAddr;
 
-
-// gBtcTestnet = true;
-if (gBtcTestnet) {
-  gTicketContractAddr = '';
-
-  gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
-}
-else {
-  gTicketContractAddr = '0x39d48bd1714e87a8a0e82e41ef9848c802186902';
-
-  gOurBtcAddr = 'TODO'  // tx1 of block300K
-}
-
-var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
+var CLAIM_FAIL_CLAIMER = 99990100
+var CLAIM_FAIL_TX_HASH = 99990200
+var CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400
+var CLAIM_FAIL_FALLTHRU = 99999999
 
 
 var gMerkleProof;
@@ -51,7 +38,7 @@ function callContract() {
 
 
   var callOnly;
-  callOnly = true;  // if commented, it will call sendTransaction
+  // callOnly = true;  // if commented, it will call sendTransaction
 
 
   // TODO don't forget to update the ABI
@@ -96,6 +83,45 @@ function callContract() {
     return;
   }
 
+
+
+  var rvalFilter = contract.ticketEvent({ ticketId: ticketId });
+  rvalFilter.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ rvalFilter err: ', err)
+      return;
+    }
+
+    console.log('@@@ rvalFilter res: ', res)
+
+    var eventArgs = res.args;
+    var rval = eventArgs.rval.toString(10);
+    switch (rval) {
+      case ticketId:
+        resultText = 'SUCCESS Ticket has been claimed';
+        break;
+      case CLAIM_FAIL_CLAIMER:
+        resultText = 'Failed: someone else has reserved the ticket';
+        break;
+      case CLAIM_FAIL_TX_HASH:
+        resultText = 'Failed: you need to use the transaction used in the reservation';
+        break;
+      case CLAIM_FAIL_INSUFFICIENT_SATOSHI:
+        resultText = 'Failed: Bitcoin transaction did not send enough Bitcoins';
+        break;
+      case CLAIM_FAIL_FALLTHRU:
+        resultText = 'Failed: Unknown';
+        break;
+      default:
+        resultText = 'ERROR Unexpected';
+        break;
+    }
+
+    document.getElementById('result').innerText = resultText;
+
+    rvalFilter.stopWatching();
+  });
+
   contract.claimTicket.sendTransaction(ticketId, txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
       console.log('@@@ err: ', err)
@@ -106,7 +132,7 @@ function callContract() {
     console.log('@@@ claimTicket result: ', result)
 
   });
-  // document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
 
 
