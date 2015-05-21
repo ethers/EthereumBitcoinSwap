@@ -20,6 +20,7 @@ macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
 
 # TODO disable testingOnly methods
+event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
 macro LAST_TID: self.gTicketId
 def testingOnlyReserveLatestTicket(txHash):
     return(self.reserveTicket(value=msg.value, LAST_TID, txHash))
@@ -73,24 +74,23 @@ def lookupTicket(ticketId):
     return([self.gTicket[ticketId]._btcAddr, self.gTicket[ticketId]._numWei, self.gTicket[ticketId]._weiPerSatoshi, self.gTicket[ticketId]._claimExpiry, self.gTicket[ticketId]._claimer, self.gTicket[ticketId]._claimTxHash]:arr)
 
 
-event rvalReserveTicket(ticketId:indexed, rval)
+# data[0] is the return value / error code
+event ticketEvent(ticketId:indexed, rval)
 def reserveTicket(ticketId, txHash):
     # required deposit is 5% numWei
     if (m_ticketAvailable(ticketId) && (msg.value >= self.gTicket[ticketId]._numWei / 20)):
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
-        log(type=rvalReserveTicket, ticketId, ticketId)
+        log(type=ticketEvent, ticketId, ticketId)
         return(ticketId)
 
     send(msg.sender, msg.value)  # refund whatever deposit provided
-    log(type=rvalReserveTicket, ticketId, 0)
+    log(type=ticketEvent, ticketId, 0)
     return(0)
 
 
-event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
-event claimFail(failCode)
-event oned(data)
+
 macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
@@ -100,11 +100,11 @@ macro CLAIM_FAIL_FALLTHRU: 99999999
 # bitcoins so that all the ether can be claimed
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     if (msg.sender != self.gTicket[ticketId]._claimer):
-        log(type=claimFail, CLAIM_FAIL_CLAIMER)
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
         return(0)
 
     if (txHash != self.gTicket[ticketId]._claimTxHash):
-        log(type=claimFail, CLAIM_FAIL_TX_HASH)
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_TX_HASH)
         return(0)
 
     outputData = self.getFirst2Outputs(txStr, outitems=4)
@@ -116,7 +116,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     numSatoshi = outputData[0]
     weiBuyable = numSatoshi * self.gTicket[ticketId]._weiPerSatoshi
     if weiBuyable < self.gTicket[ticketId]._numWei:
-        log(type=claimFail, CLAIM_FAIL_INSUFFICIENT_SATOSHI)
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_INSUFFICIENT_SATOSHI)
         return(0)
     weiBuyable = self.gTicket[ticketId]._numWei
 
@@ -148,11 +148,14 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         m_deleteTicket(ticketId)
 
+        log(type=ticketEvent, ticketId, ticketId)
+
+        # for testing only; remove when deploying
         log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
         return(res1 + res2)
 
-    log(type=claimFail, CLAIM_FAIL_FALLTHRU)
+    log(type=ticketEvent, ticketId, CLAIM_FAIL_FALLTHRU)
     return(0)
 
 

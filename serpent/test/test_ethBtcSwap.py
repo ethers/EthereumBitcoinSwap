@@ -83,22 +83,31 @@ class TestEthBtcSwap(object):
 
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
-
-        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
-            'btcAddr': btcAddr,
-            'ethAddr': ethAddr,
-            'satoshiIn2ndOutput': satoshiOutputTwo
-            }]
-        eventArr.pop()
-
+        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
 
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == 0
 
-        assert eventArr == [{'_event_type': 'claimFail',
-            'failCode': 99990100  # a claim sets the claimer to 0, thus this failure
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100  # a claim sets the claimer to 0, thus this failure
+            }]
+        eventArr.pop()
+
+
+    def assertClaimSuccessLogs(self, eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId):
+        assert eventArr[1] == {'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
+            'btcAddr': btcAddr,
+            'ethAddr': ethAddr,
+            'satoshiIn2ndOutput': satoshiOutputTwo
+            }
+        eventArr.pop()
+
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': ticketId
             }]
         eventArr.pop()
 
@@ -174,22 +183,16 @@ class TestEthBtcSwap(object):
 
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
-
-        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
-            'btcAddr': btcAddr,
-            'ethAddr': ethAddr,
-            'satoshiIn2ndOutput': satoshiOutputTwo
-            }]
-        eventArr.pop()
-
+        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
 
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == 0
 
-        assert eventArr == [{'_event_type': 'claimFail',
-            'failCode': 99990100  # a claim sets the claimer to 0, thus this failure
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100  # a claim sets the claimer to 0, thus this failure
             }]
         eventArr.pop()
 
@@ -266,13 +269,7 @@ class TestEthBtcSwap(object):
 
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
-
-        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
-            'btcAddr': btcAddr,
-            'ethAddr': ethAddr,
-            'satoshiIn2ndOutput': satoshiOutputTwo
-            }]
-        eventArr.pop()
+        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
 
 
     # smaller version of testClaimerFee except weiPerSatoshi is 1 less (thus
@@ -318,8 +315,9 @@ class TestEthBtcSwap(object):
         # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == 0
 
-        assert eventArr == [{'_event_type': 'claimFail',
-            'failCode': 99990400
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990400
             }]
         eventArr.pop()
 
@@ -360,8 +358,9 @@ class TestEthBtcSwap(object):
 
         assert 0 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
-        assert eventArr == [{'_event_type': 'claimFail',
-            'failCode': 99990100
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100
             }]
         eventArr.pop()
 
@@ -399,8 +398,9 @@ class TestEthBtcSwap(object):
 
         assert 0 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
-        assert eventArr == [{'_event_type': 'claimFail',
-            'failCode': 99990100
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100
             }]
         eventArr.pop()
 
@@ -475,8 +475,9 @@ class TestEthBtcSwap(object):
         assert buyerEthBalance == 0
         assert self.s.block.get_balance(self.c.address) == contractBalance
 
-        assert eventArr == [{'_event_type': 'claimFail',
-            'failCode': 99999999
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99999999
             }]
         eventArr.pop()
 
@@ -496,6 +497,8 @@ class TestEthBtcSwap(object):
         btcAddr = 0xc398efa9c392ba6013c5e04ee729755ef7f58b32
         numWei = self.ETHER
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
+        ethAddr = 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c
+
         depositRequired = numWei / 20
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
@@ -549,13 +552,7 @@ class TestEthBtcSwap(object):
 
         assert buyerEthBalance == numWei
 
-
-        assert eventArr == [{'_event_type': 'claimSuccess', 'numSatoshi': satoshiOutputOne,
-            'btcAddr': btcAddr,
-            'ethAddr': 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c,
-            'satoshiIn2ndOutput': satoshiOutputTwo
-            }]
-        eventArr.pop()
+        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
 
 
     def testClaimInvalidTicket(self):
