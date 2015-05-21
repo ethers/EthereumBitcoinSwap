@@ -55,6 +55,7 @@ def setTrustedBtcRelay(trustedRelayContract):
 def createTicket(btcAddr, numWei, weiPerSatoshi):
     if msg.value < numWei || numWei == 0:
         send(msg.sender, msg.value)
+        log(type=ticketEvent, 0, 0)
         return(0)
 
     self.gTicketId += 1
@@ -64,6 +65,7 @@ def createTicket(btcAddr, numWei, weiPerSatoshi):
     self.gTicket[self.gTicketId]._weiPerSatoshi = weiPerSatoshi
     self.gTicket[self.gTicketId]._claimExpiry = 1 # allow to be reserved; see m_ticketAvailable()
 
+    log(type=ticketEvent, 0, self.gTicketId)
     return(self.gTicketId)
 
 
