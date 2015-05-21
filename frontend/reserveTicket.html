@@ -125,7 +125,7 @@ function callContract() {
   console.log('@@@@ contract: ', contract)
 
 
-  var ticketId = $('#ticketId').val();
+  var ticketId = parseInt($('#ticketId').val(), 10);
   var txHash = '0x' + $('#txHash').val();
   var weiDeposit = $('#weiDeposit').val();
 
@@ -163,7 +163,7 @@ function callContract() {
     console.log('@@@ rvalFilter res: ', res)
 
     var eventArgs = res.args;
-    if (eventArgs.rval.toString(10) === ticketId) {
+    if (eventArgs.rval.toNumber() === ticketId) {
       document.getElementById('result').innerText = 'SUCCESS Ticket has been reserved';
     }
     else {
