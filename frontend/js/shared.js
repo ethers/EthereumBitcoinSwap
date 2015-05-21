@@ -22,7 +22,7 @@ if (gBtcTestnet) {
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
 }
 else {
-  gTicketContractAddr = '0xc72369303ce552f5500bb7f398f2a1916c450e7e';
+  gTicketContractAddr = '0xf5de6cd4963d69661402cc35067cb6be80865663';
 
   gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
 }

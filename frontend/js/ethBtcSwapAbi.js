@@ -71,22 +71,12 @@ window.externalEthBtcSwapAbi = [{
     "outputs": [{ "name": "out", "type": "int256" }]
 },
 {
-    "name": "claimFail(int256)",
-    "type": "event",
-    "inputs": [{ "name": "failCode", "type": "int256", "indexed": false }]
-},
-{
     "name": "claimSuccess(int256,int256,int256,int256)",
     "type": "event",
     "inputs": [{ "name": "btcAddr", "type": "int256", "indexed": false }, { "name": "numSatoshi", "type": "int256", "indexed": false }, { "name": "ethAddr", "type": "int256", "indexed": false }, { "name": "satoshiIn2ndOutput", "type": "int256", "indexed": false }]
 },
 {
-    "name": "oned(int256)",
-    "type": "event",
-    "inputs": [{ "name": "data", "type": "int256", "indexed": false }]
-},
-{
-    "name": "rvalReserveTicket(int256,int256)",
+    "name": "ticketEvent(int256,int256)",
     "type": "event",
     "inputs": [{ "name": "ticketId", "type": "int256", "indexed": true }, { "name": "rval", "type": "int256", "indexed": false }]
 }]
