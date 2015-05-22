@@ -4,20 +4,35 @@ var WEI_PER_ETHER = new BigNumber(10).pow(18);
 var SATOSHI_PER_BTC = new BigNumber(10).pow(8);
 var WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
-function formatEtherAmount(bnWei) {
-  return web3.fromWei(bnWei, 'ether').toString(10);
+// returns BigNumber
+function toEther(bnWei) {
+  return web3.fromWei(bnWei, 'ether');
 }
 
-function formatUnitPrice(nWeiPerSatoshi) {
-  return WEI_PER_SATOSHI.div(nWeiPerSatoshi).toString(10);
+// returns BigNumber
+function toUnitPrice(bnWeiPerSatoshi) {
+  return WEI_PER_SATOSHI.div(bnWeiPerSatoshi).round(8);
 }
 
-function formatTotalPrice(bnWei, bnWeiPerSatoshi) {
-  return bnWei.div(bnWeiPerSatoshi).div(SATOSHI_PER_BTC).toString(10);
+// returns BigNumber
+function toTotalPrice(bnEther, bnUnitPrice) {
+  return bnEther.mul(bnUnitPrice).round(8);
+}
+
+function formatEtherAmount(bnEther) {
+  return bnEther.toString(10);
+}
+
+function formatUnitPrice(bnUnitPrice) {
+  return bnUnitPrice.toString(10);
+}
+
+function formatTotalPrice(bnTotalPrice) {
+  return bnTotalPrice.toString(10);
 }
 
 function formatSatoshiToBTC(bnSatoshi) {
-  return bnSatoshi.div(SATOSHI_PER_BTC).toString(10);
+  return bnSatoshi.div(SATOSHI_PER_BTC).round(8).toString(10);
 }
 
 function formatWeiToEther(bnWei) {

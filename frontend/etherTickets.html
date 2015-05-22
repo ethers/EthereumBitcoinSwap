@@ -58,16 +58,21 @@ function writeRow(ticketArr, index) {
   var bnClaimer = ticketArr[index + 5]
   var bnClaimTxHash = ticketArr[index + 6]
 
-  var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td>' +
+  var tr = '<tr><td>{ticketId}</td><td>{numEther}</td><td>{unitPrice}</td>' +
     '<td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td>' +
     '<td>{claimer}</td><td>{claimTxHash}</td>' +
     ticketAction(ticketId, formatState(bnClaimExpiry)) + '</tr>';
 
+
+  var bnEther = toEther(bnWei);
+  var bnUnitPrice = toUnitPrice(bnWeiPerSatoshi);
+  var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
+
   tr = tr.replace('{ticketId}', ticketId);
   tr = tr.replace('{btcAddr}', formatBtcAddr(bnBtcAddr));
-  tr = tr.replace('{numWei}', formatEtherAmount(bnWei));
-  tr = tr.replace('{weiPerSatoshi}', formatUnitPrice(bnWeiPerSatoshi));
-  tr = tr.replace('{totalPrice}', formatTotalPrice(bnWei, bnWeiPerSatoshi));
+  tr = tr.replace('{numEther}', formatEtherAmount(bnEther));
+  tr = tr.replace('{unitPrice}', formatUnitPrice(bnUnitPrice));
+  tr = tr.replace('{totalPrice}', formatTotalPrice(bnTotalPrice));
   tr = tr.replace('{claimExpiry}', formatState(bnClaimExpiry));
   tr = tr.replace('{claimer}', formatClaimer(bnClaimer));
   tr = tr.replace('{claimTxHash}', formatClaimTx(bnClaimTxHash));
