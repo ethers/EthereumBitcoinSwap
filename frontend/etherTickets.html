@@ -54,22 +54,22 @@ function writeRow(ticketArr, index) {
   var bnWei = ticketArr[index + 2];
   var bnWeiPerSatoshi = ticketArr[index + 3];
 
-  var claimExpiry = ticketArr[index + 4].toString(10)
-  var claimer = formatHash(ticketArr[index + 5])
+  var bnClaimExpiry = ticketArr[index + 4]
+  var bnClaimer = ticketArr[index + 5]
   var bnClaimTxHash = ticketArr[index + 6]
 
   var tr = '<tr><td>{ticketId}</td><td>{numWei}</td><td>{weiPerSatoshi}</td>' +
     '<td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td>' +
     '<td>{claimer}</td><td>{claimTxHash}</td>' +
-    ticketAction(ticketId, claimExpiry) + '</tr>';
+    ticketAction(ticketId, formatState(bnClaimExpiry)) + '</tr>';
 
   tr = tr.replace('{ticketId}', ticketId);
   tr = tr.replace('{btcAddr}', formatBtcAddr(bnBtcAddr));
   tr = tr.replace('{numWei}', formatEtherAmount(bnWei));
   tr = tr.replace('{weiPerSatoshi}', formatUnitPrice(bnWeiPerSatoshi));
   tr = tr.replace('{totalPrice}', formatTotalPrice(bnWei, bnWeiPerSatoshi));
-  tr = tr.replace('{claimExpiry}', formatState(claimExpiry));
-  tr = tr.replace('{claimer}', formatClaimer(claimer));
+  tr = tr.replace('{claimExpiry}', formatState(bnClaimExpiry));
+  tr = tr.replace('{claimer}', formatClaimer(bnClaimer));
   tr = tr.replace('{claimTxHash}', formatClaimTx(bnClaimTxHash));
 
   $('#ticketTable > tbody').append(tr);
@@ -85,43 +85,15 @@ $(function() {
 });
 
 
-function ticketAction(ticketId, claimExpiry) {
+function ticketAction(ticketId, ticketState) {
   var btnLabel;
-  if (isTicketAvailable(claimExpiry)) {
+  if (ticketState === 'OPEN') {
     btnLabel = 'Reserve';
   }
   else {
     btnLabel = 'Claim';
   }
   return '<td><button class="btn">' + btnLabel + '</button></td>'
-}
-
-function formatState(expiry) {
-  if (isTicketAvailable(expiry)) {
-    return 'OPEN';
-  }
-  return expiry;
-}
-
-function formatClaimer(claimer) {
-  return claimer === '0' ? '-' : claimer;
-}
-
-function formatClaimTx(bnClaimTxHash) {
-  return bnClaimTxHash.eq(0) ? '-' : formatHash(bnClaimTxHash);
-}
-
-// http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
-function formatHash(bn) {
-  return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
-
-  // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
-}
-
-
-function isTicketAvailable(claimExpiry) {
-    // TODO: check block timestamp
-    return claimExpiry === '1';
 }
 
 

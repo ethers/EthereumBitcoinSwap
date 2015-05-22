@@ -30,9 +30,11 @@ function lookup() {
   var btcAddr = formatBtcAddr(ticketInfo[0]);
   var bnWei = ticketInfo[1];
   var bnWeiPerSatoshi = ticketInfo[2];
-  var claimExpiry = ticketInfo[3]
-  var claimer = ticketInfo[4]
-  var claimTxHash = ticketInfo[5]
+  var bnClaimExpiry = ticketInfo[3];
+  var bnClaimer = ticketInfo[4];
+  var bnClaimTxHash = ticketInfo[5];
+
+  renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
 
   gWeiDeposit = bnWei.div(20);
 
@@ -166,8 +168,20 @@ function callContract() {
   document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
 
-function writeClaimer() {
+function writeClaimer(ticketId) {
+  var ticketInfo = gContract.lookupTicket.call(ticketId);
+  console.log('@@@ tinfo: ', ticketInfo);
+  var bnClaimExpiry = ticketInfo[3];
+  var bnClaimer = ticketInfo[4];
+  var bnClaimTxHash = ticketInfo[5];
 
+  renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
+}
+
+function renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash) {
+  $('#claimExpiry').text(formatState(bnClaimExpiry));
+  $('#claimerAddr').text(formatClaimer(bnClaimer));
+  $('#claimTxHash').text(formatClaimTx(bnClaimTxHash));
 }
 
 

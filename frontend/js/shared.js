@@ -24,6 +24,35 @@ function formatWeiToEther(bnWei) {
   return bnWei.div(WEI_PER_ETHER).toString(10);
 }
 
+function formatState(bnClaimExpiry) {
+  var expiry = bnClaimExpiry.toString(10);
+  if (isTicketAvailable(expiry)) {
+    return 'OPEN';
+  }
+  return expiry;
+}
+
+function formatClaimer(bnClaimer) {
+  var claimer = formatHash(bnClaimer);
+  return claimer === '0' ? '-' : claimer;
+}
+
+function formatClaimTx(bnClaimTxHash) {
+  return bnClaimTxHash.eq(0) ? '-' : formatHash(bnClaimTxHash);
+}
+
+// http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
+function formatHash(bn) {
+  return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+
+  // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
+}
+
+function isTicketAvailable(claimExpiry) {
+    // TODO: check block timestamp
+    return claimExpiry === '1';
+}
+
 
 var bs58check = require('bs58check');
 var Buffer = require('buffer').Buffer;
