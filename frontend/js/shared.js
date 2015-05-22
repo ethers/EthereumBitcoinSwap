@@ -53,3 +53,9 @@ else {
 }
 
 var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
+
+
+// TODO don't forget to update the ABI
+var TicketContract = web3.eth.contract(externalEthBtcSwapAbi);
+var gContract = TicketContract.at(gTicketContractAddr);
+console.log('@@@@ gContract: ', gContract)

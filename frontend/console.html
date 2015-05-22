@@ -24,14 +24,8 @@ var gWeiDeposit;
 
 function lookup() {
   var ticketId = $('#ticketId').val();
-  // TODO don't forget to update the ABI
-  var bethAddress = gTicketContractAddr;
-  var abiToUse = externalEthBtcSwapAbi;
-  var TicketContract = web3.eth.contract(abiToUse);
-  var contract = TicketContract.at(bethAddress);
-  console.log('@@@@ contract: ', contract)
 
-  var ticketInfo = contract.lookupTicket.call(ticketId);
+  var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
   var btcAddr = formatBtcAddr(ticketInfo[0]);
   var bnWei = ticketInfo[1];
@@ -107,24 +101,11 @@ function lookup() {
 function callContract() {
   // TODO ticket Abi
   console.log('@@@ in callContract')
-  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
   console.log('@@@ gFromAccount: ', gFromAccount)
 
 
   var callOnly;
   // callOnly = true;  // if commented, it will do sendTransaction
-
-
-  // TODO don't forget to update the ABI
-  var bethAddress = gTicketContractAddr;
-  var abiToUse;
-  abiToUse = externalEthBtcSwapAbi;
-
-
-  var TicketContract = web3.eth.contract(abiToUse);
-  var contract = TicketContract.at(bethAddress);
-  console.log('@@@@ contract: ', contract)
-
 
   var ticketId = parseInt($('#ticketId').val(), 10);
   var txHash = '0x' + $('#txHash').val();
@@ -138,7 +119,7 @@ function callContract() {
     var startTime = Date.now();
 
 
-    var res = contract.reserveTicket.call(ticketId, txHash, objParam);
+    var res = gContract.reserveTicket.call(ticketId, txHash, objParam);
 
 
     var endTime = Date.now();
@@ -153,7 +134,7 @@ function callContract() {
 
 
 
-  var rvalFilter = contract.ticketEvent({ ticketId: ticketId });
+  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
   rvalFilter.watch(function(err, res) {
     if (err) {
       console.log('@@@ rvalFilter err: ', err)
@@ -173,7 +154,7 @@ function callContract() {
     rvalFilter.stopWatching();
   });
 
-  contract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+  gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
     if (err) {
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;
@@ -183,6 +164,10 @@ function callContract() {
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
   document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+}
+
+function writeClaimer() {
+
 }
 
 

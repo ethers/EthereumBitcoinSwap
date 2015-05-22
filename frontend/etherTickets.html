@@ -23,19 +23,7 @@ var web3 = require('web3');
 function callContract() {
   // TODO ticket Abi
   console.log('@@@ in callContract')
-  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
   console.log('@@@ gFromAccount: ', gFromAccount)
-
-
-  // TODO don't forget to update the ABI
-  var bethAddress = gTicketContractAddr;
-  var abiToUse = externalEthBtcSwapAbi;
-
-
-  var TicketContract = web3.eth.contract(abiToUse);
-  var contract = TicketContract.at(bethAddress);
-  console.log('@@@@ contract: ', contract)
-
 
   var btcAddr = '0x' + $('#btcAddr').val();
   var numWei = $('#numWei').val();
@@ -45,7 +33,7 @@ function callContract() {
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {from:gFromAccount, gas: 500000};
 
-  var ticketArr = contract.getOpenTickets.call(1, 40, objParam);  // TODO may need objParam
+  var ticketArr = gContract.getOpenTickets.call(1, 40, objParam);  // TODO may need objParam
 
   writeTable(ticketArr);
 }

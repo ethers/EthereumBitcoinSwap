@@ -43,23 +43,11 @@ function decodeBase58Check(btcAddr) {
 function callContract() {
   // TODO ticket Abi
   console.log('@@@ in callContract')
-  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
   console.log('@@@ gFromAccount: ', gFromAccount)
 
 
   var callOnly;
   // callOnly = true;  // if commented, it will do sendTransaction
-
-
-  // TODO don't forget to update the ABI
-  var bethAddress = gTicketContractAddr;
-  var abiToUse;
-  abiToUse = externalEthBtcSwapAbi;
-
-
-  var TicketContract = web3.eth.contract(abiToUse);
-  var contract = TicketContract.at(bethAddress);
-  console.log('@@@@ contract: ', contract)
 
   var btcPrice = $('#btcPrice').val();
 
@@ -85,7 +73,7 @@ function callContract() {
     var startTime = Date.now();
 
 
-    var res = contract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
+    var res = gContract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
 
 
     var endTime = Date.now();
@@ -96,7 +84,7 @@ function callContract() {
   }
 
 
-  var rvalFilter = contract.ticketEvent({ ticketId: 0 });
+  var rvalFilter = gContract.ticketEvent({ ticketId: 0 });
   rvalFilter.watch(function(err, res) {
     if (err) {
       console.log('@@@ rvalFilter err: ', err)
@@ -118,7 +106,7 @@ function callContract() {
 
   // var startTime = Date.now();
   //
-  contract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
+  gContract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
     if (err) {
       console.log('@@@ err: ', err)
       return;
