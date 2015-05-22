@@ -25,6 +25,14 @@ function formatWeiToEther(bnWei) {
 }
 
 
+var bs58check = require('bs58check');
+var Buffer = require('buffer').Buffer;
+function formatBtcAddr(bn) {
+  var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+  return bs58check.encode(new Buffer('00'+btcAddr, 'hex'));  // byte 0 for btcmainnet
+}
+
+
 var gTicketContractAddr;
 var gBtcTestnet;
 var gOurBtcAddr;
