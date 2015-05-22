@@ -55,12 +55,12 @@ function writeRow(ticketArr, index) {
   var bnWeiPerSatoshi = ticketArr[index + 3];
 
   var bnClaimExpiry = ticketArr[index + 4]
-  var bnClaimer = ticketArr[index + 5]
-  var bnClaimTxHash = ticketArr[index + 6]
+  // var bnClaimer = ticketArr[index + 5]
+  // var bnClaimTxHash = ticketArr[index + 6]
 
   var tr = '<tr><td>{ticketId}</td><td>{numEther}</td><td>{unitPrice}</td>' +
     '<td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td>' +
-    '<td>{claimer}</td><td>{claimTxHash}</td>' +
+    // '<td>{claimer}</td><td>{claimTxHash}</td>' +
     ticketAction(ticketId, formatState(bnClaimExpiry)) + '</tr>';
 
 
@@ -74,8 +74,8 @@ function writeRow(ticketArr, index) {
   tr = tr.replace('{unitPrice}', formatUnitPrice(bnUnitPrice));
   tr = tr.replace('{totalPrice}', formatTotalPrice(bnTotalPrice));
   tr = tr.replace('{claimExpiry}', formatState(bnClaimExpiry));
-  tr = tr.replace('{claimer}', formatClaimer(bnClaimer));
-  tr = tr.replace('{claimTxHash}', formatClaimTx(bnClaimTxHash));
+  // tr = tr.replace('{claimer}', formatClaimer(bnClaimer));
+  // tr = tr.replace('{claimTxHash}', formatClaimTx(bnClaimTxHash));
 
   $('#ticketTable > tbody').append(tr);
 }
@@ -120,13 +120,13 @@ function ticketAction(ticketId, ticketState) {
       <thead>
         <tr>
           <th>ID</th>
-          <th>Number of ether</th>
+          <th>Ethers</th>
           <th>Unit Price BTC</th>
           <th>Total Price BTC</th>
           <th>Bitcoin address</th>
           <th>Reserved</th>
-          <th>Claimer</th>
-          <th>Transaction Hash</th>
+          <!-- <th>Claimer</th>
+          <th>Transaction Hash</th> -->
           <th></th>
         </tr>
       </thead>
