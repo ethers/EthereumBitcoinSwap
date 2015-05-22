@@ -38,13 +38,13 @@ function lookup() {
 
   gWeiDeposit = bnWei.div(20);
 
-  // var btcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015';
-  // var numWei = web3.toWei(1, 'ether');
+  var bnEther = toEther(bnWei);
+  var bnUnitPrice = toUnitPrice(bnWeiPerSatoshi);
+  var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
 
-  // TODO base58check
   $('#btcAddr').text(btcAddr);
-  $('#numWei').text(formatEtherAmount(bnWei));
-  $('#totalPrice').text(formatTotalPrice(bnWei, bnWeiPerSatoshi));
+  $('#numEther').text(formatEtherAmount(bnEther));
+  $('#totalPrice').text(formatTotalPrice(bnTotalPrice));
 
   $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 
@@ -218,7 +218,7 @@ $(function() {
     <div class="row">
       <div class="col-md-6">
         <h3>Ticket</h3>
-        <h5>Ether amount: <strong id="numWei"></strong></h5>
+        <h5>Ether amount: <strong id="numEther"></strong></h5>
         <h5>Total Price BTC: <strong id="totalPrice"></strong></h5>
         <h5>Bitcoin Address: <strong id="btcAddr"></strong></h5>
       </div>
