@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Ethereum: offer your ether for bitcoin</title>
+  <link rel="stylesheet" href="./css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/dapp.css">
+  <script src="./js/jquery-2.1.3.min.js"></script>
+  <script src="./js/bootstrap.min.js"></script>
+
+  <script src="./js/bignumber.js"></script>
+  <script src="./js/web3.min.js"></script>
+
+  <script src="./js/ethBtcSwapAbi.js"></script>
+  <script src="./js/shared.js"></script>
+
+<script type="text/javascript">
+var web3 = require('web3');
+    web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+
+
+function lookup() {
+  var ticketId = $('#ticketId').val();
+  // TODO don't forget to update the ABI
+  var bethAddress = gTicketContractAddr;
+  var abiToUse = externalEthBtcSwapAbi;
+  var TicketContract = web3.eth.contract(abiToUse);
+  var contract = TicketContract.at(bethAddress);
+  console.log('@@@@ contract: ', contract)
+
+  var ticketInfo = contract.lookupTicket.call(ticketId);
+  console.log('@@@ tinfo: ', ticketInfo);
+  var btcAddr = ticketInfo[0].toString(16);
+  var numWei = ticketInfo[1];
+  var weiPerSatoshi = ticketInfo[2].toString(10);
+  var claimExpiry = ticketInfo[3]
+  var claimer = ticketInfo[4]
+  var claimTxHash = ticketInfo[5]
+
+
+  // var btcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015';
+  // var numWei = web3.toWei(1, 'ether');
+  // var weiPerSatoshi = '38461538461';
+
+  // TODO base58check
+  $('#btcAddr').text(btcAddr);
+  $('#numWei').text(numWei);
+  $('#weiPerSatoshi').text(weiPerSatoshi);
+
+  var bnWei = web3.toBigNumber(numWei);
+
+  var depositRequired = bnWei.div(20).toString(10);
+  $('#depositRequired').text(depositRequired);
+
+
+  var txHash = $('#txHash').val();
+  var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
+  $.getJSON(urlJsonTx, function(data) {
+    console.log('@@@ rawtx data: ', data)
+
+    if (!data || !data.out || data.out.length < 2) {
+      console.log('@@@ err btc tx not enough outputs')
+      return;
+    }
+
+    var bnSatoshi = web3.toBigNumber(data.out[0].value)
+    $('#satoshiPayment').text(bnSatoshi.toString(10));
+
+    $('#satoshiAddr').text(data.out[0].addr);
+
+    // TODO check addr slice
+    var tx1Script = data.out[1].script;
+    var etherAddr;
+    if (tx1Script && tx1Script.length === 50 &&
+        tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
+      etherAddr = data.out[1].script.slice(6, -4);
+    }
+    else {
+      etherAddr = 'INVALID'
+      console.log('@@ invalid ether addr: ', data.out[1])
+    }
+    $('#etherAddr').text(etherAddr);
+
+    var bnWeiBuyable = new BigNumber(weiPerSatoshi).mul(bnSatoshi);
+    // $('#weiBuyable').text(bnWeiBuyable.toString(10));
+
+    var txQuality;
+    var bnExtraWei = bnWeiBuyable.sub(bnWei);
+    if (bnExtraWei.lt(0)) {
+      txQuality = 'NO, transaction does not send enough bitcoin.'
+    }
+    else {
+      txQuality = 'YES, transaction can claim the ethers in the ticket.'
+    }
+    $('#txQuality').text(txQuality);
+
+
+
+    var bnEncodedFee = web3.toBigNumber(data.out[1].value).mod(10000);
+    $('#encodedFee').text(bnEncodedFee.div(100).toString(10) + '%');
+
+    var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
+    $('#computedFee').text(bnComputedFee.toString(10));
+  });
+}
+
+function callContract() {
+  // TODO ticket Abi
+  console.log('@@@ in callContract')
+  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
+  console.log('@@@ gFromAccount: ', gFromAccount)
+
+
+  var callOnly;
+  // callOnly = true;  // if commented, it will do sendTransaction
+
+
+  // TODO don't forget to update the ABI
+  var bethAddress = gTicketContractAddr;
+  var abiToUse;
+  abiToUse = externalEthBtcSwapAbi;
+
+
+  var TicketContract = web3.eth.contract(abiToUse);
+  var contract = TicketContract.at(bethAddress);
+  console.log('@@@@ contract: ', contract)
+
+
+  var ticketId = parseInt($('#ticketId').val(), 10);
+  var txHash = '0x' + $('#txHash').val();
+  var weiDeposit = $('#weiDeposit').val();
+
+
+  // TODO confirmation to deposit ether, from account, gasprice
+  var objParam = {value: weiDeposit, from:gFromAccount, gas: 500000};
+
+  if (callOnly) {
+    console.log('@@@@ callOnly')
+    var startTime = Date.now();
+
+
+    var res = contract.reserveTicket.call(ticketId, txHash, objParam);
+
+
+    var endTime = Date.now();
+    var durationSec = (endTime - startTime) / 1000;
+    console.log('@@@@ call res: ', res, ' duration: ', durationSec)
+    document.getElementById('result').innerText = res.toString(10) + "    " + durationSec+ "secs";
+    return;
+  }
+
+
+  // var startTime = Date.now();
+
+
+
+  var rvalFilter = contract.ticketEvent({ ticketId: ticketId });
+  rvalFilter.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ rvalFilter err: ', err)
+      return;
+    }
+
+    console.log('@@@ rvalFilter res: ', res)
+
+    var eventArgs = res.args;
+    if (eventArgs.rval.toNumber() === ticketId) {
+      document.getElementById('result').innerText = 'SUCCESS Ticket has been reserved';
+    }
+    else {
+      document.getElementById('result').innerText = 'Failed. Did you send enough deposit or specify correct ticket id?';
+    }
+
+    rvalFilter.stopWatching();
+  });
+
+  contract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+    if (err) {
+      console.log('@@@ reserveTicket sendtx err: ', err)
+      return;
+    }
+
+    // result is a txhash
+    console.log('@@@ reserveTicket txHash: ', txHash)
+  });
+  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+}
+
+
+
+
+$(function() {
+  if (!gBtcTestnet) {
+    $('#ticketContractAddr').text(gTicketContractAddr);
+
+    // tx190 300K
+    var txHash = '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566';
+    $('#txHash').val(txHash);
+    $('#weiDeposit').val(web3.toWei(1/20, 'ether'))
+  }
+});
+
+
+
+</script>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="logo">
+      <img src="./images/ethereum-logo-small.png"/>
+    </div>
+
+    <h2>Reserve then Claim Ether
+    </h2>
+
+    <p class="lead">Ticket contract at <span id="ticketContractAddr"></span></p>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Ticket</h3>
+        <h5>Ether amount: <strong id="numWei"></strong></h5>
+        <h5>Total Price BTC: <strong id="weiPerSatoshi"></strong></h5>
+        <h5>Bitcoin Address: <strong id="btcAddr"></strong></h5>
+      </div>
+      <div class="col-md-6">
+        <h3>Bitcoin Transaction</h3>
+        <h5>Fee to Claimer: <strong id="encodedFee"></strong></h5>
+        <h5>Bitcoins: <strong id="satoshiPayment"></strong></h5>
+        <h5>Bitcoin Address: <strong id="satoshiAddr"></strong></h5>
+        <h5>Ether address: <strong id="etherAddr"></strong></h5>
+      </div>
+    </div>
+
+    <form class="form">
+      <fieldset>
+        <label for="ticketId">Ticket ID</label>
+        <input type="text" class="form-control" id="ticketId"></input>
+
+        <label for="txHash">Bitcoin Transaction Hash</label>
+        <input type="text" class="form-control" id="txHash"></input>
+
+        <label for="weiDeposit">Deposit amount</label>
+        <input type="text" class="form-control" id="weiDeposit"></input>
+
+        <br>
+        <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
+      </fieldset>
+    </form>
+
+    <h5>Computed fee: <strong id="computedFee"></strong></h5>
+    <h5>Deposit required: <strong id="depositRequired"></strong></h5>
+    <button type="button" class="btn" onclick="callContract();">Reserve Ticket</button>
+
+    <div id="result"></div>
+
+    <div class="footer-logo">
+      <img src="./images/ETH_DEV_LOGO_LARGE.svg"/>
+    </div>
+  </div>
+
+</body>
+
+</html>
