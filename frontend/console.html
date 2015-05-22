@@ -54,8 +54,7 @@ function lookup() {
   $('#numWei').text(formatEtherAmount(bnWei));
   $('#totalPrice').text(formatTotalPrice(bnWei, bnWeiPerSatoshi));
 
-  var depositRequired = bnWei.div(20).toString(10);
-  $('#depositRequired').text(depositRequired);
+  $('#depositRequired').text(formatWeiToEther(bnWei.div(20)));
 
 
   var txHash = $('#txHash').val();
@@ -69,9 +68,9 @@ function lookup() {
     }
 
     var bnSatoshi = web3.toBigNumber(data.out[0].value)
-    $('#satoshiPayment').text(bnSatoshi.toString(10));
+    $('#btcPayment').text(formatSatoshiToBTC(bnSatoshi));
 
-    $('#satoshiAddr').text(data.out[0].addr);
+    $('#paymentAddr').text(data.out[0].addr);
 
     // TODO check addr slice
     var tx1Script = data.out[1].script;
@@ -105,7 +104,7 @@ function lookup() {
     $('#encodedFee').text(bnEncodedFee.div(100).toString(10) + '%');
 
     var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
-    $('#computedFee').text(bnComputedFee.toString(10));
+    $('#computedFee').text(formatWeiToEther(bnComputedFee));
   });
 }
 
@@ -233,8 +232,8 @@ $(function() {
       <div class="col-md-6">
         <h3>Bitcoin Transaction</h3>
         <h5>Fee to Claimer: <strong id="encodedFee"></strong></h5>
-        <h5>Bitcoins: <strong id="satoshiPayment"></strong></h5>
-        <h5>Bitcoin Address: <strong id="satoshiAddr"></strong></h5>
+        <h5>Bitcoins: <strong id="btcPayment"></strong></h5>
+        <h5>Bitcoin Address: <strong id="paymentAddr"></strong></h5>
         <h5>Ether address: <strong id="etherAddr"></strong></h5>
       </div>
     </div>

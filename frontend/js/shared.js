@@ -1,7 +1,8 @@
 var TWO_POW_256 = new BigNumber(2).pow(256);
 
-var WEI_PER_SATOSHI = new BigNumber(10).pow(10);
+var WEI_PER_ETHER = new BigNumber(10).pow(18);
 var SATOSHI_PER_BTC = new BigNumber(10).pow(8);
+var WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 function formatEtherAmount(bnWei) {
   return web3.fromWei(bnWei, 'ether').toString(10);
@@ -14,6 +15,15 @@ function formatUnitPrice(nWeiPerSatoshi) {
 function formatTotalPrice(bnWei, bnWeiPerSatoshi) {
   return bnWei.div(bnWeiPerSatoshi).div(SATOSHI_PER_BTC).toString(10);
 }
+
+function formatSatoshiToBTC(bnSatoshi) {
+  return bnSatoshi.div(SATOSHI_PER_BTC).toString(10);
+}
+
+function formatWeiToEther(bnWei) {
+  return bnWei.div(WEI_PER_ETHER).toString(10);
+}
+
 
 var gTicketContractAddr;
 var gBtcTestnet;
