@@ -74,14 +74,19 @@ if (gBtcTestnet) {
   gRelayAddr = '0x7d5a9e09786d628603ce7f5819b21f5ac14e6baf';
   gExchangeContractAddr = '0xa5bbd4e59bdc2c17e52e7056afe43ba9f52462f2';
 
-  gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
+  // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
+  // should base58check decode
 }
 else {
   gRelayAddr = '0xcffaf1199ff8b486a20728424879dd59ecb38a92';
   gExchangeContractAddr = '0xf073d7b459592fc9552f6015473c44d50d802d6d';
   // gExchangeContractAddr = '0x95e32f338d28bed978b3ef948bd73ec20d1eb60a'; // Go
 
-  gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx1 of block300K
+  // from tx190 of block300K
+  // hex is 956bfc5575c0a7134c7effef268e51d887ba7015
+  // gOurBtcAddr = '1Ed53ZSJiL5hF9qLonNPQ6CAckKYsNeWwJ';
+  // should base58check decode
+
   // var gOurBtcAddr = '29a158767437cd82ccf4bd3e34ecd16c267fc363'  // tx3 of block300K
   // var gOurBtcAddr = 'c398efa9c392ba6013c5e04ee729755ef7f58b32'  // tx1 of block100K
 }

@@ -20,6 +20,26 @@ var web3 = require('web3');
     web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
 
+function decodeBase58Check(btcAddr) {
+  var byteArrayData = bs58check.decode(btcAddr);
+
+  var ret = "",
+    i = 1,  // skip the Bitcoin "version" prefix
+    len = byteArrayData.length;
+
+  while (i < len) {
+    var a = byteArrayData[i];
+    var h = a.toString(16);
+    if (a < 10) {
+      h = "0" + h;
+    }
+    ret += h;
+    i++;
+  }
+
+  return ret;
+}
+
 function callContract() {
   // TODO ticket Abi
   console.log('@@@ in callContract')
@@ -44,10 +64,17 @@ function callContract() {
   var btcPrice = $('#btcPrice').val();
 
   // these are passed to contract
-  var btcAddr = '0x' + $('#btcAddr').val();
+  var addrHex;
+  try {
+    addrHex = '0x' + decodeBase58Check($('#btcAddr').val().trim());
+  }
+  catch (err) {
+    document.getElementById('result').innerText = 'Bad Bitcoin address: ' + err.message;
+    return;
+  }
   var numWei = web3.toWei($('#numWei').val(), 'ether');
   var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0);
-  console.log('@@@@ weiPerSatoshi: ', weiPerSatoshi.toString(10));
+  console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi.toString(10));
 
 
   // TODO confirmation to deposit ether, from account, gasprice
@@ -58,7 +85,7 @@ function callContract() {
     var startTime = Date.now();
 
 
-    var res = contract.createTicket.call(btcAddr, numWei, weiPerSatoshi, objParam);
+    var res = contract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
 
 
     var endTime = Date.now();
@@ -91,7 +118,7 @@ function callContract() {
 
   // var startTime = Date.now();
   //
-  contract.createTicket.sendTransaction(btcAddr, numWei, weiPerSatoshi, objParam, function(err, result) {
+  contract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
     if (err) {
       console.log('@@@ err: ', err)
       return;

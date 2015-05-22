@@ -47,7 +47,9 @@ if (gBtcTestnet) {
 else {
   gTicketContractAddr = '0x668a7adf4cb288d48b5b23e47fe35e8c14c55a81';
 
-  gOurBtcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015'  // tx190 of block300K
+  // from tx190 of block300K
+  // hex is 956bfc5575c0a7134c7effef268e51d887ba7015
+  gOurBtcAddr = '1Ed53ZSJiL5hF9qLonNPQ6CAckKYsNeWwJ';
 }
 
 var gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
