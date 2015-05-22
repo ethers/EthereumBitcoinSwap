@@ -27,6 +27,8 @@ function formatBtcAddr(bn) {
   return bs58check.encode(new Buffer('00'+btcAddr, 'hex'));  // byte 0 for btcmainnet
 }
 
+var gWeiDeposit;
+
 function lookup() {
   var ticketId = $('#ticketId').val();
   // TODO don't forget to update the ABI
@@ -45,6 +47,7 @@ function lookup() {
   var claimer = ticketInfo[4]
   var claimTxHash = ticketInfo[5]
 
+  gWeiDeposit = bnWei.div(20);
 
   // var btcAddr = '956bfc5575c0a7134c7effef268e51d887ba7015';
   // var numWei = web3.toWei(1, 'ether');
@@ -54,7 +57,7 @@ function lookup() {
   $('#numWei').text(formatEtherAmount(bnWei));
   $('#totalPrice').text(formatTotalPrice(bnWei, bnWeiPerSatoshi));
 
-  $('#depositRequired').text(formatWeiToEther(bnWei.div(20)));
+  $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 
 
   var txHash = $('#txHash').val();
@@ -132,11 +135,10 @@ function callContract() {
 
   var ticketId = parseInt($('#ticketId').val(), 10);
   var txHash = '0x' + $('#txHash').val();
-  var weiDeposit = $('#weiDeposit').val();
 
 
   // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: weiDeposit, from:gFromAccount, gas: 500000};
+  var objParam = {value: gWeiDeposit, from:gFromAccount, gas: 500000};
 
   if (callOnly) {
     console.log('@@@@ callOnly')
@@ -200,7 +202,6 @@ $(function() {
     // tx190 300K
     var txHash = '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566';
     $('#txHash').val(txHash);
-    $('#weiDeposit').val(web3.toWei(1/20, 'ether'))
   }
 });
 
@@ -245,9 +246,6 @@ $(function() {
 
         <label for="txHash">Bitcoin Transaction Hash</label>
         <input type="text" class="form-control" id="txHash"></input>
-
-        <label for="weiDeposit">Deposit amount</label>
-        <input type="text" class="form-control" id="weiDeposit"></input>
 
         <br>
         <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
