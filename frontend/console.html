@@ -13,10 +13,19 @@
   <script src="./js/ethBtcSwapAbi.js"></script>
   <script src="./js/shared.js"></script>
 
+  <script src="./js/bs58check.js"></script>
+
 <script type="text/javascript">
 var web3 = require('web3');
     web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
+var bs58check = require('bs58check');
+var Buffer = require('buffer').Buffer;
+
+function formatBtcAddr(bn) {
+  var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+  return bs58check.encode(new Buffer('00'+btcAddr, 'hex'));  // byte 0 for btcmainnet
+}
 
 function lookup() {
   var ticketId = $('#ticketId').val();
@@ -29,7 +38,7 @@ function lookup() {
 
   var ticketInfo = contract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
-  var btcAddr = ticketInfo[0].toString(16);
+  var btcAddr = formatBtcAddr(ticketInfo[0]);
   var numWei = ticketInfo[1];
   var weiPerSatoshi = ticketInfo[2].toString(10);
   var claimExpiry = ticketInfo[3]

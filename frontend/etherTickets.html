@@ -122,7 +122,6 @@ function formatClaimer(claimer) {
   return claimer === '0' ? '-' : claimer;
 }
 
-var TWO_POW_256 = new BigNumber(2).pow(256);
 function formatClaimTx(bnClaimTxHash) {
   return bnClaimTxHash.eq(0) ? '-' : formatHash(bnClaimTxHash);
 }

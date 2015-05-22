@@ -1,3 +1,5 @@
+var TWO_POW_256 = new BigNumber(2).pow(256);
+
 var WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 var SATOSHI_PER_BTC = new BigNumber(10).pow(8);
 
