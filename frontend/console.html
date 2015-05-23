@@ -187,7 +187,7 @@ function writeClaimer(ticketId) {
 function renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash) {
   $('#claimExpiry').text(formatState(bnClaimExpiry));
   $('#claimerAddr').text(formatClaimer(bnClaimer));
-  $('#claimTxHash').text(formatClaimTx(bnClaimTxHash));
+  // $('#claimTxHash').text(formatClaimTx(bnClaimTxHash));
 }
 
 
@@ -357,7 +357,8 @@ $(function() {
         <h3>Claimer</h3>
         <h5>Address: <strong id="claimerAddr"></strong></h5>
         <h5>Expiry: <strong id="claimExpiry"></strong></h5>
-        <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5>
+        <!-- to save space, we will toggle #txHash to readonly when a ticket is reserved -->
+        <!-- <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5> -->
         <h5>Claimer will receive ether: <strong id="computedFee"></strong></h5>
         <h5>Claimer needs to provide ether security deposit: <strong id="depositRequired"></strong></h5>
         <button type="button" class="btn" onclick="callContract();">Reserve Ticket</button>
