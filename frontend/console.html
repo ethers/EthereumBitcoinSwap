@@ -27,6 +27,12 @@ function lookup() {
 
   var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
+
+  if (ticketInfo[0].eq(0)) {
+    document.getElementById('result').innerText = 'Ticket has been claimed or does not exist'
+    return;
+  }
+
   var btcAddr = formatBtcAddr(ticketInfo[0]);
   var bnWei = ticketInfo[1];
   var bnWeiPerSatoshi = ticketInfo[2];
