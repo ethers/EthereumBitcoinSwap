@@ -15,14 +15,25 @@
   <script src="./js/ethBtcSwapAbi.js"></script>
   <script src="./js/shared.js"></script>
 
+  <script src="./js/btcproof.js"></script>
+
 <script type="text/javascript">
 var web3 = require('web3');
     web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
+var btcproof = require('btcproof');
+
 var gWeiDeposit;
 
 
-function lookup() {
+function lookupClicked() {
+  // some condition that decides between Reserve and Claim
+  // lookupForReserving();
+
+  lookupForClaiming();
+}
+
+function lookupForReserving() {
   var ticketId = $('#ticketId').val();
 
   var ticketInfo = gContract.lookupTicket.call(ticketId);
@@ -259,6 +270,69 @@ function ticketAction(ticketId, ticketState) {
 
 
 
+
+function lookupForClaiming() {
+  var result = getTxInfo();
+}
+
+// get raw serialized transaction and merkle proof
+function getTxInfo() {
+  var result = {};
+
+  var txid = $('#txHash').val();
+  console.log('@@@ txid: ', txid);
+
+  var urlJsonTx;
+  if (gBtcTestnet) {
+      urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/" + txid;
+  }
+  else {
+      urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/" + txid;
+  }
+  $.getJSON(urlJsonTx, function(data) {
+      console.log('@@@ data: ', data)
+
+      result.rawTx = data.data.tx.hex;
+      // console.log('@@@@ rawTx: ', result.rawTx);
+
+      var blockNum = data.data.tx.blockhash; // blockr does not easily provide block height
+      $('#txBlockNum').text('n/a for blockr.io');
+      // $('#txBlockNum').text(blockNum);
+
+      var blockInfoUrl;
+      if (gBtcTestnet) {
+          blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
+      }
+      else {
+          blockInfoUrl = "http://btc.blockr.io/api/v1/block/raw/"+blockNum;
+      }
+      $.getJSON(blockInfoUrl, function(res) {
+          console.log('@@@ res: ', res)
+
+          gBlockHashOfTx = res.data.hash;
+          $('#txBlockHash').text(gBlockHashOfTx)
+
+          var txIndex;
+          for (var key in res.data.tx) {
+            if (res.data.tx[key] == txid) {
+              txIndex = key;
+              break;
+            }
+          }
+
+          // var txIndex = Object.keys(res.data.tx).indexOf(txid);
+          console.log('@@@@ txIndex: ', txIndex)
+
+          result.merkleProof = btcproof.getProof(res.data.tx, txIndex);
+          console.log('@@@ result.merkleProof: ', result.merkleProof)
+          $('#mProof').val(JSON.stringify(result.merkleProof));
+
+          return result;
+      });
+  })
+}
+
+
 $(function() {
   if (!gBtcTestnet) {
     $('#ticketContractAddr').text(gTicketContractAddr);
@@ -350,7 +424,7 @@ $(function() {
             <input type="text" class="form-control" id="txHash"></input>
 
             <br>
-            <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
+            <button type="button" class="btn btn-default" onclick="lookupClicked();">Lookup</button>
           </fieldset>
         </form>
 
