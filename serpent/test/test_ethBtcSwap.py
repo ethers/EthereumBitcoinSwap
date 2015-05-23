@@ -68,7 +68,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 2
+        assert claimRes['output'] == ticketId
 
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
@@ -157,7 +157,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 2
+        assert claimRes['output'] == ticketId
 
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
@@ -243,7 +243,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 2
+        assert claimRes['output'] == ticketId
 
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
@@ -504,8 +504,13 @@ class TestEthBtcSwap(object):
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
+        # let's claim a ticket with ID bigger than 1
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 1
+        ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert ticketId == 2
+        ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        assert ticketId == 3
 
         claimer = tester.k1
         addrClaimer = tester.a1
@@ -514,7 +519,7 @@ class TestEthBtcSwap(object):
         gasPrice = int(10e12)  # 10 szabo
         res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
-        assert res['output'] == 1
+        assert res['output'] == ticketId
 
         # since the gas from profiling seems approximate, assert that the
         # balance is within 5% of approxTxCost
@@ -531,7 +536,7 @@ class TestEthBtcSwap(object):
 
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 2
+        assert claimRes['output'] == ticketId
 
         # gas from profiling claimTicket() is inaccurate so assert that the
         # balance is within 1.8X of approxCostToClaim
