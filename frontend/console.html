@@ -29,7 +29,7 @@ var gWeiDeposit;
 // TODO dedupe with isTicketAvailable()
 function ticketNeedsToBeReserved() {
   // hacky and needs to check if expired
-  return $('#claimExpiry').text() === 'OPEN';
+  return $('#claimExpiry').text() === '' || $('#claimExpiry').text() === 'OPEN';
 }
 
 function lookupClicked() {
@@ -50,7 +50,7 @@ function lookupForReserving() {
   var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
-  if (ticketInfo[0].eq(0)) {
+  if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].eq(0)) {
     document.getElementById('result').innerText = 'Ticket has been claimed or does not exist'
     $('#result').addClass('alert-danger');
     return;
