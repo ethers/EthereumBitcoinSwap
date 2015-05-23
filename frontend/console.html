@@ -26,11 +26,22 @@ var btcproof = require('btcproof');
 var gWeiDeposit;
 
 
-function lookupClicked() {
-  // some condition that decides between Reserve and Claim
-  // lookupForReserving();
+// TODO dedupe with isTicketAvailable()
+function ticketNeedsToBeReserved() {
+  // hacky and needs to check if expired
+  return $('#claimExpiry').text() === 'OPEN';
+}
 
-  lookupForClaiming();
+function lookupClicked() {
+  lookupForReserving();
+  $('#btnReserve').addClass('btn-primary');
+  $('#btnClaim').removeClass('btn-primary');
+
+  if (!ticketNeedsToBeReserved()) {
+    lookupForClaiming();
+    $('#btnClaim').addClass('btn-primary');
+    $('#btnReserve').removeClass('btn-primary');
+  }
 }
 
 function lookupForReserving() {
@@ -541,14 +552,14 @@ $(function() {
             <!-- <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5> -->
             <h5>Claimer will receive ether: <strong id="computedFee"></strong></h5>
             <h5>Claimer needs to provide ether security deposit: <strong id="depositRequired"></strong></h5>
-            <button type="button" class="btn" onclick="reserveClicked();">Reserve</button>
+            <button type="button" id="btnReserve" class="btn btn-default" onclick="reserveClicked();">Reserve</button>
           </div>
 
           <div class="col-md-6">
             <h5>Merkle Proof</h5>
             <textarea readonly class="form-control" name="textarea" id="mProof" rows="5"></textarea>
             <br>
-            <button type="button" class="btn" onclick="claimClicked();">Claim</button>
+            <button type="button" id="btnClaim" class="btn btn-default" onclick="claimClicked();">Claim</button>
           </div>
         </div>
       </div>
