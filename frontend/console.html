@@ -106,9 +106,9 @@ function lookup() {
   });
 }
 
-function callContract() {
+function reserveClicked() {
   // TODO ticket Abi
-  console.log('@@@ in callContract')
+  console.log('@@@ in reserveClicked')
   console.log('@@@ gFromAccount: ', gFromAccount)
 
 
@@ -354,14 +354,23 @@ $(function() {
           </fieldset>
         </form>
 
-        <h3>Claimer</h3>
-        <h5>Address: <strong id="claimerAddr"></strong></h5>
-        <h5>Expiry: <strong id="claimExpiry"></strong></h5>
-        <!-- to save space, we will toggle #txHash to readonly when a ticket is reserved -->
-        <!-- <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5> -->
-        <h5>Claimer will receive ether: <strong id="computedFee"></strong></h5>
-        <h5>Claimer needs to provide ether security deposit: <strong id="depositRequired"></strong></h5>
-        <button type="button" class="btn" onclick="callContract();">Reserve Ticket</button>
+        <div class="col-md-6">
+          <h3>Claimer</h3>
+          <h5>Address: <strong id="claimerAddr"></strong></h5>
+          <h5>Expiry: <strong id="claimExpiry"></strong></h5>
+          <!-- to save space, we will toggle #txHash to readonly when a ticket is reserved -->
+          <!-- <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5> -->
+          <h5>Claimer will receive ether: <strong id="computedFee"></strong></h5>
+          <h5>Claimer needs to provide ether security deposit: <strong id="depositRequired"></strong></h5>
+          <button type="button" class="btn" onclick="reserveClicked();">Reserve</button>
+        </div>
+
+        <div class="col-md-6">
+          <h5>Merkle Proof</h5>
+          <textarea readonly class="form-control" name="textarea" id="mProof" rows="5"></textarea>
+          <br>
+          <button type="button" class="btn" onclick="claimClicked();">Claim</button>
+        </div>
 
       </div>
     </div>
