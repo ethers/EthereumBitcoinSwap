@@ -195,6 +195,12 @@ $(function() {
     var txHash = '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566';
     $('#txHash').val(txHash);
   }
+
+
+  $("#appTab a").click(function(e){
+    e.preventDefault();
+    $(this).tab('show');
+  });
 });
 
 
@@ -210,47 +216,62 @@ $(function() {
       <img src="./images/ethereum-logo-small.png"/>
     </div>
 
-    <h2>Reserve then Claim Ether
-    </h2>
+    <ul class="nav nav-tabs" id="appTab">
+      <li role="presentation"><a href="#ticketSection">Tickets</a></li>
+      <li role="presentation" class="active"><a href="#claimSection">Claim</a></li>
+    </ul>
 
-    <p class="lead">Ticket contract at <span id="ticketContractAddr"></span></p>
-
-    <div class="row">
-      <div class="col-md-6">
-        <h3>Ticket</h3>
-        <h5>Ether amount: <strong id="numEther"></strong></h5>
-        <h5>Total Price BTC: <strong id="totalPrice"></strong></h5>
-        <h5>Bitcoin Address: <strong id="btcAddr"></strong></h5>
+    <div class="tab-content">
+      <div id="ticketSection" class="tab-pane fade">
+        TODO
       </div>
-      <div class="col-md-6">
-        <h3>Bitcoin Transaction</h3>
-        <h5>Ether Fee to Claimer: <strong id="encodedFee"></strong></h5>
-        <h5>BTC: <strong id="btcPayment"></strong></h5>
-        <h5>Bitcoin Address: <strong id="paymentAddr"></strong></h5>
-        <h5>Ether address: <strong id="etherAddr"></strong></h5>
+      <div id="claimSection" class="tab-pane fade in active">
+
+        <h2>Reserve then Claim Ether
+        </h2>
+
+        <p class="lead">Ticket contract at <span id="ticketContractAddr"></span></p>
+
+        <div class="row">
+          <div class="col-md-6">
+            <h3>Ticket</h3>
+            <h5>Ether amount: <strong id="numEther"></strong></h5>
+            <h5>Total Price BTC: <strong id="totalPrice"></strong></h5>
+            <h5>Bitcoin Address: <strong id="btcAddr"></strong></h5>
+          </div>
+          <div class="col-md-6">
+            <h3>Bitcoin Transaction</h3>
+            <h5>Ether Fee to Claimer: <strong id="encodedFee"></strong></h5>
+            <h5>BTC: <strong id="btcPayment"></strong></h5>
+            <h5>Bitcoin Address: <strong id="paymentAddr"></strong></h5>
+            <h5>Ether address: <strong id="etherAddr"></strong></h5>
+          </div>
+        </div>
+
+        <form class="form">
+          <fieldset>
+            <label for="ticketId">Ticket ID</label>
+            <input type="text" class="form-control" id="ticketId"></input>
+
+            <label for="txHash">Bitcoin Transaction Hash</label>
+            <input type="text" class="form-control" id="txHash"></input>
+
+            <br>
+            <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
+          </fieldset>
+        </form>
+
+        <h3>Claimer</h3>
+        <h5>Address: <strong id="claimerAddr"></strong></h5>
+        <h5>Expiry: <strong id="claimExpiry"></strong></h5>
+        <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5>
+        <h5>Claimer will receive ether: <strong id="computedFee"></strong></h5>
+        <h5>Claimer needs to provide ether security deposit: <strong id="depositRequired"></strong></h5>
+        <button type="button" class="btn" onclick="callContract();">Reserve Ticket</button>
+
       </div>
     </div>
 
-    <form class="form">
-      <fieldset>
-        <label for="ticketId">Ticket ID</label>
-        <input type="text" class="form-control" id="ticketId"></input>
-
-        <label for="txHash">Bitcoin Transaction Hash</label>
-        <input type="text" class="form-control" id="txHash"></input>
-
-        <br>
-        <button type="button" class="btn btn-default" onclick="lookup();">Lookup</button>
-      </fieldset>
-    </form>
-
-    <h3>Claimer</h3>
-    <h5>Address: <strong id="claimerAddr"></strong></h5>
-    <h5>Expiry: <strong id="claimExpiry"></strong></h5>
-    <h5>Bitcoin Transaction Hash: <strong id="claimTxHash"></strong></h5>
-    <h5>Claimer will receive ether: <strong id="computedFee"></strong></h5>
-    <h5>Claimer needs to provide ether security deposit: <strong id="depositRequired"></strong></h5>
-    <button type="button" class="btn" onclick="callContract();">Reserve Ticket</button>
 
     <div id="result"></div>
 
