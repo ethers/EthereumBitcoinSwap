@@ -10,6 +10,8 @@
   <script src="./js/bignumber.js"></script>
   <script src="./js/web3.min.js"></script>
 
+  <script src="./js/bs58check.js"></script>
+
   <script src="./js/ethBtcSwapAbi.js"></script>
   <script src="./js/shared.js"></script>
 
@@ -31,26 +33,8 @@ var CLAIM_FAIL_FALLTHRU = 99999999
 var gMerkleProof;
 var gBlockHashOfTx;
 var gRawTx;
-function callContract() {
-  console.log('@@@ in callContract')
-  console.log('@@@ externalEthBtcSwapAbi: ', externalEthBtcSwapAbi)
-  console.log('@@@ gFromAccount: ', gFromAccount)
-
-
-  var callOnly;
-  // callOnly = true;  // if commented, it will call sendTransaction
-
-
-  // TODO don't forget to update the ABI
-  var bethAddress = gTicketContractAddr;
-  var abiToUse;
-  abiToUse = externalEthBtcSwapAbi;
-
-
-  var TicketContract = web3.eth.contract(abiToUse);
-  var contract = TicketContract.at(bethAddress);
-  console.log('@@@@ contract: ', contract)
-
+function claimTicket() {
+  console.log('@@@ in claimTicket')
 
   var ticketId = parseInt($('#ticketId').val(), 10);
   var txHex = gRawTx;
@@ -67,13 +51,23 @@ function callContract() {
     // return new BigNumber('0x' + sib);
   });
 
+  doClaim(ticketId, txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash);
+}
+
+
+function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
+  console.log('@@@ doClaim args: ', arguments)
+
+  var callOnly;
+  // callOnly = true;  // if commented, it will call sendTransaction
+
 
   var objParam = {from:gFromAccount, gas: 3000000};
   if (callOnly) {
     console.log('@@@@ callOnly')
     var startTime = Date.now();
 
-    var res = contract.claimTicket.call(ticketId, txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam);
+    var res = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
 
 
     var endTime = Date.now();
@@ -85,7 +79,7 @@ function callContract() {
 
 
 
-  var rvalFilter = contract.ticketEvent({ ticketId: ticketId });
+  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
   rvalFilter.watch(function(err, res) {
     if (err) {
       console.log('@@@ rvalFilter err: ', err)
@@ -123,7 +117,7 @@ function callContract() {
     rvalFilter.stopWatching();
   });
 
-  contract.claimTicket.sendTransaction(ticketId, txHex, txHash, gMerkleProof.txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
+  gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
       console.log('@@@ err: ', err)
       return;
@@ -322,7 +316,7 @@ $(function() {
         </div>
       </div>
       <br><br>
-      <button type="button" class="btn btn-default" onclick="callContract();">Claim Ether</button>
+      <button type="button" class="btn btn-default" onclick="claimTicket();">Claim Ether</button>
     </form>
 
 
