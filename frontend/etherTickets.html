@@ -25,11 +25,6 @@ function callContract() {
   console.log('@@@ in callContract')
   console.log('@@@ gFromAccount: ', gFromAccount)
 
-  var btcAddr = '0x' + $('#btcAddr').val();
-  var numWei = $('#numWei').val();
-  var weiPerSatoshi = $('#weiPerSatoshi').val();
-
-
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {from:gFromAccount, gas: 500000};
 

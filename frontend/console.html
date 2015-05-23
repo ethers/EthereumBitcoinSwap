@@ -187,6 +187,72 @@ function renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash) {
 
 
 
+function showTickets() {
+  console.log('@@@ showTickets()')
+
+  // TODO confirmation to deposit ether, from account, gasprice
+  var objParam = {from:gFromAccount, gas: 500000};
+
+  var ticketArr = gContract.getOpenTickets.call(1, 40, objParam);  // TODO may need objParam
+
+  writeTable(ticketArr);
+}
+
+
+var TICKET_FIELDS = 7;
+function writeTable(ticketArr) {
+  var len = ticketArr.length;
+  for (var i=0; i < len; i+= TICKET_FIELDS) {
+    writeRow(ticketArr, i);
+  }
+}
+
+
+function writeRow(ticketArr, index) {
+  var ticketId = ticketArr[index + 0].toString(10);
+  var bnBtcAddr = ticketArr[index + 1];
+  var bnWei = ticketArr[index + 2];
+  var bnWeiPerSatoshi = ticketArr[index + 3];
+
+  var bnClaimExpiry = ticketArr[index + 4]
+  // var bnClaimer = ticketArr[index + 5]
+  // var bnClaimTxHash = ticketArr[index + 6]
+
+  var tr = '<tr><td>{ticketId}</td><td>{numEther}</td><td>{unitPrice}</td>' +
+    '<td>{totalPrice}</td><td>{btcAddr}</td><td>{claimExpiry}</td>' +
+    // '<td>{claimer}</td><td>{claimTxHash}</td>' +
+    ticketAction(ticketId, formatState(bnClaimExpiry)) + '</tr>';
+
+
+  var bnEther = toEther(bnWei);
+  var bnUnitPrice = toUnitPrice(bnWeiPerSatoshi);
+  var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
+
+  tr = tr.replace('{ticketId}', ticketId);
+  tr = tr.replace('{btcAddr}', formatBtcAddr(bnBtcAddr));
+  tr = tr.replace('{numEther}', formatEtherAmount(bnEther));
+  tr = tr.replace('{unitPrice}', formatUnitPrice(bnUnitPrice));
+  tr = tr.replace('{totalPrice}', formatTotalPrice(bnTotalPrice));
+  tr = tr.replace('{claimExpiry}', formatState(bnClaimExpiry));
+  // tr = tr.replace('{claimer}', formatClaimer(bnClaimer));
+  // tr = tr.replace('{claimTxHash}', formatClaimTx(bnClaimTxHash));
+
+  $('#ticketTable > tbody').append(tr);
+}
+
+function ticketAction(ticketId, ticketState) {
+  var btnLabel;
+  if (ticketState === 'OPEN') {
+    btnLabel = 'Reserve';
+  }
+  else {
+    btnLabel = 'Claim';
+  }
+  return '<td><button class="btn">' + btnLabel + '</button></td>'
+}
+
+
+
 $(function() {
   if (!gBtcTestnet) {
     $('#ticketContractAddr').text(gTicketContractAddr);
@@ -194,6 +260,8 @@ $(function() {
     // tx190 300K
     var txHash = '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566';
     $('#txHash').val(txHash);
+
+    showTickets();
   }
 
 
@@ -222,11 +290,30 @@ $(function() {
     </ul>
 
     <div class="tab-content">
-      <div id="ticketSection" class="tab-pane fade">
-        TODO
-      </div>
-      <div id="claimSection" class="tab-pane fade in active">
 
+      <div id="ticketSection" class="tab-pane fade">
+        <h2>Tickets offering ether for bitcoin
+        </h2>
+
+        <table class="table" id="ticketTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ethers</th>
+              <th>Unit Price BTC</th>
+              <th>Total Price BTC</th>
+              <th>Bitcoin address</th>
+              <th>Reserved</th>
+              <!-- <th>Claimer</th>
+              <th>Transaction Hash</th> -->
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="claimSection" class="tab-pane fade in active">
         <h2>Reserve then Claim Ether
         </h2>
 
