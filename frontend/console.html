@@ -45,13 +45,14 @@ function lookupClicked() {
 }
 
 function lookupForReserving() {
-  var ticketId = $('#ticketId').val();
+  var ticketId = parseInt($('#ticketId').val(), 10);
 
   var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
   if (ticketInfo[0].eq(0)) {
     document.getElementById('result').innerText = 'Ticket has been claimed or does not exist'
+    $('#result').addClass('alert-danger');
     return;
   }
 
@@ -566,7 +567,7 @@ $(function() {
     </div>
 
 
-    <div id="result"></div>
+    <div id="result" class="alert" role="alert"></div>
 
     <div class="footer-logo">
       <img src="./images/ETH_DEV_LOGO_LARGE.svg"/>
