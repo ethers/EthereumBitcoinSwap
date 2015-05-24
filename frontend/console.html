@@ -452,6 +452,8 @@ function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
 $(function() {
   if (!gBtcTestnet) {
     $('#ticketContractAddr').text(gTicketContractAddr);
+    var bnTCBal = web3.eth.getBalance(gTicketContractAddr);
+    $('#ticketContractBal').text(web3.fromWei(bnTCBal, 'ether'));
 
     // tx190 300K
     var txHash = '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566';
@@ -479,6 +481,11 @@ $(function() {
     <div class="logo">
       <img src="./images/ethereum-logo-small.png"/>
     </div>
+
+    <h3>Ticket contract: <span id="ticketContractAddr"></span><br>
+    Ether balance: <span id="ticketContractBal"></span>
+    </h3>
+    <br>
 
     <ul class="nav nav-tabs" id="appTab">
       <li role="presentation"><a href="#ticketSection">Tickets</a></li>
@@ -514,8 +521,6 @@ $(function() {
       <div id="claimSection" class="tab-pane fade in active">
         <h2>Reserve then Claim Ether
         </h2>
-
-        <p class="lead">Ticket contract at <span id="ticketContractAddr"></span></p>
 
         <div class="row">
           <div class="col-md-6">
