@@ -45,7 +45,7 @@ Template.ticket.viewmodel(function(data) {
       return formatUnitPrice(bnUnitPrice);
     },
     totalPrice: function() {
-      var bnTotalPrice = toTotalPrice(data.bnEther, data.bnUnitPrice);
+      var bnTotalPrice = toTotalPrice(toEther(data.bnWei), toUnitPrice(data.bnWeiPerSatoshi));
       return formatTotalPrice(bnTotalPrice);
     },
     btcAddr: formatBtcAddr(data.bnBtcAddr),
