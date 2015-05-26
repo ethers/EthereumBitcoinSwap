@@ -45,10 +45,6 @@ function callContract() {
   console.log('@@@ in callContract')
   console.log('@@@ gFromAccount: ', gFromAccount)
 
-
-  var callOnly;
-  // callOnly = true;  // if commented, it will do sendTransaction
-
   var btcPrice = $('#btcPrice').val();
 
   // these are passed to contract
@@ -64,7 +60,15 @@ function callContract() {
   var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0);
   console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi.toString(10));
 
+  submitOffer(addrHex, numWei, weiPerSatoshi);
+}
 
+
+
+function submitOffer(addrHex, numWei, weiPerSatoshi) {
+  var callOnly;
+  // callOnly = true;  // if commented, it will do sendTransaction
+  //
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {value: numWei, from:gFromAccount, gas: 500000};
 
@@ -127,7 +131,7 @@ $(function() {
     // tx190 300K
     $('#btcAddr').val(gOurBtcAddr);
 
-    var etherAmount = formatEtherAmount(web3.toWei(1, 'ether'));
+    var etherAmount = 1;
     $('#numWei').val(etherAmount);
 
     var btcPrice = '0.26';
