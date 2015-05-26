@@ -32,6 +32,7 @@ Template.offerEther.events({
       addrHex = '0x' + decodeBase58Check(vmOfferEther.btcAddr());
     }
     catch (err) {
+      var vmResultStatus = ViewModel.byId('vmResultStatus');
       vmResultStatus.msg('Bad Bitcoin address: ' + err.message);
       return;
     }
@@ -39,21 +40,16 @@ Template.offerEther.events({
     var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
     console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi);
 
-    return
     submitOffer(addrHex, numWei, weiPerSatoshi);
-
   }
 });
 
 
 
-var vmResultStatus = ViewModel.byId('vmResultStatus');
-
-
-
-
 
 function submitOffer(addrHex, numWei, weiPerSatoshi) {
+  var vmResultStatus = ViewModel.byId('vmResultStatus');
+
   var callOnly;
   // callOnly = true;  // if commented, it will do sendTransaction
   //
@@ -71,7 +67,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
     var endTime = Date.now();
     var durationSec = (endTime - startTime) / 1000;
     console.log('@@@@ call res: ', res, ' duration: ', durationSec)
-    document.getElementById('result').innerText = res.toString(10) + "    " + durationSec+ "secs";
+    vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
     return;
   }
 
@@ -87,10 +83,10 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
 
     var eventArgs = res.args;
     if (eventArgs.rval.toNumber() > 0) {
-      document.getElementById('result').innerText = 'SUCCESS Ticket created';
+      vmResultStatus.msg('SUCCESS Ticket created');
     }
     else {
-      document.getElementById('result').innerText = 'Failed. You need to send the ethers to the Ticket contract';
+      vmResultStatus.msg('Failed. You need to send the ethers to the Ticket contract');
     }
 
     rvalFilter.stopWatching();
@@ -108,7 +104,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
     console.log('@@@ createTicket result: ', result)
 
   });
-  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+  vmResultStatus.msg('Ethereum transaction is in progress...');
 }
 
 
