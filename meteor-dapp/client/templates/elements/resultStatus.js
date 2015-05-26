@@ -1,0 +1,3 @@
+Template.resultStatus.viewmodel({
+  msg: ''
+});
