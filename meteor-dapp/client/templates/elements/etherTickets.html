@@ -1,0 +1,36 @@
+<template name="etherTickets">
+  <h2>Tickets offering ether for bitcoin
+  </h2>
+
+  <table class="table" id="ticketTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Ethers</th>
+        <th>Unit Price BTC</th>
+        <th>Total Price BTC</th>
+        <th>Bitcoin address</th>
+        <th>Reserved</th>
+        <!-- <th>Claimer</th>
+        <th>Transaction Hash</th> -->
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each tickets}}
+        <tr>
+          {{> ticket}}
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</template>
+
+<template name="ticket">
+  <td data-bind="text: ticketId"></td>
+  <td data-bind="text: numEther"></td>
+  <td data-bind="text: unitPrice"></td>
+  <td data-bind="text: totalPrice"></td>
+  <td data-bind="text: btcAddr"></td>
+  <td data-bind="text: ticketStatus"></td>
+</template>
