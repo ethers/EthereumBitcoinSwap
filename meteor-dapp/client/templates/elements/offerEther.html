@@ -1,0 +1,20 @@
+<template name="offerEther">
+  <form class="form">
+    <fieldset>
+      <label for="btcAddr">Your Bitcoin address</label>
+      <input type="text" class="form-control" data-bind="value: btcAddr"></input>
+
+      <label for="numEther">Number of ethers</label>
+      <input type="text" class="form-control" data-bind="value: numEther"></input>
+
+      <label for="btcPrice">Bitcoin Price</label>
+      <input type="text" class="form-control" data-bind="value: btcPrice"></input>
+
+      <label for="unitPrice">Unit Price</label>
+      <input type="text" readonly class="form-control" data-bind="value: unitPrice"></input>
+
+      <br>
+      <button type="submit" class="btn btn-default">Submit offer</button>
+    </fieldset>
+  </form>
+</template>
