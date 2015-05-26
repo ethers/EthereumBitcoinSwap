@@ -1,3 +1,4 @@
-Template.resultStatus.viewmodel({
+Template.resultStatus.viewmodel(
+  'vmResultStatus', {
   msg: ''
 });
