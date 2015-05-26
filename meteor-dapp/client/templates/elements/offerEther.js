@@ -23,7 +23,7 @@ Template.offerEther.events({
 
     console.log('@@@ in submit offerEther event: ', event)
 
-    var vmOfferEther = ViewModel.byId('vmOfferEther');
+    var vmOfferEther = Template.instance().viewmodel;  //ViewModel.byId('vmOfferEther');
     var btcPrice = vmOfferEther.btcPrice();
 
     // these are passed to contract

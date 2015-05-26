@@ -5,7 +5,6 @@ Template.etherTickets.onCreated(function() {
 });
 
 Template.etherTickets.viewmodel(
-  'tickets',
   {
     tickets: function() {
       // TODO confirmation to deposit ether, from account, gasprice
