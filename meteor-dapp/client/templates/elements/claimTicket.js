@@ -28,6 +28,10 @@ Template.claimTicket.viewmodel({
   claimExpiry: '',
   claimTxHash: '',
 
+  btcPayment: '',
+  paymentAddr: '',
+  etherAddr: '',
+
   bnEncodedFee: '',
 
   encodedFee: function() {
@@ -36,19 +40,23 @@ Template.claimTicket.viewmodel({
       return bnEncodedFee.div(100).toString(10) + '%';
     }
   },
-  btcPayment: '',
-  paymentAddr: '',
-  etherAddr: '',
+
+  computedFee: function() {
+    var bnEncodedFee = this.bnEncodedFee();
+    if (bnEncodedFee) {
+      var bnWei = this.bnWei();
+      if (bnWei) {
+        var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
+        return formatWeiToEther(bnComputedFee);
+      }
+    }
+  },
 
   depositRequired: function() {
     var bnWei = this.bnWei();
     if (bnWei) {
       return formatWeiToEther(bnWei.div(20));
     }
-  },
-
-  computedFee: function() {
-
   },
 
   merkleProof: ''
@@ -141,9 +149,5 @@ function lookupBitcoinTx(viewm) {
 
 
     viewm.bnEncodedFee(web3.toBigNumber(data.out[1].value).mod(10000));
-
-
-    var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
-    $('#computedFee').text(formatWeiToEther(bnComputedFee));
   });
 }
