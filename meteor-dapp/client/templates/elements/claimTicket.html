@@ -40,14 +40,14 @@
       <!-- <h5>Bitcoin Transaction Hash: <strong data-bind="text: claimTxHash"></strong></h5> -->
       <h5>Claimer will receive ether: <strong data-bind="text: computedFee"></strong></h5>
       <h5>Claimer needs to provide ether security deposit: <strong data-bind="text: depositRequired"></strong></h5>
-      <button type="button" id="btnReserve" class="btn btn-default" onclick="reserveClicked();">Reserve</button>
+      <button type="button" id="btnReserve" class="btn btn-default" data-bind="class: { btn-primary: ticketNeedsToBeReserved }" onclick="reserveClicked();">Reserve</button>
     </div>
 
     <div class="col-md-6">
       <h5>Merkle Proof</h5>
       <textarea readonly class="form-control" name="textarea" id="mProof" rows="5"></textarea>
       <br>
-      <button type="button" id="btnClaim" class="btn btn-default" onclick="claimClicked();">Claim</button>
+      <button type="button" id="btnClaim" class="btn btn-default" data-bind="class: { btn-primary: !ticketNeedsToBeReserved }" onclick="claimClicked();">Claim</button>
     </div>
   </div>
 </template>

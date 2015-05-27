@@ -59,7 +59,14 @@ Template.claimTicket.viewmodel({
     }
   },
 
-  merkleProof: ''
+  merkleProof: '',
+
+
+  ticketNeedsToBeReserved: function() {
+    // hacky and needs to check if expired
+    var claimExpiry = this.claimExpiry();
+    return claimExpiry === '' || claimExpiry === 'OPEN';
+  }
 })
 
 
