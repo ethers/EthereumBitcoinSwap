@@ -3,9 +3,25 @@ Template.claimTicket.viewmodel({
   btcTxHash: '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566',
 
   bnWei: '',
+  bnWeiPerSatoshi: '',
+  bnEther: function() {
+    return toEther(this.bnWei());
+  },
 
-  numEther: '',
-  totalPrice: '',
+  numEther: function() {
+    return formatEtherAmount(this.bnEther());
+  },
+  totalPrice: function() {
+    var bnWeiPerSatoshi = this.bnWeiPerSatoshi();
+    if (bnWeiPerSatoshi) {
+      var bnEther = this.bnEther();
+      if (bnEther) {
+        var bnUnitPrice = toUnitPrice(bnWeiPerSatoshi);
+        var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
+        return formatTotalPrice(bnTotalPrice);
+      }
+    }
+  },
   btcAddr: '',
 
   claimerAddr: '',
@@ -76,15 +92,9 @@ function lookupForReserving(viewm) {
 
   // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
-
-
-  var bnEther = toEther(bnWei);
-  var bnUnitPrice = toUnitPrice(bnWeiPerSatoshi);
-  var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
+  viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
 
   viewm.btcAddr(btcAddr);
-  viewm.numEther(formatEtherAmount(bnEther));
-  viewm.totalPrice(formatTotalPrice(bnTotalPrice));
 
   // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 
