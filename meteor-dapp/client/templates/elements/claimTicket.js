@@ -1,6 +1,6 @@
 Template.claimTicket.viewmodel({
   ticketId: '',
-  btcTxHash: '',
+  btcTxHash: '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566',
 
   bnWei: '',
 
@@ -53,8 +53,6 @@ function lookupForReserving(viewm) {
 
   var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
-
-  return
 
   if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].eq(0)) {
     var vmResultStatus = ViewModel.byId('vmResultStatus');
