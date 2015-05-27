@@ -52,7 +52,7 @@ formatClaimer = function(bnClaimer) {
   return claimer === '0' ? '-' : claimer;
 }
 
-function formatClaimTx(bnClaimTxHash) {
+formatClaimTx = function(bnClaimTxHash) {
   return bnClaimTxHash.eq(0) ? '-' : formatHash(bnClaimTxHash);
 }
 

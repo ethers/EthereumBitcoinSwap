@@ -16,7 +16,7 @@ bs58check = require('bs58check');
 
 
 var ticketContractAddr;
-var useBtcTestnet;
+useBtcTestnet = false;
 // var gOurBtcAddr;
 
 

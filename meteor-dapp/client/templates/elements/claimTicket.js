@@ -1,3 +1,5 @@
+var btcproof = require('btcproof');
+
 Template.claimTicket.viewmodel({
   ticketId: '',
   btcTxHash: '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566',
@@ -60,6 +62,8 @@ Template.claimTicket.viewmodel({
   },
 
   merkleProof: '',
+  rawTx: '',
+  blockHashOfTx: '',
 
 
   ticketNeedsToBeReserved: function() {
@@ -80,6 +84,10 @@ Template.claimTicket.events({
     var vmThis = Template.instance().viewmodel;
 
     lookupForReserving(vmThis);
+
+    if (!vmThis.ticketNeedsToBeReserved()) {
+      lookupForClaiming(vmThis);
+    }
   }
 
   // TODO other submits
@@ -110,7 +118,14 @@ function lookupForReserving(viewm) {
   // renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
   viewm.claimExpiry(formatState(bnClaimExpiry));
   viewm.claimerAddr(formatClaimer(bnClaimer));
+
   // viewm.claimTxHash(formatClaimTx(bnClaimTxHash));
+  var claimTxHash = formatClaimTx(bnClaimTxHash);
+  if (claimTxHash !== viewm.btcTxHash()) {
+    viewm.btcTxHash(claimTxHash);
+    var vmResultStatus = ViewModel.byId('vmResultStatus');
+    vmResultStatus.msg('use the tx hash that was reserved');
+  }
 
   // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
@@ -157,4 +172,58 @@ function lookupBitcoinTx(viewm) {
 
     viewm.bnEncodedFee(web3.toBigNumber(data.out[1].value).mod(10000));
   });
+}
+
+
+// get raw serialized transaction and merkle proof
+function lookupForClaiming(viewm) {
+  var txid = viewm.btcTxHash();
+  console.log('@@@ txid: ', txid);
+
+  var urlJsonTx;
+  if (useBtcTestnet) {
+      urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/" + txid;
+  }
+  else {
+      urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/" + txid;
+  }
+  $.getJSON(urlJsonTx, function(data) {
+      console.log('@@@ data: ', data)
+
+      var rawTx = data.data.tx.hex;
+      viewm.rawTx(rawTx);
+      console.log('@@@@ rawTx: ', rawTx);
+
+      var blockNum = data.data.tx.blockhash; // blockr does not easily provide block height
+      //$('#txBlockNum').text('n/a for blockr.io');
+      // $('#txBlockNum').text(blockNum);
+
+      var blockInfoUrl;
+      if (useBtcTestnet) {
+          blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
+      }
+      else {
+          blockInfoUrl = "http://btc.blockr.io/api/v1/block/raw/"+blockNum;
+      }
+      $.getJSON(blockInfoUrl, function(res) {
+          console.log('@@@ res: ', res)
+
+          viewm.blockHashOfTx(res.data.hash);
+
+          var txIndex;
+          for (var key in res.data.tx) {
+            if (res.data.tx[key] == txid) {
+              txIndex = key;
+              break;
+            }
+          }
+
+          // var txIndex = Object.keys(res.data.tx).indexOf(txid);
+          console.log('@@@@ txIndex: ', txIndex)
+
+          var merkleProof = btcproof.getProof(res.data.tx, txIndex);
+          console.log('@@@ merkleProof: ', merkleProof)
+          viewm.merkleProof(JSON.stringify(merkleProof));
+      });
+  })
 }
