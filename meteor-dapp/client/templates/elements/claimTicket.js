@@ -28,7 +28,14 @@ Template.claimTicket.viewmodel({
   claimExpiry: '',
   claimTxHash: '',
 
-  encodedFee: '',
+  bnEncodedFee: '',
+
+  encodedFee: function() {
+    var bnEncodedFee = this.bnEncodedFee();
+    if (bnEncodedFee) {
+      return bnEncodedFee.div(100).toString(10) + '%';
+    }
+  },
   btcPayment: '',
   paymentAddr: '',
   etherAddr: '',
@@ -98,7 +105,11 @@ function lookupForReserving(viewm) {
 
   // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 
+  lookupBitcoinTx(viewm);
+}
 
+
+function lookupBitcoinTx(viewm) {
   var txHash = viewm.btcTxHash();
   var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
   $.getJSON(urlJsonTx, function(data) {
@@ -128,24 +139,9 @@ function lookupForReserving(viewm) {
     }
     viewm.etherAddr(etherAddr);
 
-    var bnWeiBuyable = bnWeiPerSatoshi.mul(bnSatoshi);
-    // $('#weiBuyable').text(bnWeiBuyable.toString(10));
 
-    // TODO ?
-    // var txQuality;
-    // var bnExtraWei = bnWeiBuyable.sub(bnWei);
-    // if (bnExtraWei.lt(0)) {
-    //   txQuality = 'NO, transaction does not send enough bitcoin.'
-    // }
-    // else {
-    //   txQuality = 'YES, transaction can claim the ethers in the ticket.'
-    // }
-    // $('#txQuality').text(txQuality);
+    viewm.bnEncodedFee(web3.toBigNumber(data.out[1].value).mod(10000));
 
-
-
-    var bnEncodedFee = web3.toBigNumber(data.out[1].value).mod(10000);
-    $('#encodedFee').text(bnEncodedFee.div(100).toString(10) + '%');
 
     var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
     $('#computedFee').text(formatWeiToEther(bnComputedFee));
