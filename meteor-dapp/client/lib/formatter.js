@@ -1,4 +1,5 @@
 
+EMPTY_CLAIMER = '-';
 EMPTY_CLAIM_TX_HASH = '-';
 
 

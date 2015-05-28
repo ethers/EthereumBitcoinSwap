@@ -72,6 +72,18 @@ Template.claimTicket.viewmodel({
   blockHashOfTx: '',
 
 
+  isReservable: function() {
+    console.log('@@@ isReservable called')
+    return this.ticketId() && this.bnWei().gt(0)
+      // TODO
+      // && this.totalPrice() === this.btcPayment  or less than
+      && this.btcAddr() === this.paymentAddr()
+      && this.claimerAddr() === EMPTY_CLAIMER
+      && this.claimTxHash() === EMPTY_CLAIM_TX_HASH
+      && this.ticketNeedsToBeReserved()
+      && currentUserBalance().gte(this.bnWeiDeposit());
+  },
+
   ticketNeedsToBeReserved: function() {
     // hacky and needs to check if expired
     var claimExpiry = this.claimExpiry();
@@ -313,4 +325,10 @@ function doReserveTicket(viewm) {
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
   vmResultStatus.msg('Ethereum transaction is in progress...')
+}
+
+
+// assumes currentUser is coinbase
+function currentUserBalance() {
+  return web3.eth.getBalance(web3.eth.coinbase);
 }
