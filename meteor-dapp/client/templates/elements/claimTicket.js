@@ -83,6 +83,9 @@ Template.claimTicket.events({
 
     var vmThis = Template.instance().viewmodel;
 
+    vmThis.merkleProof('');
+    ViewModel.byId('vmResultStatus').msg('');
+
     lookupForReserving(vmThis);
 
     if (!vmThis.ticketNeedsToBeReserved()) {
@@ -118,14 +121,7 @@ function lookupForReserving(viewm) {
   // renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
   viewm.claimExpiry(formatState(bnClaimExpiry));
   viewm.claimerAddr(formatClaimer(bnClaimer));
-
-  // viewm.claimTxHash(formatClaimTx(bnClaimTxHash));
-  var claimTxHash = formatClaimTx(bnClaimTxHash);
-  if (claimTxHash !== viewm.btcTxHash()) {
-    viewm.btcTxHash(claimTxHash);
-    var vmResultStatus = ViewModel.byId('vmResultStatus');
-    vmResultStatus.msg('use the tx hash that was reserved');
-  }
+  viewm.claimTxHash(formatClaimTx(bnClaimTxHash));
 
   // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
@@ -177,7 +173,15 @@ function lookupBitcoinTx(viewm) {
 
 // get raw serialized transaction and merkle proof
 function lookupForClaiming(viewm) {
-  var txid = viewm.btcTxHash();
+  var claimTxHash = viewm.claimTxHash();
+  if (claimTxHash !== viewm.btcTxHash()) {
+    viewm.btcTxHash(claimTxHash);
+    var vmResultStatus = ViewModel.byId('vmResultStatus');
+    vmResultStatus.msg('use the tx hash that was reserved');
+  }
+
+
+  var txid = claimTxHash;
   console.log('@@@ txid: ', txid);
 
   var urlJsonTx;

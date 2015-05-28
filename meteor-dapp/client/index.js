@@ -1,4 +1,4 @@
-web3.setProvider(new web3.providers.HttpProvider('http://localhost:8549'));
+web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
 TWO_POW_256 = new BigNumber(2).pow(256);
 
