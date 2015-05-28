@@ -40,7 +40,8 @@
       <!-- <h5>Bitcoin Transaction Hash: <strong data-bind="text: claimTxHash"></strong></h5> -->
       <h5>Claimer will receive ether: <strong data-bind="text: computedFee"></strong></h5>
       <h5>Claimer needs to provide ether security deposit: <strong data-bind="text: depositRequired"></strong></h5>
-      <button type="button" id="btnReserve" class="btn btn-default" data-bind="class: { btn-primary: ticketNeedsToBeReserved }" onclick="reserveClicked();">Reserve</button>
+      <button type="button" class="btn btn-default"
+        data-bind="click: reserveClicked, class: { btn-primary: ticketNeedsToBeReserved }">Reserve</button>
     </div>
 
     <div class="col-md-6">

@@ -54,11 +54,17 @@ Template.claimTicket.viewmodel({
     }
   },
 
+  // ethers
   depositRequired: function() {
     var bnWei = this.bnWei();
     if (bnWei) {
       return formatWeiToEther(bnWei.div(20));
     }
+  },
+
+  // 5% of the ticket's wei
+  bnWeiDeposit: function() {
+    return this.bnWei().div(20);
   },
 
   merkleProof: '',
@@ -70,6 +76,11 @@ Template.claimTicket.viewmodel({
     // hacky and needs to check if expired
     var claimExpiry = this.claimExpiry();
     return claimExpiry === '' || claimExpiry === 'OPEN';
+  },
+
+  reserveClicked: function() {
+    console.log('@@@ reserveClicked')
+    doReserveTicket(this);
   }
 })
 
@@ -233,4 +244,73 @@ function lookupForClaiming(viewm) {
           viewm.merkleProof(JSON.stringify(merkleProof));
       });
   })
+}
+
+
+function doReserveTicket(viewm) {
+  // TODO ticket Abi
+  console.log('@@@ gFromAccount: ', gFromAccount)
+
+
+  var callOnly;
+  callOnly = true;  // if commented, it will do sendTransaction
+
+  var ticketId = viewm.ticketId();
+  var txHash = '0x' + viewm.btcTxHash();
+
+  // TODO confirmation to deposit ether, from account, gasprice
+  var objParam = {value: viewm.bnWeiDeposit(), from:gFromAccount, gas: 500000};
+
+  var vmResultStatus = ViewModel.byId('vmResultStatus');
+
+  if (callOnly) {
+    console.log('@@@@ callOnly')
+    var startTime = Date.now();
+
+
+    var res = gContract.reserveTicket.call(ticketId, txHash, objParam);
+
+
+    var endTime = Date.now();
+    var durationSec = (endTime - startTime) / 1000;
+    console.log('@@@@ call res: ', res, ' duration: ', durationSec)
+    vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
+    return;
+  }
+
+
+  // var startTime = Date.now();
+
+
+
+  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
+  rvalFilter.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ rvalFilter err: ', err)
+      return;
+    }
+
+    console.log('@@@ rvalFilter res: ', res)
+
+    var eventArgs = res.args;
+    if (eventArgs.rval.toNumber() === ticketId) {
+      vmResultStatus.msg('SUCCESS Ticket has been reserved');
+    }
+    else {
+      vmResultStatus.msg('Failed. Did you send enough deposit or specify correct ticket id?');
+    }
+
+    rvalFilter.stopWatching();
+  });
+
+  gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+    if (err) {
+      console.log('@@@ reserveTicket sendtx err: ', err)
+      return;
+    }
+
+    // result is a txhash
+    console.log('@@@ reserveTicket txHash: ', txHash)
+  });
+  vmResultStatus.msg('Ethereum transaction is in progress...')
 }
