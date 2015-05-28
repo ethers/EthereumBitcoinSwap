@@ -1,5 +1,5 @@
 
-
+EMPTY_CLAIM_TX_HASH = '-';
 
 
 
@@ -49,7 +49,7 @@ formatState = function(bnClaimExpiry) {
 
 formatClaimer = function(bnClaimer) {
   var claimer = formatHash(bnClaimer);
-  return claimer === '0' ? '-' : claimer;
+  return claimer === '0' ? EMPTY_CLAIM_TX_HASH : claimer;
 }
 
 formatClaimTx = function(bnClaimTxHash) {

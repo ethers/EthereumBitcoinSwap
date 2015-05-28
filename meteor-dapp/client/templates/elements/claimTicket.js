@@ -136,7 +136,10 @@ function lookupForReserving(viewm) {
 
 
 function lookupBitcoinTx(viewm) {
-  var txHash = viewm.btcTxHash();
+  var txHash = viewm.claimTxHash();
+  if (txHash === EMPTY_CLAIM_TX_HASH) {
+    txHash = viewm.btcTxHash();
+  }
   var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
   $.getJSON(urlJsonTx, function(data) {
     console.log('@@@ rawtx data: ', data)
