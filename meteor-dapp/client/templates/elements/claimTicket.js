@@ -73,10 +73,8 @@ Template.claimTicket.viewmodel({
 
 
   isReservable: function() {
-    console.log('@@@ isReservable called')
     return this.ticketId() && this.bnWei().gt(0)
-      // TODO
-      // && this.totalPrice() === this.btcPayment  or less than
+      && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
       && this.btcAddr() === this.paymentAddr()
       && this.claimerAddr() === EMPTY_CLAIMER
       && this.claimTxHash() === EMPTY_CLAIM_TX_HASH
