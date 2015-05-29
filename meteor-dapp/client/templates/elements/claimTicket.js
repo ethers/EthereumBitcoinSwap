@@ -282,18 +282,18 @@ function lookupForClaiming(viewm) {
 
 
 function doReserveTicket(viewm) {
-  // TODO ticket Abi
-  console.log('@@@ gFromAccount: ', gFromAccount)
-
-
-  var callOnly;
-  callOnly = true;  // if commented, it will do sendTransaction
-
   var ticketId = viewm.ticketId();
   var txHash = '0x' + viewm.btcTxHash();
 
+  ethReserveTicket(ticketId, txHash, viewm.bnWeiDeposit());
+}
+
+function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
+  var callOnly;
+  callOnly = true;  // if commented, it will do sendTransaction
+
   // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: viewm.bnWeiDeposit(), from:gFromAccount, gas: 500000};
+  var objParam = {value: bnWeiDeposit, from:gFromAccount, gas: 500000};
 
   var vmResultStatus = ViewModel.byId('vmResultStatus');
 
@@ -347,6 +347,103 @@ function doReserveTicket(viewm) {
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
   vmResultStatus.msg('Ethereum transaction is in progress...')
+}
+
+
+function claimClicked() {
+  console.log('@@@ in claimClicked')
+
+  var ticketId = parseInt($('#ticketId').val(), 10);
+  var txHex = gRawTx;
+
+  var txHash = '0x' + $('#txHash').val();
+
+  var txBlockHash = new BigNumber('0x'+gBlockHashOfTx);
+
+  var merkleProof = JSON.parse($('#mProof').val());
+  // web3.js wants 0x prepended
+  var merkleSibling = merkleProof.sibling.map(function(sib) {
+    return '0x' + sib;
+    // return new BigNumber('0x' + sib);
+  });
+
+  doClaim(ticketId, txHex, txHash, merkleProof.txIndex, merkleSibling, txBlockHash);
+}
+
+
+function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
+  console.log('@@@ doClaim args: ', arguments)
+
+  var callOnly;
+  // callOnly = true;  // if commented, it will call sendTransaction
+
+
+  var objParam = {from:gFromAccount, gas: 3000000};
+  if (callOnly) {
+    console.log('@@@@ callOnly')
+    var startTime = Date.now();
+
+    var res = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
+
+
+    var endTime = Date.now();
+    var durationSec = (endTime - startTime) / 1000;
+    console.log('@@@@ verifyTx res: ', res, ' duration: ', durationSec)
+    document.getElementById('result').innerText = res.toString(10) + "    " + durationSec+ "secs";
+    return;
+  }
+
+
+
+  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
+  rvalFilter.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ rvalFilter err: ', err)
+      return;
+    }
+
+    console.log('@@@ rvalFilter res: ', res)
+
+    var eventArgs = res.args;
+    var rval = eventArgs.rval.toNumber();
+    console.log('@@@ rvalFilter rval: ', rval)
+    switch (rval) {
+      case ticketId:
+        resultText = 'SUCCESS Ticket has been claimed';
+        break;
+      case CLAIM_FAIL_CLAIMER:
+        resultText = 'Failed: someone else has reserved the ticket';
+        break;
+      case CLAIM_FAIL_TX_HASH:
+        resultText = 'Failed: you need to use the transaction used in the reservation';
+        break;
+      case CLAIM_FAIL_INSUFFICIENT_SATOSHI:
+        resultText = 'Failed: Bitcoin transaction did not send enough Bitcoins';
+        break;
+      case CLAIM_FAIL_FALLTHRU:
+        resultText = 'Failed: Unknown';
+        break;
+      default:
+        resultText = 'ERROR Unexpected';
+        break;
+    }
+
+    document.getElementById('result').innerText = resultText;
+
+    rvalFilter.stopWatching();
+  });
+
+  gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
+    if (err) {
+      console.log('@@@ err: ', err)
+      return;
+    }
+
+    // result is a txhash
+    console.log('@@@ claimTicket result: ', result)
+
+  });
+  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
 }
 
 
