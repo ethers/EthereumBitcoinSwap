@@ -352,7 +352,7 @@ function doReserveTicket(viewm) {
 
 // assumes currentUser is coinbase.  returns address with 0x prefix
 function currentUser() {
-  return web3.eth.coinbase;
+  return web3.eth.accounts[0];
 }
 
 function currentUserBalance() {
