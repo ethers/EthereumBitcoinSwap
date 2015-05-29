@@ -115,6 +115,7 @@ Template.claimTicket.viewmodel({
 
   claimClicked: function() {
     console.log('@@@ claimClicked')
+    doClaimTicket(this);
   }
 })
 
@@ -350,33 +351,35 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
 }
 
 
-function claimClicked() {
-  console.log('@@@ in claimClicked')
+function doClaimTicket(viewm) {
+  console.log('@@@ in doClaimTicket')
 
-  var ticketId = parseInt($('#ticketId').val(), 10);
-  var txHex = gRawTx;
+  var ticketId = viewm.ticketId();
+  var txHex = viewm.rawTx();
 
-  var txHash = '0x' + $('#txHash').val();
+  var txHash = '0x' + viewm.claimTxHash();
 
-  var txBlockHash = new BigNumber('0x'+gBlockHashOfTx);
+  // TODO shouldn't need new BigNumber here
+  var txBlockHash = new BigNumber('0x' + viewm.blockHashOfTx());
 
-  var merkleProof = JSON.parse($('#mProof').val());
+  var merkleProof = JSON.parse(viewm.merkleProof());
   // web3.js wants 0x prepended
   var merkleSibling = merkleProof.sibling.map(function(sib) {
     return '0x' + sib;
     // return new BigNumber('0x' + sib);
   });
 
-  doClaim(ticketId, txHex, txHash, merkleProof.txIndex, merkleSibling, txBlockHash);
+  ethClaimTicket(ticketId, txHex, txHash, merkleProof.txIndex, merkleSibling, txBlockHash);
 }
 
 
-function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
-  console.log('@@@ doClaim args: ', arguments)
+function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
+  console.log('@@@ ethClaimTicket args: ', arguments)
 
   var callOnly;
-  // callOnly = true;  // if commented, it will call sendTransaction
+  callOnly = true;  // if commented, it will call sendTransaction
 
+  var vmResultStatus = ViewModel.byId('vmResultStatus');
 
   var objParam = {from:gFromAccount, gas: 3000000};
   if (callOnly) {
@@ -389,7 +392,7 @@ function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
     var endTime = Date.now();
     var durationSec = (endTime - startTime) / 1000;
     console.log('@@@@ verifyTx res: ', res, ' duration: ', durationSec)
-    document.getElementById('result').innerText = res.toString(10) + "    " + durationSec+ "secs";
+    vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
     return;
   }
 
@@ -428,7 +431,7 @@ function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
         break;
     }
 
-    document.getElementById('result').innerText = resultText;
+    vmResultStatus.msg(resultText);
 
     rvalFilter.stopWatching();
   });
@@ -443,7 +446,7 @@ function doClaim(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
     console.log('@@@ claimTicket result: ', result)
 
   });
-  document.getElementById('result').innerText = 'Ethereum transaction is in progress...'
+  vmResultStatus.msg('Ethereum transaction is in progress...')
 }
 
 
