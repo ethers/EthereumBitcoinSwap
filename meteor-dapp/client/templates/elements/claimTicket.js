@@ -73,14 +73,34 @@ Template.claimTicket.viewmodel({
 
 
   isReservable: function() {
-    return this.ticketId() && this.bnWei().gt(0)
-      && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
-      && this.btcAddr() === this.paymentAddr()
+    return this.txSatisfiesTicket()
       && this.claimerAddr() === EMPTY_CLAIMER
       && this.claimTxHash() === EMPTY_CLAIM_TX_HASH
       && this.ticketNeedsToBeReserved()
       && currentUserBalance().gte(this.bnWeiDeposit());
   },
+
+  isClaimable: function() {
+    return this.txSatisfiesTicket()
+      && this.ticketIsReserved()
+      && this.merkleProof() && this.rawTx() && this.blockHashOfTx()
+      && '0x'+this.claimerAddr() === currentUser()
+  },
+
+
+  txSatisfiesTicket: function() {
+    return this.ticketId() && this.bnWei().gt(0)
+      && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
+      && this.btcAddr() === this.paymentAddr();
+  },
+
+  ticketIsReserved: function() {
+    return this.claimerAddr() !== EMPTY_CLAIMER
+      && this.claimTxHash() !== EMPTY_CLAIM_TX_HASH
+      // TODO check expiration and block timestamp
+  },
+
+
 
   ticketNeedsToBeReserved: function() {
     // hacky and needs to check if expired
@@ -91,6 +111,10 @@ Template.claimTicket.viewmodel({
   reserveClicked: function() {
     console.log('@@@ reserveClicked')
     doReserveTicket(this);
+  },
+
+  claimClicked: function() {
+    console.log('@@@ claimClicked')
   }
 })
 
@@ -326,7 +350,11 @@ function doReserveTicket(viewm) {
 }
 
 
-// assumes currentUser is coinbase
+// assumes currentUser is coinbase.  returns address with 0x prefix
+function currentUser() {
+  return web3.eth.coinbase;
+}
+
 function currentUserBalance() {
-  return web3.eth.getBalance(web3.eth.coinbase);
+  return web3.eth.getBalance(currentUser());
 }

@@ -50,7 +50,10 @@
       <h5>Merkle Proof</h5>
       <textarea readonly class="form-control" name="textarea" data-bind="text: merkleProof" rows="5"></textarea>
       <br>
-      <button type="button" id="btnClaim" class="btn btn-default" data-bind="class: { btn-primary: !ticketNeedsToBeReserved }" onclick="claimClicked();">Claim</button>
+      <button type="button" class="btn btn-default"
+        data-bind="click: claimClicked,
+          disabled: !isClaimable,
+          class: { btn-primary: !ticketNeedsToBeReserved }">Claim</button>
     </div>
   </div>
 </template>
