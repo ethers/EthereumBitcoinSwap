@@ -50,6 +50,16 @@ Template.ticket.viewmodel(function(data) {
     btcAddr: formatBtcAddr(data.bnBtcAddr),
     ticketStatus: function() {
       return formatState(data.bnClaimExpiry);
+    },
+
+
+    ticketAction: function() {
+      if (this.ticketStatus() === 'OPEN') {
+        return 'Reserve';
+      }
+      else {
+        return 'Claim';
+      }
     }
   }
 });
