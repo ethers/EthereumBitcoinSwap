@@ -27,7 +27,10 @@
       <input type="text" class="form-control" data-bind="value: btcTxHash, disabled: !ticketNeedsToBeReserved">
 
       <br>
-      <button type="submit" class="btn btn-default">Lookup</button>
+      <button type="button" class="btn btn-default"
+        data-bind="click: lookupClicked,
+          disabled: !lookupFormComplete,
+          class: { btn-primary: isLookupNeeded }">Lookup</button>
     </fieldset>
   </form>
 

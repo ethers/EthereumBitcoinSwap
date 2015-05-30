@@ -72,6 +72,10 @@ Template.claimTicket.viewmodel({
   blockHashOfTx: '',
 
 
+  isLookupNeeded: function() {
+    return this.lookupFormComplete() && !this.isReservable() && !this.isClaimable();
+  },
+
   isReservable: function() {
     return this.txSatisfiesTicket()
       && this.claimerAddr() === EMPTY_CLAIMER
@@ -88,10 +92,23 @@ Template.claimTicket.viewmodel({
   },
 
 
+
+  lookupFormComplete: function() {
+    return this.ticketId() && this.btcTxHash();
+  },
+
   txSatisfiesTicket: function() {
-    return this.ticketId() && this.bnWei().gt(0)
-      && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
-      && this.btcAddr() === this.paymentAddr();
+    var ticketId = this.ticketId();
+    if (ticketId) {
+      var bnWei = this.bnWei();
+      if (bnWei) {
+        return bnWei.gt(0)
+          && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
+          && this.btcAddr() === this.paymentAddr();
+      }
+    }
+
+    return false;
   },
 
   ticketIsReserved: function() {
@@ -108,6 +125,13 @@ Template.claimTicket.viewmodel({
     return claimExpiry === '' || claimExpiry === 'OPEN';
   },
 
+
+
+  lookupClicked: function() {
+    console.log('@@@ lookupClicked')
+    doLookupTicket(this);
+  },
+
   reserveClicked: function() {
     console.log('@@@ reserveClicked')
     doReserveTicket(this);
@@ -121,26 +145,16 @@ Template.claimTicket.viewmodel({
 
 
 
-Template.claimTicket.events({
-  'submit form': function(event) {
-    event.preventDefault();
+function doLookupTicket(viewm) {
+  viewm.merkleProof('');
+  ViewModel.byId('vmResultStatus').msg('');
 
-    console.log('@@@ in submit lookup ticket event: ', event)
+  lookupForReserving(viewm);
 
-    var vmThis = Template.instance().viewmodel;
-
-    vmThis.merkleProof('');
-    ViewModel.byId('vmResultStatus').msg('');
-
-    lookupForReserving(vmThis);
-
-    if (!vmThis.ticketNeedsToBeReserved()) {
-      lookupForClaiming(vmThis);
-    }
+  if (!viewm.ticketNeedsToBeReserved()) {
+    lookupForClaiming(viewm);
   }
-
-  // TODO other submits
-});
+}
 
 
 function lookupForReserving(viewm) {
