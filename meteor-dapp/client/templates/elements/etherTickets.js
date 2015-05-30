@@ -52,7 +52,6 @@ Template.ticket.viewmodel(function(data) {
       return formatState(data.bnClaimExpiry);
     },
 
-
     ticketAction: function() {
       if (this.ticketStatus() === 'OPEN') {
         return 'Reserve';
@@ -60,6 +59,10 @@ Template.ticket.viewmodel(function(data) {
       else {
         return 'Claim';
       }
+    },
+
+    ticketClicked: function() {
+      console.log('@@ clicked ticket with id: ', this.ticketId())
     }
   }
 });
