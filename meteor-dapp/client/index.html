@@ -6,9 +6,25 @@
   <div class="container">
     {{> ticketContractInfo}}
 
-    {{> etherTicketsView}}
+    <ul class="nav nav-tabs" id="appTab">
+      <li role="presentation"><a href="#ticketSection" role="tab" data-toggle="tab">Tickets</a></li>
+      <li role="presentation" class="active"><a href="#claimSection" role="tab" data-toggle="tab">Claim</a></li>
+      <li role="presentation"><a href="#helpSection" role="tab" data-toggle="tab">Help</a></li>
+      <li role="presentation"><a href="#sellSection" role="tab" data-toggle="tab">Sell</a></li>
+    </ul>
 
-    <!-- {{> claimTicketView}} -->
+    <div class="tab-content">
+
+      <div id="ticketSection" class="tab-pane fade">
+        {{> etherTicketsView}}
+      </div>
+
+      <div id="claimSection" class="tab-pane fade">
+        {{> claimTicketView}}
+      </div>
+
+    </div>
+
 
     <!-- {{> offerEtherView}}  -->
   </div>
