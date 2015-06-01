@@ -42,6 +42,7 @@ Template.claimTicket.viewmodel(
     if (bnEncodedFee) {
       return bnEncodedFee.div(100).toString(10) + '%';
     }
+    return '';
   },
 
   computedFee: function() {
@@ -53,6 +54,7 @@ Template.claimTicket.viewmodel(
         return formatWeiToEther(bnComputedFee);
       }
     }
+    return '';
   },
 
   // ethers
@@ -200,6 +202,12 @@ function lookupBitcoinTx(viewm) {
   var txHash = viewm.claimTxHash();
   if (txHash === EMPTY_CLAIM_TX_HASH) {
     txHash = viewm.btcTxHash();
+
+    // TODO heuristic on txhash
+    if (!txHash) {
+      // this flow is when user clicks Reserve in the etherTicketsView
+      return;
+    }
   }
   var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
   $.getJSON(urlJsonTx, function(data) {
