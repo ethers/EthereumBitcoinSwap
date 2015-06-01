@@ -4,6 +4,9 @@ Template.etherTickets.onCreated(function() {
   this.subscribe("tickets");
 });
 
+// var?
+var TicketColl = new Mongo.Collection('TicketColl');
+
 Template.etherTickets.viewmodel(
   {
     tickets: function() {
@@ -14,7 +17,19 @@ Template.etherTickets.viewmodel(
 
       var len = ticketArr.length;
       var retArr = [];
+
       for (var i=0; i < len; i+= TICKET_FIELDS) {
+
+        TicketColl.insert({
+          ticketId: ticketArr[i + 0].toString(10),
+          bnBtcAddr: ticketArr[i + 1],
+          bnWei: ticketArr[i + 2],
+          bnWeiPerSatoshi: ticketArr[i + 3],
+          bnClaimExpiry: ticketArr[i + 4],
+          bnClaimer: ticketArr[i + 5],
+          bnClaimTxHash: ticketArr[i + 6]
+        });
+
         retArr.push({
           ticketId: ticketArr[i + 0].toString(10),
           bnBtcAddr: ticketArr[i + 1],
@@ -26,7 +41,8 @@ Template.etherTickets.viewmodel(
         });
       }
 
-      return retArr;
+
+      return TicketColl.find({});
     }
   },
   'tickets'
@@ -34,22 +50,32 @@ Template.etherTickets.viewmodel(
 
 Template.ticket.viewmodel(function(data) {
   return {
-    ticketId: data.ticketId,
+    id: data._id,
+
+    ticket: function() {
+      return TicketColl.findOne(this.id());
+    },
+
+    ticketId: function() {
+      return this.ticket().ticketId;
+    },
     numEther: function() {
-      var bnEther = toEther(data.bnWei);
+      var bnEther = toEther(this.ticket().bnWei);
       return formatEtherAmount(bnEther);
     },
     unitPrice: function() {
-      var bnUnitPrice = toUnitPrice(data.bnWeiPerSatoshi);
+      var bnUnitPrice = toUnitPrice(this.ticket().bnWeiPerSatoshi);
       return formatUnitPrice(bnUnitPrice);
     },
     totalPrice: function() {
-      var bnTotalPrice = toTotalPrice(toEther(data.bnWei), toUnitPrice(data.bnWeiPerSatoshi));
+      var bnTotalPrice = toTotalPrice(toEther(this.ticket().bnWei), toUnitPrice(this.ticket().bnWeiPerSatoshi));
       return formatTotalPrice(bnTotalPrice);
     },
-    btcAddr: formatBtcAddr(data.bnBtcAddr),
+    btcAddr: function() {
+      return formatBtcAddr(this.ticket().bnBtcAddr);
+    },
     ticketStatus: function() {
-      return formatState(data.bnClaimExpiry);
+      return formatState(this.ticket().bnClaimExpiry);
     },
 
     ticketAction: function() {
