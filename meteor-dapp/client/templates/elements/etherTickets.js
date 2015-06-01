@@ -63,6 +63,8 @@ Template.ticket.viewmodel(function(data) {
 
     ticketClicked: function() {
       console.log('@@ clicked ticket with id: ', this.ticketId())
+
+      $('#appTab a[href="#claimSection"]').tab('show');
     }
   }
 });
