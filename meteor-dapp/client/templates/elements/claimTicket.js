@@ -1,8 +1,9 @@
 var btcproof = require('btcproof');
 
-Template.claimTicket.viewmodel({
+Template.claimTicket.viewmodel(
+  'vmClaimTicket', {
   ticketId: '',
-  btcTxHash: '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566',
+  btcTxHash: '',  // 141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
 
   bnWei: '',
   bnWeiPerSatoshi: '',

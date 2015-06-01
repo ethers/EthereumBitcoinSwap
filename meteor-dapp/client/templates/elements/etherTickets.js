@@ -65,6 +65,10 @@ Template.ticket.viewmodel(function(data) {
       console.log('@@ clicked ticket with id: ', this.ticketId())
 
       $('#appTab a[href="#claimSection"]').tab('show');
+      var vmClaimTicket = ViewModel.byId('vmClaimTicket');
+      vmClaimTicket.reset();
+      vmClaimTicket.ticketId(this.ticketId());
+      vmClaimTicket.lookupClicked();
     }
   }
 });
