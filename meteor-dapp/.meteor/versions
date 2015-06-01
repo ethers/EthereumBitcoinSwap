@@ -11,7 +11,7 @@ coffeescript@1.0.6
 ddp@1.1.0
 deps@1.0.7
 ejson@1.0.6
-ethereum:web3@0.4.2
+ethereum:web3@0.5.0
 fastclick@1.0.3
 geojson-utils@1.0.3
 html-tools@1.0.4
@@ -25,7 +25,7 @@ launch-screen@1.0.2
 livedata@1.0.13
 logging@1.0.7
 manuel:reactivearray@1.0.5
-manuel:viewmodel@1.6.9
+manuel:viewmodel@1.7.1
 meteor@1.1.6
 meteor-platform@1.2.2
 minifiers@1.1.5
