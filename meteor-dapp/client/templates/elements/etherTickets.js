@@ -41,7 +41,7 @@ Template.etherTickets.helpers({
           fields: [
             { key: 'ticketId', label: 'ID' },
             { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
-            { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sort: 'descending' },
+            { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
             { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
             { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
             { key: 'bnClaimExpiry', label: 'Reserved' }
@@ -56,10 +56,15 @@ function displayEthers(nWei) {
   return formatEtherAmount(bnEther);
 }
 
+function displayUnitPrice(ignore, object) {
+  var bnUnitPrice = toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi));
+  return formatUnitPrice(bnUnitPrice);
+}
+
 // object is the data object per reactive-table
-function displayTotalPrice(_, object) {
+function displayTotalPrice(bnWei, object) {
   var bnTotalPrice = toTotalPrice(
-    toEther(new BigNumber(object.bnWei)),
+    toEther(new BigNumber(bnWei)),
     toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi)));
   return formatTotalPrice(bnTotalPrice);
 }
