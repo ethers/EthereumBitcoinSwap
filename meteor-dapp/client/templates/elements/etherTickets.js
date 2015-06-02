@@ -11,21 +11,20 @@ Template.etherTickets.viewmodel(
 
   function (data) {
     return {
-      limit: data.limit
+      startTicketId: data.startTicketId,
+      endTicketId: data.endTicketId
     }
   },
   {
     tickets: function() {
-      console.log('@@@@@@@@@@@@ LIMIT: ', this.limit())
+      console.log('@@@@@@@@@@@@ start & end tid: ', this.startTicketId(), this.endTicketId())
 
       // TODO confirmation to deposit ether, from account, gasprice
-      var objParam = {from:gFromAccount, gas: 500000};
+      var objParam = {from:gFromAccount, gas: 3000000};
 
-      var ticketArr = gContract.getOpenTickets.call(1, 40, objParam);
+      var ticketArr = gContract.getOpenTickets.call(this.startTicketId(), this.endTicketId(), objParam);
 
       var len = ticketArr.length;
-      var retArr = [];
-
       for (var i=0; i < len; i+= TICKET_FIELDS) {
 
         TicketColl.insert({
@@ -37,18 +36,7 @@ Template.etherTickets.viewmodel(
           bnClaimer: ticketArr[i + 5].toString(10),
           bnClaimTxHash: ticketArr[i + 6].toString(10)
         });
-
-        retArr.push({
-          ticketId: ticketArr[i + 0].toString(10),
-          bnBtcAddr: ticketArr[i + 1],
-          bnWei: ticketArr[i + 2],
-          bnWeiPerSatoshi: ticketArr[i + 3],
-          bnClaimExpiry: ticketArr[i + 4],
-          bnClaimer: ticketArr[i + 5],
-          bnClaimTxHash: ticketArr[i + 6]
-        });
       }
-
 
       return TicketColl.find({});
     }
