@@ -27,9 +27,9 @@ Template.etherTickets.helpers({
           bnWei: ticketArr[i + 2].toNumber(),
           numWeiPerSatoshi: ticketArr[i + 3].toNumber(),  // for sorting
           bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
-          bnClaimExpiry: ticketArr[i + 4].toNumber(),
-          bnClaimer: ticketArr[i + 5].toString(10),
-          bnClaimTxHash: ticketArr[i + 6].toString(10)
+          numClaimExpiry: ticketArr[i + 4].toNumber(),
+          // bnClaimer: ticketArr[i + 5].toString(10),
+          // bnClaimTxHash: ticketArr[i + 6].toString(10)
         });
       }
 
@@ -44,7 +44,7 @@ Template.etherTickets.helpers({
             { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
             { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
             { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
-            { key: 'bnClaimExpiry', label: 'Reserved' }
+            { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus }
           ]
       };
     }
@@ -71,6 +71,10 @@ function displayTotalPrice(bnWei, object) {
 
 function displayBtcAddr(bnstr) {
   return formatBtcAddr(new BigNumber(bnstr));
+}
+
+function displayTicketStatus(numClaimExpiry) {
+  return formatState(new BigNumber(numClaimExpiry));
 }
 
 
