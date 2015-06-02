@@ -5,24 +5,19 @@ Template.etherTickets.onCreated(function() {
 });
 
 // var?
-var TicketColl = new Mongo.Collection(null);
+// TODO Mongo.Collection ?
+var TicketColl = new Meteor.Collection(null);
 
-Template.etherTickets.viewmodel(
-
-  function (data) {
-    return {
-      startTicketId: data.startTicketId,
-      endTicketId: data.endTicketId
-    }
-  },
-  {
-    tickets: function() {
-      console.log('@@@@@@@@@@@@ start & end tid: ', this.startTicketId(), this.endTicketId())
+Template.etherTickets.helpers({
+    ticketCollection: function() {
+      // console.log('@@@@@@@@@@@@ start & end tid: ', this.startTicketId(), this.endTicketId())
 
       // TODO confirmation to deposit ether, from account, gasprice
       var objParam = {from:gFromAccount, gas: 3000000};
 
-      var ticketArr = gContract.getOpenTickets.call(this.startTicketId(), this.endTicketId(), objParam);
+      // var ticketArr = gContract.getOpenTickets.call(this.startTicketId(), this.endTicketId(), objParam);
+
+      var ticketArr = gContract.getOpenTickets.call(1, 1000, objParam);
 
       var len = ticketArr.length;
       for (var i=0; i < len; i+= TICKET_FIELDS) {
@@ -39,6 +34,51 @@ Template.etherTickets.viewmodel(
       }
 
       return TicketColl.find({});
+    },
+
+    tableSettings : function () {
+      return {
+          fields: [
+            { key: 'ticketId', label: 'ID' },
+            { key: 'bnWei', label: 'Ethers' },
+            { key: 'name', label: 'First Name', fn: function (name) { return name ? name.split(' ')[0] : ''; } },
+          ]
+      };
+    }
+});
+
+Template.etherTickets.viewmodel(
+
+  function (data) {
+    return {
+      startTicketId: data.startTicketId,
+      endTicketId: data.endTicketId
+    }
+  },
+  {
+    tickets: function() {
+      // console.log('@@@@@@@@@@@@ start & end tid: ', this.startTicketId(), this.endTicketId())
+      //
+      // // TODO confirmation to deposit ether, from account, gasprice
+      // var objParam = {from:gFromAccount, gas: 3000000};
+      //
+      // var ticketArr = gContract.getOpenTickets.call(this.startTicketId(), this.endTicketId(), objParam);
+      //
+      // var len = ticketArr.length;
+      // for (var i=0; i < len; i+= TICKET_FIELDS) {
+      //
+      //   TicketColl.insert({
+      //     ticketId: ticketArr[i + 0].toString(10),
+      //     bnBtcAddr: ticketArr[i + 1].toString(10),
+      //     bnWei: ticketArr[i + 2].toString(10),
+      //     bnWeiPerSatoshi: ticketArr[i + 3].toString(10),
+      //     bnClaimExpiry: ticketArr[i + 4].toString(10),
+      //     bnClaimer: ticketArr[i + 5].toString(10),
+      //     bnClaimTxHash: ticketArr[i + 6].toString(10)
+      //   });
+      // }
+      //
+      // return TicketColl.find({});
     }
   },
   'tickets'
