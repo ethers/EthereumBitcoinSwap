@@ -23,11 +23,11 @@ Template.etherTickets.helpers({
       for (var i=0; i < len; i+= TICKET_FIELDS) {
 
         TicketColl.insert({
-          ticketId: ticketArr[i + 0].toString(10),
+          ticketId: ticketArr[i + 0].toNumber(),
           bnBtcAddr: ticketArr[i + 1].toString(10),
-          bnWei: ticketArr[i + 2].toString(10),
-          bnWeiPerSatoshi: ticketArr[i + 3].toString(10),
-          bnClaimExpiry: ticketArr[i + 4].toString(10),
+          bnWei: ticketArr[i + 2].toNumber(),
+          bnWeiPerSatoshi: ticketArr[i + 3].toNumber(),
+          bnClaimExpiry: ticketArr[i + 4].toNumber(),
           bnClaimer: ticketArr[i + 5].toString(10),
           bnClaimTxHash: ticketArr[i + 6].toString(10)
         });
@@ -41,6 +41,9 @@ Template.etherTickets.helpers({
           fields: [
             { key: 'ticketId', label: 'ID' },
             { key: 'bnWei', label: 'Ethers' },
+            { key: 'bnWeiPerSatoshi', label: 'Unit Price BTC', sort: 'ascending' },
+            { key: 'bnBtcAddr', label: 'Bitcoin address' },
+            { key: 'bnClaimExpiry', label: 'Reserved' },
             { key: 'name', label: 'First Name', fn: function (name) { return name ? name.split(' ')[0] : ''; } },
           ]
       };
