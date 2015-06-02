@@ -5,8 +5,16 @@ Template.etherTickets.onCreated(function() {
 });
 
 Template.etherTickets.viewmodel(
+
+  function (data) {
+    return {
+      limit: data.limit
+    }
+  },
   {
     tickets: function() {
+      console.log('@@@@@@@@@@@@ LIMIT: ', this.limit())
+
       // TODO confirmation to deposit ether, from account, gasprice
       var objParam = {from:gFromAccount, gas: 500000};
 
