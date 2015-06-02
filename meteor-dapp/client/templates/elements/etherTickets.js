@@ -40,7 +40,7 @@ Template.etherTickets.helpers({
       return {
           fields: [
             { key: 'ticketId', label: 'ID' },
-            { key: 'bnWei', label: 'Ethers' },
+            { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
             { key: 'bnWeiPerSatoshi', label: 'Unit Price BTC', sort: 'ascending' },
             { key: 'bnBtcAddr', label: 'Bitcoin address' },
             { key: 'bnClaimExpiry', label: 'Reserved' },
@@ -49,6 +49,13 @@ Template.etherTickets.helpers({
       };
     }
 });
+
+
+function displayEthers(nWei) {
+  var bnEther = toEther(new BigNumber(nWei));
+  return formatEtherAmount(bnEther);
+}
+
 
 Template.etherTickets.viewmodel(
 
