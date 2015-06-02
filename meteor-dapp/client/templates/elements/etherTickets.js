@@ -21,12 +21,12 @@ Template.etherTickets.helpers({
 
       var len = ticketArr.length;
       for (var i=0; i < len; i+= TICKET_FIELDS) {
-
         TicketColl.insert({
           ticketId: ticketArr[i + 0].toNumber(),
           bnBtcAddr: ticketArr[i + 1].toString(10),
           bnWei: ticketArr[i + 2].toNumber(),
-          bnWeiPerSatoshi: ticketArr[i + 3].toNumber(),
+          numWeiPerSatoshi: ticketArr[i + 3].toNumber(),  // for sorting
+          bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
           bnClaimExpiry: ticketArr[i + 4].toNumber(),
           bnClaimer: ticketArr[i + 5].toString(10),
           bnClaimTxHash: ticketArr[i + 6].toString(10)
@@ -41,7 +41,8 @@ Template.etherTickets.helpers({
           fields: [
             { key: 'ticketId', label: 'ID' },
             { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
-            { key: 'bnWeiPerSatoshi', label: 'Unit Price BTC', sort: 'descending' },
+            { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sort: 'descending' },
+            { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
             { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
             { key: 'bnClaimExpiry', label: 'Reserved' }
           ]
@@ -53,6 +54,14 @@ Template.etherTickets.helpers({
 function displayEthers(nWei) {
   var bnEther = toEther(new BigNumber(nWei));
   return formatEtherAmount(bnEther);
+}
+
+// object is the data object per reactive-table
+function displayTotalPrice(_, object) {
+  var bnTotalPrice = toTotalPrice(
+    toEther(new BigNumber(object.bnWei)),
+    toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi)));
+  return formatTotalPrice(bnTotalPrice);
 }
 
 function displayBtcAddr(bnstr) {
