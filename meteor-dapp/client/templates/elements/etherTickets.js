@@ -4,6 +4,9 @@ Template.etherTickets.onCreated(function() {
   this.subscribe("tickets");
 });
 
+// var?
+var TicketColl = new Mongo.Collection(null);
+
 Template.etherTickets.viewmodel(
 
   function (data) {
@@ -22,7 +25,19 @@ Template.etherTickets.viewmodel(
 
       var len = ticketArr.length;
       var retArr = [];
+
       for (var i=0; i < len; i+= TICKET_FIELDS) {
+
+        TicketColl.insert({
+          ticketId: ticketArr[i + 0].toString(10),
+          bnBtcAddr: ticketArr[i + 1].toString(10),
+          bnWei: ticketArr[i + 2].toString(10),
+          bnWeiPerSatoshi: ticketArr[i + 3].toString(10),
+          bnClaimExpiry: ticketArr[i + 4].toString(10),
+          bnClaimer: ticketArr[i + 5].toString(10),
+          bnClaimTxHash: ticketArr[i + 6].toString(10)
+        });
+
         retArr.push({
           ticketId: ticketArr[i + 0].toString(10),
           bnBtcAddr: ticketArr[i + 1],
@@ -34,7 +49,8 @@ Template.etherTickets.viewmodel(
         });
       }
 
-      return retArr;
+
+      return TicketColl.find({});
     }
   },
   'tickets'
@@ -42,22 +58,32 @@ Template.etherTickets.viewmodel(
 
 Template.ticket.viewmodel(function(data) {
   return {
-    ticketId: data.ticketId,
+    id: data._id,
+
+    ticket: function() {
+      return TicketColl.findOne(this.id());
+    },
+
+    ticketId: function() {
+      return this.ticket().ticketId;
+    },
     numEther: function() {
-      var bnEther = toEther(data.bnWei);
+      var bnEther = toEther(new BigNumber(this.ticket().bnWei));
       return formatEtherAmount(bnEther);
     },
     unitPrice: function() {
-      var bnUnitPrice = toUnitPrice(data.bnWeiPerSatoshi);
+      var bnUnitPrice = toUnitPrice(new BigNumber(this.ticket().bnWeiPerSatoshi));
       return formatUnitPrice(bnUnitPrice);
     },
     totalPrice: function() {
-      var bnTotalPrice = toTotalPrice(toEther(data.bnWei), toUnitPrice(data.bnWeiPerSatoshi));
+      var bnTotalPrice = toTotalPrice(toEther(new BigNumber(this.ticket().bnWei)), toUnitPrice(new BigNumber(this.ticket().bnWeiPerSatoshi)));
       return formatTotalPrice(bnTotalPrice);
     },
-    btcAddr: formatBtcAddr(data.bnBtcAddr),
+    btcAddr: function() {
+      return formatBtcAddr(new BigNumber(this.ticket().bnBtcAddr));
+    },
     ticketStatus: function() {
-      return formatState(data.bnClaimExpiry);
+      return formatState(new BigNumber(this.ticket().bnClaimExpiry));
     },
 
     ticketAction: function() {
