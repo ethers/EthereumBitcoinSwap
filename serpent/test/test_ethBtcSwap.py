@@ -650,7 +650,9 @@ class TestEthBtcSwap(object):
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
-        assert 1 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
+        res = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei, profiling=True)
+        print('GAS: '+str(res['gas']))
+        assert res['output'] == 1
         assert numWei == self.s.block.get_balance(self.c.address)
 
         assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
