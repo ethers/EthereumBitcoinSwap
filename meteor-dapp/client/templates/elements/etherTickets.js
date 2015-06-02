@@ -5,7 +5,7 @@ Template.etherTickets.onCreated(function() {
 });
 
 // var?
-TicketColl = new Mongo.Collection('TicketColl');
+var TicketColl = new Mongo.Collection(null);
 
 Template.etherTickets.viewmodel(
   {
