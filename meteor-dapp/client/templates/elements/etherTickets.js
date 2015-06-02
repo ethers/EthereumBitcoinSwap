@@ -5,7 +5,7 @@ Template.etherTickets.onCreated(function() {
 });
 
 // var?
-var TicketColl = new Mongo.Collection('TicketColl');
+TicketColl = new Mongo.Collection('TicketColl');
 
 Template.etherTickets.viewmodel(
   {
@@ -22,12 +22,12 @@ Template.etherTickets.viewmodel(
 
         TicketColl.insert({
           ticketId: ticketArr[i + 0].toString(10),
-          bnBtcAddr: ticketArr[i + 1],
-          bnWei: ticketArr[i + 2],
-          bnWeiPerSatoshi: ticketArr[i + 3],
-          bnClaimExpiry: ticketArr[i + 4],
-          bnClaimer: ticketArr[i + 5],
-          bnClaimTxHash: ticketArr[i + 6]
+          bnBtcAddr: ticketArr[i + 1].toString(10),
+          bnWei: ticketArr[i + 2].toString(10),
+          bnWeiPerSatoshi: ticketArr[i + 3].toString(10),
+          bnClaimExpiry: ticketArr[i + 4].toString(10),
+          bnClaimer: ticketArr[i + 5].toString(10),
+          bnClaimTxHash: ticketArr[i + 6].toString(10)
         });
 
         retArr.push({
@@ -60,22 +60,22 @@ Template.ticket.viewmodel(function(data) {
       return this.ticket().ticketId;
     },
     numEther: function() {
-      var bnEther = toEther(this.ticket().bnWei);
+      var bnEther = toEther(new BigNumber(this.ticket().bnWei));
       return formatEtherAmount(bnEther);
     },
     unitPrice: function() {
-      var bnUnitPrice = toUnitPrice(this.ticket().bnWeiPerSatoshi);
+      var bnUnitPrice = toUnitPrice(new BigNumber(this.ticket().bnWeiPerSatoshi));
       return formatUnitPrice(bnUnitPrice);
     },
     totalPrice: function() {
-      var bnTotalPrice = toTotalPrice(toEther(this.ticket().bnWei), toUnitPrice(this.ticket().bnWeiPerSatoshi));
+      var bnTotalPrice = toTotalPrice(toEther(new BigNumber(this.ticket().bnWei)), toUnitPrice(new BigNumber(this.ticket().bnWeiPerSatoshi)));
       return formatTotalPrice(bnTotalPrice);
     },
     btcAddr: function() {
-      return formatBtcAddr(this.ticket().bnBtcAddr);
+      return formatBtcAddr(new BigNumber(this.ticket().bnBtcAddr));
     },
     ticketStatus: function() {
-      return formatState(this.ticket().bnClaimExpiry);
+      return formatState(new BigNumber(this.ticket().bnClaimExpiry));
     },
 
     ticketAction: function() {
