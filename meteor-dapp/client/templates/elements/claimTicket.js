@@ -228,9 +228,8 @@ function lookupBitcoinTx(viewm) {
       return;
     }
 
-    var satoshiPaid = data.data.tx.vout[0].value;
-    var bnSatoshi = web3.toBigNumber(satoshiPaid);
-    viewm.btcPayment(formatSatoshiToBTC(bnSatoshi));
+    var btcPaid = data.data.tx.vout[0].value;
+    viewm.btcPayment(btcPaid);
 
     var paymentAddr = data.data.tx.vout[0].scriptPubKey.addresses[0];
     viewm.paymentAddr(paymentAddr);
