@@ -44,7 +44,8 @@ Template.etherTickets.helpers({
             { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
             { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
             { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
-            { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus }
+            { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus },
+            { key: 'numClaimExpiry', label: '', sortByValue: true, fn: displayTicketAction }
           ]
       };
     }
@@ -75,6 +76,19 @@ function displayBtcAddr(bnstr) {
 
 function displayTicketStatus(numClaimExpiry) {
   return formatState(new BigNumber(numClaimExpiry));
+}
+
+function displayTicketAction(numClaimExpiry) {
+  var action;
+  if (displayTicketStatus(numClaimExpiry) === 'OPEN') {
+    action = 'Reserve';
+  }
+  else {
+    action = 'Claim';
+  }
+
+  var html = '<td><button class="btn btn-default">' + action + '</button></td>';
+  return new Spacebars.SafeString(html);
 }
 
 
