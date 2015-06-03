@@ -18,7 +18,7 @@ Template.etherTickets.helpers({
           ticketId: ticketArr[i + 0].toNumber(),
           bnBtcAddr: ticketArr[i + 1].toString(10),
           bnWei: ticketArr[i + 2].toNumber(),
-          numWeiPerSatoshi: ticketArr[i + 3].toNumber(),  // for sorting
+          numWeiPerSatoshi: ticketArr[i + 3].negated().toNumber(),  // negated so that sort is ascending
           bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
           numClaimExpiry: ticketArr[i + 4].toNumber(),
           // bnClaimer: ticketArr[i + 5].toString(10),
@@ -35,7 +35,7 @@ Template.etherTickets.helpers({
         fields: [
           { key: 'ticketId', label: 'ID' },
           { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
-          { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
+          { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'ascending', fn: displayUnitPrice },
           { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
           { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
           { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus },
