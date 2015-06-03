@@ -238,20 +238,20 @@ function lookupBitcoinTx(viewm) {
 
 
     // TODO check addr slice
-    var tx1Script = data.data.tx.vout[1].scriptPubKey;
+    var tx1Script = data.data.tx.vout[1].scriptPubKey.hex;
     var etherAddr;
     if (tx1Script && tx1Script.length === 50 &&
         tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
-      etherAddr = data.out[1].script.slice(6, -4);
+      etherAddr = tx1Script.slice(6, -4);
     }
     else {
       etherAddr = 'INVALID'
-      console.log('@@ invalid ether addr: ', data.out[1])
+      console.log('@@ invalid ether addr. script is: ', tx1Script)
     }
     viewm.etherAddr(etherAddr);
 
     var encodedFee = data.data.tx.vout[1].value;
-    viewm.bnEncodedFee(web3.toBigNumber(encodedFee).mod(10000));
+    viewm.bnEncodedFee(web3.toBigNumber(encodedFee).mul(SATOSHI_PER_BTC).mod(10000));
   });
 }
 
