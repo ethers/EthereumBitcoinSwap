@@ -4,9 +4,8 @@ Template.etherTickets.onCreated(function() {
   this.subscribe("tickets");
 });
 
-// var?
-// TODO Mongo.Collection ?
-var TicketColl = new Meteor.Collection(null);
+
+var TicketColl = new Mongo.Collection(null);
 
 Template.etherTickets.helpers({
     ticketCollection: function() {
