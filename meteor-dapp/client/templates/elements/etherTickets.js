@@ -38,15 +38,16 @@ Template.etherTickets.helpers({
 
     tableSettings : function () {
       return {
-          fields: [
-            { key: 'ticketId', label: 'ID' },
-            { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
-            { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
-            { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
-            { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
-            { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus },
-            { key: 'numClaimExpiry', label: '', sortByValue: true, fn: displayTicketAction }
-          ]
+        showFilter: false,
+        fields: [
+          { key: 'ticketId', label: 'ID' },
+          { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
+          { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
+          { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
+          { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
+          { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus },
+          { key: 'numClaimExpiry', label: '', sortByValue: true, fn: displayTicketAction }
+        ]
       };
     }
 });
@@ -78,7 +79,7 @@ function displayTicketStatus(numClaimExpiry) {
   return formatState(new BigNumber(numClaimExpiry));
 }
 
-function displayTicketAction(numClaimExpiry) {
+function displayTicketAction(numClaimExpiry, object) {
   var action;
   if (displayTicketStatus(numClaimExpiry) === 'OPEN') {
     action = 'Reserve';
@@ -87,8 +88,19 @@ function displayTicketAction(numClaimExpiry) {
     action = 'Claim';
   }
 
-  var html = '<td><button class="btn btn-default">' + action + '</button></td>';
+  var html = '<td><button class="btn btn-default"' +
+    'onclick=ethTicketsViewActionClicked('+object.ticketId+')>' + action + '</button></td>';
   return new Spacebars.SafeString(html);
+}
+
+ethTicketsViewActionClicked = function(ticketId) {
+  console.log('@@ clicked ticket with id: ', ticketId)
+
+  $('#appTab a[href="#claimSection"]').tab('show');
+  var vmClaimTicket = ViewModel.byId('vmClaimTicket');
+  vmClaimTicket.reset();
+  vmClaimTicket.ticketId(ticketId);
+  vmClaimTicket.lookupClicked();
 }
 
 
