@@ -209,6 +209,65 @@ function lookupBitcoinTx(viewm) {
       return;
     }
   }
+
+  var decodeEndpoint;
+  if (useBtcTestnet) {
+    decodeEndpoint = 'http://tbtc.blockr.io/api/v1/tx/decode';
+  }
+  else {
+    decodeEndpoint = 'http://btc.blockr.io/api/v1/tx/decode';
+  }
+
+  $.post(decodeEndpoint, {'hex':txHash}, function(data) {
+    console.log(data);
+
+    // TODO more checks
+    if (data.code !== 200 || data.status !== "success" ||
+      !data.data.tx.vout[0] ) {
+      console.log('@@@ err decode btc tx')
+      return;
+    }
+
+    var satoshiPaid = data.data.tx.vout[0].value;
+    var bnSatoshi = web3.toBigNumber(satoshiPaid);
+    viewm.btcPayment(formatSatoshiToBTC(bnSatoshi));
+
+    var paymentAddr = data.data.tx.vout[0].scriptPubKey.addresses[0];
+    viewm.paymentAddr(paymentAddr);
+
+
+
+    // TODO check addr slice
+    var tx1Script = data.data.tx.vout[1].scriptPubKey;
+    var etherAddr;
+    if (tx1Script && tx1Script.length === 50 &&
+        tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
+      etherAddr = data.out[1].script.slice(6, -4);
+    }
+    else {
+      etherAddr = 'INVALID'
+      console.log('@@ invalid ether addr: ', data.out[1])
+    }
+    viewm.etherAddr(etherAddr);
+
+    var encodedFee = data.data.tx.vout[1].value;
+    viewm.bnEncodedFee(web3.toBigNumber(encodedFee).mod(10000));
+  });
+}
+
+
+function lookupBitcoinTxTwo(viewm) {
+  var txHash = viewm.claimTxHash();
+  if (txHash === EMPTY_CLAIM_TX_HASH) {
+    txHash = viewm.btcTxHash();
+
+    // TODO heuristic on txhash
+    if (!txHash) {
+      // this flow is when user clicks Reserve in the etherTicketsView
+      return;
+    }
+  }
+  // TODO testnet
   var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
   $.getJSON(urlJsonTx, function(data) {
     console.log('@@@ rawtx data: ', data)
