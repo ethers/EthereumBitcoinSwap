@@ -109,7 +109,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
 
 
 function decodeBase58Check(btcAddr) {
-  var byteArrayData = bs58check.decode(btcAddr);
+  var byteArrayData = Bitcoin.Address.decodeString(btcAddr);
 
   var ret = "",
     i = 1,  // skip the Bitcoin "version" prefix
