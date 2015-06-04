@@ -70,9 +70,7 @@ function isTicketAvailable(claimExpiry) {
 }
 
 
-
-var Buffer = require('buffer').Buffer;
 formatBtcAddr = function(bn) {
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
-  return bs58check.encode(new Buffer('00'+btcAddr, 'hex'));  // byte 0 for btcmainnet
+  return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr)).toString();
 }
