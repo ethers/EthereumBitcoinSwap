@@ -13,11 +13,9 @@
         </div>
         <div class="form-group">
           <div class="row">
-            <label>Bitcoin Transaction Hash</label>
-            <input type="text" class="form-control"
-              data-bind="value: btcTxHash, disabled: !ticketNeedsToBeReserved">
-            <!-- <textarea class="form-control" rows="5"
-              data-bind="value: btcTxHash, disabled: !ticketNeedsToBeReserved"></textarea> -->
+            <label>Bitcoin Transaction (raw hex)</label>
+            <textarea class="form-control" rows="5"
+              data-bind="value: btcRawTx, disabled: !ticketNeedsToBeReserved"></textarea>
           </div>
         </div>
         <button type="button" class="btn btn-default"
@@ -41,6 +39,7 @@
         <h5>BTC: <strong data-bind="text: btcPayment"></strong></h5>
         <h5>Bitcoin Address: <strong data-bind="text: paymentAddr"></strong></h5>
         <h5>Ether address: <strong data-bind="text: etherAddr"></strong></h5>
+        <h5>Transaction hash: <strong data-bind="text: btcTxHash"></strong></h5>
       </div>
     </div>
   </div>
