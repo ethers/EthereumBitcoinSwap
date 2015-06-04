@@ -133,7 +133,7 @@ Template.claimTicket.viewmodel(
 
   lookupClicked: function() {
     console.log('@@@ lookupClicked')
-    doLookupTicket(this);
+    doLookup(this);
   },
 
   reserveClicked: function() {
@@ -149,19 +149,16 @@ Template.claimTicket.viewmodel(
 
 
 
-function doLookupTicket(viewm) {
+function doLookup(viewm) {
   viewm.merkleProof('');
   ViewModel.byId('vmResultStatus').msg('');
 
-  lookupForReserving(viewm);
-
-  if (!viewm.ticketNeedsToBeReserved()) {
-    lookupForClaiming(viewm);
-  }
+  lookupTicket(viewm);
+  lookupBtcTx(viewm);
 }
 
 
-function lookupForReserving(viewm) {
+function lookupTicket(viewm) {
   var ticketId = parseInt(viewm.ticketId(), 10);
 
   var ticketInfo = gContract.lookupTicket.call(ticketId);
@@ -190,19 +187,27 @@ function lookupForReserving(viewm) {
   // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
   viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
-
   viewm.btcAddr(btcAddr);
 
   // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
-
-  lookupBitcoinTx(viewm);
 }
 
 
-function lookupBitcoinTx(viewm) {
+function lookupBtcTx(viewm) {
+  if (viewm.claimTxHash() !== EMPTY_CLAIM_TX_HASH) {
+
+  }
+  else {
+    lookupRawBitcoinTx(viewm);
+  }
+}
+
+
+function lookupRawBitcoinTx(viewm) {
   var rawTx = viewm.btcRawTx();
 
   if (!rawTx) {
+    console.log('@@@@  empty rawTx')
     return;
   }
 
