@@ -3,43 +3,47 @@
   </h2>
 
   <div class="row">
-    <div class="col-md-6">
-      <h3>Ticket</h3>
-      <h5>Ether amount: <strong data-bind="text: numEther"></strong></h5>
-      <h5>Total Price BTC: <strong data-bind="text: totalPrice"></strong></h5>
-      <h5>Bitcoin Address: <strong data-bind="text: btcAddr"></strong></h5>
+    <div class="col-md-5">
+      <form class="form">
+        <div class="form-group">
+          <div class="row">
+            <label>Ticket ID</label>
+            <input type="text" class="form-control" data-bind="value: ticketId">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <label>Bitcoin Transaction Hash</label>
+            <input type="text" class="form-control"
+              data-bind="value: btcTxHash, disabled: !ticketNeedsToBeReserved">
+            <!-- <textarea class="form-control" rows="5"
+              data-bind="value: btcTxHash, disabled: !ticketNeedsToBeReserved"></textarea> -->
+          </div>
+        </div>
+        <button type="button" class="btn btn-default"
+          data-bind="click: lookupClicked,
+            disabled: !lookupFormComplete,
+            class: { btn-primary: isLookupNeeded }">Lookup</button>
+      </form>
+    </div>
+    <div class="col-md-1">
     </div>
     <div class="col-md-6">
-      <h3>Bitcoin Transaction</h3>
-      <h5>Ether Fee to Claimer: <strong data-bind="text: encodedFee"></strong></h5>
-      <h5>BTC: <strong data-bind="text: btcPayment"></strong></h5>
-      <h5>Bitcoin Address: <strong data-bind="text: paymentAddr"></strong></h5>
-      <h5>Ether address: <strong data-bind="text: etherAddr"></strong></h5>
+      <div class="row">
+        <h3>Ticket</h3>
+        <h5>Ether amount: <strong data-bind="text: numEther"></strong></h5>
+        <h5>Total Price BTC: <strong data-bind="text: totalPrice"></strong></h5>
+        <h5>Bitcoin Address: <strong data-bind="text: btcAddr"></strong></h5>
+      </div>
+      <div class="row">
+        <h3>Bitcoin Transaction</h3>
+        <h5>Ether Fee to Claimer: <strong data-bind="text: encodedFee"></strong></h5>
+        <h5>BTC: <strong data-bind="text: btcPayment"></strong></h5>
+        <h5>Bitcoin Address: <strong data-bind="text: paymentAddr"></strong></h5>
+        <h5>Ether address: <strong data-bind="text: etherAddr"></strong></h5>
+      </div>
     </div>
   </div>
-
-  <form class="form">
-    <div class="form-group">
-      <div class="row">
-        <div class="col-md-2">
-          <label>Ticket ID</label>
-          <input type="text" class="form-control" data-bind="value: ticketId">
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="row">
-        <div class="col-md-7">
-          <label>Bitcoin Transaction Hash</label>
-          <input type="text" class="form-control" data-bind="value: btcTxHash, disabled: !ticketNeedsToBeReserved">
-        </div>
-      </div>
-    </div>
-    <button type="button" class="btn btn-default"
-      data-bind="click: lookupClicked,
-        disabled: !lookupFormComplete,
-        class: { btn-primary: isLookupNeeded }">Lookup</button>
-  </form>
 
   <div class="row">
     <div class="col-md-6">
