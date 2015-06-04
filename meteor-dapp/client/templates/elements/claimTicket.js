@@ -4,7 +4,7 @@ Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
   btcRawTx: '',
-  btcTxHash: '',  // 141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+  btcTxHash: '',
 
   bnWei: '',
   bnWeiPerSatoshi: '',
@@ -201,6 +201,12 @@ function lookupForReserving(viewm) {
 
 function lookupBitcoinTx(viewm) {
   var rawTx = viewm.btcRawTx();
+
+  if (!rawTx) {
+    return;
+  }
+
+  viewm.btcTxHash(hashTx(viewm.btcRawTx()));
 
   var decodeEndpoint;
   if (useBtcTestnet) {
@@ -521,6 +527,13 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
   });
   vmResultStatus.msg('Ethereum transaction is in progress...')
+}
+
+
+function hashTx(rawTx) {
+  var txByte = Crypto.util.hexToBytes(rawTx);
+  var hashByte = Crypto.SHA256(Crypto.SHA256(txByte, {asBytes: true}), {asBytes: true});
+  return Crypto.util.bytesToHex(hashByte.reverse());
 }
 
 
