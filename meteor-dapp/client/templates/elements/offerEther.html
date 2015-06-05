@@ -1,19 +1,33 @@
 <template name="offerEther">
+  <h2>Offer your ether for bitcoin</h2>
+
   <form class="form">
     <fieldset>
-      <label>Your Bitcoin address</label>
-      <input type="text" class="form-control" data-bind="value: btcAddr">
+      <div class="form-group">
+        <label data-toggle="tooltip" data-placement="right"
+          title="address where you want to receive bitcoins">
+          Bitcoin address</label>
+        <input type="text" class="form-control" data-bind="value: btcAddr">
+      </div>
 
-      <label>Number of ethers</label>
-      <input type="text" class="form-control" data-bind="value: numEther">
+      <div class="form-group">
+        <label data-toggle="tooltip" data-placement="right"
+          title="how many ethers you are offering for bitcoins">Number of ethers</label>
+        <input type="text" class="form-control" data-bind="value: numEther">
+      </div>
 
-      <label>Bitcoin Price</label>
-      <input type="text" class="form-control" data-bind="value: btcPrice">
+      <div class="form-group">
+        <label data-toggle="tooltip" data-placement="right"
+          title="total amount of bitcoins you are offering for your ethers">Bitcoin Price</label>
+        <input type="text" class="form-control" data-bind="value: btcPrice">
+      </div>
 
-      <label>Unit Price</label>
-      <input type="text" readonly class="form-control" data-bind="value: unitPrice">
+      <div class="form-group">
+        <label data-toggle="tooltip" data-placement="right"
+          title="effectively how many bitcoins you are offering each ether for">Unit Price</label>
+        <input type="text" readonly class="form-control" data-bind="value: unitPrice">
+      </div>
 
-      <br>
       <button type="submit" class="btn btn-default">Submit offer</button>
     </fieldset>
   </form>

@@ -33,3 +33,9 @@ gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
 // TODO don't forget to update the ABI
 gContract = web3.eth.contract(externalEthBtcSwapAbi).at(gTicketContractAddr);
 console.log('@@@@ gContract: ', gContract)
+
+
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
