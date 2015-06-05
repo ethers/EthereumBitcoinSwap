@@ -1,5 +1,5 @@
 Template.ticketContractInfo.viewmodel({
-  address: '0x668a7adf4cb288d48b5b23e47fe35e8c14c55a81',
+  address: gTicketContractAddr,
 
   balanceChanged: true,
 
