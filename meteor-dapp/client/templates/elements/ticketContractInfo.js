@@ -10,5 +10,9 @@ Template.ticketContractInfo.viewmodel({
       return web3.fromWei(bnWei, 'ether');
     }
     return 13;
+  },
+
+  labelNetwork: function() {
+    return useBtcTestnet ? 'TESTNET bitcoins to get ether' : 'production (mainnet)';
   }
 });
