@@ -8,13 +8,12 @@ WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 
 var ticketContractAddr;
-useBtcTestnet = false;
+// useBtcTestnet = false;
 // var gOurBtcAddr;
 
-
-// useBtcTestnet = true;
+useBtcTestnet = true;
 if (useBtcTestnet) {
-  // ticketContractAddr = '0xa5bbd4e59bdc2c17e52e7056afe43ba9f52462f2';
+  ticketContractAddr = '0x9fec21cff232687e6105b1a95f1cee47c493a5b1';
   //
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
 }
