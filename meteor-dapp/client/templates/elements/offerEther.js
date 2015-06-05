@@ -117,7 +117,7 @@ function decodeBase58Check(btcAddr) {
   var byteArrayData = versionAndHash.hash;
 
   var ret = "",
-    i = 1,  // skip the Bitcoin "version" prefix
+    i = 0,
     len = byteArrayData.length;
 
   while (i < len) {

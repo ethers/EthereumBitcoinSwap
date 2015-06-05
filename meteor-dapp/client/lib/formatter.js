@@ -72,5 +72,5 @@ function isTicketAvailable(claimExpiry) {
 
 formatBtcAddr = function(bn) {
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
-  return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr)).toString();
+  return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), gVersionAddr).toString();
 }

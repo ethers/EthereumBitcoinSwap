@@ -7,18 +7,19 @@ SATOSHI_PER_BTC = new BigNumber(10).pow(8);
 WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 
-gTicketContractAddr = '';
 // useBtcTestnet = false;
 // var gOurBtcAddr;
 
 useBtcTestnet = true;
 if (useBtcTestnet) {
   gTicketContractAddr = '0x9fec21cff232687e6105b1a95f1cee47c493a5b1';
+  gVersionAddr = 111;
   //
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
 }
 else {
   gTicketContractAddr = '0x668a7adf4cb288d48b5b23e47fe35e8c14c55a81';
+  gVersionAddr = 0;
 
   // from tx190 of block300K
   // hex is 956bfc5575c0a7134c7effef268e51d887ba7015
