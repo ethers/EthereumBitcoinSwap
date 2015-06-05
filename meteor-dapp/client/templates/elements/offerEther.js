@@ -1,8 +1,12 @@
 Template.offerEther.viewmodel(
   'vmOfferEther', {
-  btcAddr: '1Ed53ZSJiL5hF9qLonNPQ6CAckKYsNeWwJ',
-  numEther: '5.2',
-  btcPrice: '0.26',
+  // btcAddr: '1Ed53ZSJiL5hF9qLonNPQ6CAckKYsNeWwJ',
+  // numEther: '5.2',
+  // btcPrice: '0.26',
+
+  btcAddr: 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR',
+  numEther: '0.17',
+  btcPrice: '0.0017',
 
   // btcAddr: '',
   // numEther: '',
@@ -109,7 +113,8 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
 
 
 function decodeBase58Check(btcAddr) {
-  var byteArrayData = Bitcoin.Address.decodeString(btcAddr);
+  var versionAndHash = Bitcoin.Address.decodeString(btcAddr);
+  var byteArrayData = versionAndHash.hash;
 
   var ret = "",
     i = 1,  // skip the Bitcoin "version" prefix
