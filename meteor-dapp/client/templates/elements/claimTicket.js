@@ -195,7 +195,7 @@ function lookupTicket(viewm) {
 
 function lookupBtcTx(viewm) {
   if (viewm.claimTxHash() !== EMPTY_CLAIM_TX_HASH) {
-
+    lookupBitcoinTxHash(viewm);
   }
   else {
     lookupRawBitcoinTx(viewm);
@@ -258,64 +258,59 @@ function lookupRawBitcoinTx(viewm) {
 }
 
 
-// TODO delete?
-// function lookupBitcoinTxTwo(viewm) {
-//   var txHash = viewm.claimTxHash();
-//   if (txHash === EMPTY_CLAIM_TX_HASH) {
-//     txHash = viewm.btcTxHash();
-//
-//     // TODO heuristic on txhash
-//     if (!txHash) {
-//       // this flow is when user clicks Reserve in the etherTicketsView
-//       return;
-//     }
-//   }
-//   // TODO testnet
-//   var urlJsonTx = "https://blockchain.info/rawtx/"+txHash+"?format=json&cors=true";
-//   $.getJSON(urlJsonTx, function(data) {
-//     console.log('@@@ rawtx data: ', data)
-//
-//     if (!data || !data.out || data.out.length < 2) {
-//       // TODO
-//       console.log('@@@ err btc tx not enough outputs')
-//       return;
-//     }
-//
-//     var bnSatoshi = web3.toBigNumber(data.out[0].value)
-//     viewm.btcPayment(formatSatoshiToBTC(bnSatoshi));
-//
-//     viewm.paymentAddr(data.out[0].addr);
-//
-//     // TODO check addr slice
-//     var tx1Script = data.out[1].script;
-//     var etherAddr;
-//     if (tx1Script && tx1Script.length === 50 &&
-//         tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
-//       etherAddr = data.out[1].script.slice(6, -4);
-//     }
-//     else {
-//       etherAddr = 'INVALID'
-//       console.log('@@ invalid ether addr: ', data.out[1])
-//     }
-//     viewm.etherAddr(etherAddr);
-//
-//
-//     viewm.bnEncodedFee(web3.toBigNumber(data.out[1].value).mod(10000));
-//   });
-// }
+function lookupBitcoinTxHash(viewm) {
+  var claimTxHash = viewm.claimTxHash();
+  var btcTxHash = viewm.btcTxHash();
+  if (claimTxHash !== btcTxHash) {
+    if (!btcTxHash) {
+      viewm.btcTxHash(claimTxHash);
+    }
+    else {
+      var vmResultStatus = ViewModel.byId('vmResultStatus');
+      var msg = 'btc and claim tx hashes mismatch';
+      vmResultStatus.msg(msg);
+      throw new Error('btc and claim tx hashes mismatch');
+    }
+  }
+
+  // TODO testnet
+  var urlJsonTx = "https://blockchain.info/rawtx/"+claimTxHash+"?format=json&cors=true";
+  $.getJSON(urlJsonTx, function(data) {
+    console.log('@@@ rawtx data: ', data)
+
+    if (!data || !data.out || data.out.length < 2) {
+      // TODO
+      console.log('@@@ err btc tx not enough outputs')
+      return;
+    }
+
+    var bnSatoshi = web3.toBigNumber(data.out[0].value)
+    viewm.btcPayment(formatSatoshiToBTC(bnSatoshi));
+
+    viewm.paymentAddr(data.out[0].addr);
+
+    // TODO check addr slice
+    var tx1Script = data.out[1].script;
+    var etherAddr;
+    if (tx1Script && tx1Script.length === 50 &&
+        tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
+      etherAddr = data.out[1].script.slice(6, -4);
+    }
+    else {
+      etherAddr = 'INVALID'
+      console.log('@@ invalid ether addr: ', data.out[1])
+    }
+    viewm.etherAddr(etherAddr);
+
+    viewm.bnEncodedFee(web3.toBigNumber(data.out[1].value).mod(10000));
+
+    getProofForClaiming(claimTxHash, viewm);
+  });
+}
 
 
 // get raw serialized transaction and merkle proof
-function lookupForClaiming(viewm) {
-  var claimTxHash = viewm.claimTxHash();
-  if (claimTxHash !== viewm.btcTxHash()) {
-    viewm.btcTxHash(claimTxHash);
-    var vmResultStatus = ViewModel.byId('vmResultStatus');
-    vmResultStatus.msg('use the tx hash that was reserved');
-  }
-
-
-  var txid = claimTxHash;
+function getProofForClaiming(txid, viewm) {
   console.log('@@@ txid: ', txid);
 
   var urlJsonTx;
