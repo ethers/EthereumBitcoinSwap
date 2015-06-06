@@ -252,21 +252,25 @@ function lookupBitcoinTxHash(viewm) {
   urlJsonTx += claimTxHash;
   $.getJSON(urlJsonTx, function(txResponse) {
     setBtcTxDetails(viewm, txResponse);
-
-    getProofForClaiming(claimTxHash, viewm);
+    setBtcTxExtendedDetails(viewm, txResponse, claimTxHash);
   });
 }
 
-function setBtcTxDetails(viewm, txResponse) {
-  console.log('@@@ rawtx txResponse: ', txResponse)
+function isTxResponseSuccess(txResponse) {
+  return !txResponse || txResponse.code !== 200 || txResponse.status !== 'success';
+}
 
-  if (!txResponse || txResponse.code !== 200 || txResponse.status !== 'success') {
+function setBtcTxDetails(viewm, txResponse) {
+  // console.log('@@@ rawtx txResponse: ', txResponse)
+
+  if (isTxResponseSuccess(txResponse)) {
     // TODO
-    console.log('@@@ err rawtx: ', txResponse.message)
+    console.log('@@@ err setBtcTxDetails: ', txResponse.message)
     return;
   }
 
   var data = txResponse.data;
+  // TODO check scriptpubkeys, etc exist
   if (!data || !data.tx || !data.tx.vout || data.tx.vout.length < 2) {
     // TODO
     console.log('@@@ err btc tx not enough outputs')
@@ -294,57 +298,54 @@ function setBtcTxDetails(viewm, txResponse) {
 }
 
 
-// get raw serialized transaction and merkle proof
-function getProofForClaiming(txid, viewm) {
-  console.log('@@@ txid: ', txid);
+// extended details for claiming ticket, such as merkle proof
+function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
+  if (isTxResponseSuccess(txResponse)) {
+    // TODO
+    console.log('@@@ err setBtcTxDetails: ', txResponse.message)
+    return;
+  }
 
-  var urlJsonTx;
+  var data = txResponse.data;
+  if (!data || !data.tx || !data.tx.hex || !data.tx.blockhash) {
+    // TODO
+    console.log('@@@ data missing: ', data)
+    return;
+  }
+
+  viewm.rawTx(data.tx.hex);
+
+  var blockNum = data.tx.blockhash; // blockr does not easily provide block height
+
+  var blockInfoUrl;
   if (useBtcTestnet) {
-      urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/" + txid;
+      blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
   }
   else {
-      urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/" + txid;
+      blockInfoUrl = "http://btc.blockr.io/api/v1/block/raw/"+blockNum;
   }
-  $.getJSON(urlJsonTx, function(data) {
-      console.log('@@@ data: ', data)
+  $.getJSON(blockInfoUrl, function(res) {
+      console.log('@@@ blockInfoUrl res: ', res)
 
-      var rawTx = data.data.tx.hex;
-      viewm.rawTx(rawTx);
-      console.log('@@@@ rawTx: ', rawTx);
+      viewm.blockHashOfTx(res.data.hash);
 
-      var blockNum = data.data.tx.blockhash; // blockr does not easily provide block height
-      //$('#txBlockNum').text('n/a for blockr.io');
-      // $('#txBlockNum').text(blockNum);
-
-      var blockInfoUrl;
-      if (useBtcTestnet) {
-          blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
+      var txIndex;
+      for (var key in res.data.tx) {
+        if (res.data.tx[key] == claimTxHash) {
+          txIndex = key;
+          break;
+        }
       }
-      else {
-          blockInfoUrl = "http://btc.blockr.io/api/v1/block/raw/"+blockNum;
-      }
-      $.getJSON(blockInfoUrl, function(res) {
-          console.log('@@@ res: ', res)
 
-          viewm.blockHashOfTx(res.data.hash);
+      // var txIndex = Object.keys(res.data.tx).indexOf(claimTxHash);
+      console.log('@@@@ txIndex: ', txIndex)
 
-          var txIndex;
-          for (var key in res.data.tx) {
-            if (res.data.tx[key] == txid) {
-              txIndex = key;
-              break;
-            }
-          }
-
-          // var txIndex = Object.keys(res.data.tx).indexOf(txid);
-          console.log('@@@@ txIndex: ', txIndex)
-
-          var merkleProof = btcproof.getProof(res.data.tx, txIndex);
-          console.log('@@@ merkleProof: ', merkleProof)
-          viewm.merkleProof(JSON.stringify(merkleProof));
-      });
-  })
+      var merkleProof = btcproof.getProof(res.data.tx, txIndex);
+      console.log('@@@ merkleProof: ', merkleProof)
+      viewm.merkleProof(JSON.stringify(merkleProof));
+  });
 }
+
 
 
 function doReserveTicket(viewm) {
