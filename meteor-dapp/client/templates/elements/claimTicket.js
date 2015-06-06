@@ -390,7 +390,13 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
     var durationSec = (endTime - startTime) / 1000;
     console.log('@@@@ call res: ', res, ' duration: ', durationSec)
     vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
-    return;
+
+    if (res.toNumber() === ticketId) {
+      console.log('@@@@ call GOOD so now sendTx...')
+    }
+    else {
+      return;
+    }
   }
 
 
