@@ -281,43 +281,47 @@ function lookupBitcoinTxHash(viewm) {
       urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/";
   }
   urlJsonTx += claimTxHash;
-  $.getJSON(urlJsonTx, function(response) {
-    console.log('@@@ rawtx response: ', response)
-
-    if (!response || response.code !== 200 || response.status !== 'success') {
-      // TODO
-      console.log('@@@ err rawtx: ', response.message)
-      return;
-    }
-
-    var data = response.data;
-    if (!data || !data.tx || !data.tx.vout || data.tx.vout.length < 2) {
-      // TODO
-      console.log('@@@ err btc tx not enough outputs')
-      return;
-    }
-
-    viewm.btcPayment(data.tx.vout[0].value);
-
-    viewm.paymentAddr(data.tx.vout[0].scriptPubKey.addresses[0]);
-
-    var tx1Script = data.tx.vout[1].scriptPubKey.hex;
-    var etherAddr;
-    if (tx1Script && tx1Script.length === 50 &&
-        tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
-      etherAddr = tx1Script.slice(6, -4);
-    }
-    else {
-      etherAddr = 'INVALID'
-      console.log('@@ invalid ether addr: ', tx1Script)
-    }
-    viewm.etherAddr(etherAddr);
-
-    var encodedFee = data.tx.vout[1].value;
-    viewm.bnEncodedFee(SATOSHI_PER_BTC.mul(encodedFee).mod(10000));
+  $.getJSON(urlJsonTx, function(txResponse) {
+    setBtcTxDetails(viewm, txResponse);
 
     getProofForClaiming(claimTxHash, viewm);
   });
+}
+
+function setBtcTxDetails(viewm, txResponse) {
+  console.log('@@@ rawtx txResponse: ', txResponse)
+
+  if (!txResponse || txResponse.code !== 200 || txResponse.status !== 'success') {
+    // TODO
+    console.log('@@@ err rawtx: ', txResponse.message)
+    return;
+  }
+
+  var data = txResponse.data;
+  if (!data || !data.tx || !data.tx.vout || data.tx.vout.length < 2) {
+    // TODO
+    console.log('@@@ err btc tx not enough outputs')
+    return;
+  }
+
+  viewm.btcPayment(data.tx.vout[0].value);
+
+  viewm.paymentAddr(data.tx.vout[0].scriptPubKey.addresses[0]);
+
+  var tx1Script = data.tx.vout[1].scriptPubKey.hex;
+  var etherAddr;
+  if (tx1Script && tx1Script.length === 50 &&
+      tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
+    etherAddr = tx1Script.slice(6, -4);
+  }
+  else {
+    etherAddr = 'INVALID'
+    console.log('@@ invalid ether addr: ', tx1Script)
+  }
+  viewm.etherAddr(etherAddr);
+
+  var encodedFee = data.tx.vout[1].value;
+  viewm.bnEncodedFee(SATOSHI_PER_BTC.mul(encodedFee).mod(10000));
 }
 
 
