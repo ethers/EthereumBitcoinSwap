@@ -221,39 +221,8 @@ function lookupRawBitcoinTx(viewm) {
     decodeEndpoint = 'http://btc.blockr.io/api/v1/tx/decode';
   }
 
-  $.post(decodeEndpoint, {'hex': rawTx}, function(data) {
-    console.log(data);
-
-    // TODO more checks
-    if (data.code !== 200 || data.status !== "success" ||
-      !data.data.tx.vout[0] ) {
-      console.log('@@@ err decode btc tx')
-      return;
-    }
-
-    var btcPaid = data.data.tx.vout[0].value;
-    viewm.btcPayment(btcPaid);
-
-    var paymentAddr = data.data.tx.vout[0].scriptPubKey.addresses[0];
-    viewm.paymentAddr(paymentAddr);
-
-
-
-    // TODO check addr slice
-    var tx1Script = data.data.tx.vout[1].scriptPubKey.hex;
-    var etherAddr;
-    if (tx1Script && tx1Script.length === 50 &&
-        tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
-      etherAddr = tx1Script.slice(6, -4);
-    }
-    else {
-      etherAddr = 'INVALID'
-      console.log('@@ invalid ether addr. script is: ', tx1Script)
-    }
-    viewm.etherAddr(etherAddr);
-
-    var encodedFee = data.data.tx.vout[1].value;
-    viewm.bnEncodedFee(web3.toBigNumber(encodedFee).mul(SATOSHI_PER_BTC).mod(10000));
+  $.post(decodeEndpoint, {'hex': rawTx}, function(txResponse) {
+    setBtcTxDetails(viewm, txResponse);
   });
 }
 
