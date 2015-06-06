@@ -1,5 +1,10 @@
 var btcproof = require('btcproof');
 
+var CLAIM_FAIL_CLAIMER = 99990100
+var CLAIM_FAIL_TX_HASH = 99990200
+var CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400
+var CLAIM_FAIL_FALLTHRU = 99999999
+
 Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
@@ -432,7 +437,7 @@ function doClaimTicket(viewm) {
   var txHash = '0x' + viewm.claimTxHash();
 
   // TODO shouldn't need new BigNumber here
-  var txBlockHash = new BigNumber('0x' + viewm.blockHashOfTx());
+  var txBlockHash = '0x' + viewm.blockHashOfTx();
 
   var merkleProof = JSON.parse(viewm.merkleProof());
   // web3.js wants 0x prepended
@@ -449,7 +454,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   console.log('@@@ ethClaimTicket args: ', arguments)
 
   var callOnly;
-  callOnly = true;  // if commented, it will call sendTransaction
+  // callOnly = true;  // if commented, it will call sendTransaction
 
   var vmResultStatus = ViewModel.byId('vmResultStatus');
 
