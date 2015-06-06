@@ -273,36 +273,48 @@ function lookupBitcoinTxHash(viewm) {
     }
   }
 
-  // TODO testnet
-  var urlJsonTx = "https://blockchain.info/rawtx/"+claimTxHash+"?format=json&cors=true";
-  $.getJSON(urlJsonTx, function(data) {
-    console.log('@@@ rawtx data: ', data)
+  var urlJsonTx;
+  if (useBtcTestnet) {
+      urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/";
+  }
+  else {
+      urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/";
+  }
+  urlJsonTx += claimTxHash;
+  $.getJSON(urlJsonTx, function(response) {
+    console.log('@@@ rawtx response: ', response)
 
-    if (!data || !data.out || data.out.length < 2) {
+    if (!response || response.code !== 200 || response.status !== 'success') {
+      // TODO
+      console.log('@@@ err rawtx: ', response.message)
+      return;
+    }
+
+    var data = response.data;
+    if (!data || !data.tx || !data.tx.vout || data.tx.vout.length < 2) {
       // TODO
       console.log('@@@ err btc tx not enough outputs')
       return;
     }
 
-    var bnSatoshi = web3.toBigNumber(data.out[0].value)
-    viewm.btcPayment(formatSatoshiToBTC(bnSatoshi));
+    viewm.btcPayment(data.tx.vout[0].value);
 
-    viewm.paymentAddr(data.out[0].addr);
+    viewm.paymentAddr(data.tx.vout[0].scriptPubKey.addresses[0]);
 
-    // TODO check addr slice
-    var tx1Script = data.out[1].script;
+    var tx1Script = data.tx.vout[1].scriptPubKey.hex;
     var etherAddr;
     if (tx1Script && tx1Script.length === 50 &&
         tx1Script.slice(0, 6) === '76a914' && tx1Script.slice(-4) === '88ac') {
-      etherAddr = data.out[1].script.slice(6, -4);
+      etherAddr = tx1Script.slice(6, -4);
     }
     else {
       etherAddr = 'INVALID'
-      console.log('@@ invalid ether addr: ', data.out[1])
+      console.log('@@ invalid ether addr: ', tx1Script)
     }
     viewm.etherAddr(etherAddr);
 
-    viewm.bnEncodedFee(web3.toBigNumber(data.out[1].value).mod(10000));
+    var encodedFee = data.tx.vout[1].value;
+    viewm.bnEncodedFee(SATOSHI_PER_BTC.mul(encodedFee).mod(10000));
 
     getProofForClaiming(claimTxHash, viewm);
   });
