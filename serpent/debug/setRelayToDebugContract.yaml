@@ -1,0 +1,14 @@
+- set:
+    EthBtcSwap: "0x9fec21cff232687e6105b1a95f1cee47c493a5b1"
+    BtcRelay: "0x90439a6495ee8e7d86a4acd2cbe649ed21e2ef6e"
+
+-
+  transact:
+    SetTrustedBtcRelay:
+      gas: 900000
+      to: $EthBtcSwap
+      fun_name: setTrustedBtcRelay
+      sig: i
+      data:
+        - $BtcRelay
+      wait: True

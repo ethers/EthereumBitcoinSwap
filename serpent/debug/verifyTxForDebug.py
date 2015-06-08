@@ -6,7 +6,11 @@ def verifyTx(txHash, txIndex, sibling:arr, txBlockHash):
 
     merkle = self.computeMerkle(txHash, txIndex, sibling)
     log(type=txhEvent, txHash, merkle)
-    
+
+    expMerkle = 0x7d1435034b4eb870e2cb9131796ab201a7f7ecd25ecd59d7dd8b7199efe7bbff
+    val = merkle == expMerkle
+    log(type=txhEvent, txHash, val)
+
     return(0)  # always return 0 since we don't want to claim ticket
 
     # val = self.within6Confirms(txBlockHash)

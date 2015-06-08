@@ -453,7 +453,7 @@ function doClaimTicket(viewm) {
 
 function dbgVerifyTx() {
   // TODO don't forget to update the ABI
-  var dbgAddress = '0xbf60a020ab3eb9135f62ecf5cb62657882496007';
+  var dbgAddress = '0x90439a6495ee8e7d86a4acd2cbe649ed21e2ef6e';
   var dbgContract = web3.eth.contract(externaDebugVerifyTxAbi).at(dbgAddress);
 
   var txHash = '0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012';

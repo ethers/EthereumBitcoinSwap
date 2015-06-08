@@ -1,2 +1,11 @@
+June 8
+
+1. to debug verifyTx, update verifyTxForDebug.py then run deployDebug.yaml
+1. with the contract address, replace setRelayToDebugContract.yaml and the dbgAddress variable in claimTicket.js
+1. run setRelayToDebugContract.yaml
+1. update dbgVerifyTx() txHash variable in claimTicket.js if needed
+1. claim the ticket and watch what is fired
+
+
 
 early ideas on Reserve Ticket http://imgur.com/INl0gk7
