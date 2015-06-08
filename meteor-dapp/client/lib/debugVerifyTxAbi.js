@@ -1,4 +1,10 @@
 window.externaDebugVerifyTxAbi = [{
+    "name": "computeMerkle(int256,int256,int256[])",
+    "type": "function",
+    "inputs": [{ "name": "txHash", "type": "int256" }, { "name": "txIndex", "type": "int256" }, { "name": "sibling", "type": "int256[]" }],
+    "outputs": [{ "name": "out", "type": "int256" }]
+},
+{
     "name": "verifyTx(int256,int256,int256[],int256)",
     "type": "function",
     "inputs": [{ "name": "txHash", "type": "int256" }, { "name": "txIndex", "type": "int256" }, { "name": "sibling", "type": "int256[]" }, { "name": "txBlockHash", "type": "int256" }],
