@@ -450,6 +450,39 @@ function doClaimTicket(viewm) {
 }
 
 
+
+function dbgVerifyTx() {
+  // TODO don't forget to update the ABI
+  var dbgAddress = '0x7eecb8e7f198c774baa515dcc3c5120b7185718c';
+  var dbgContract = web3.eth.contract(externaDebugVerifyTxAbi).at(dbgAddress);
+
+  var txHash = '0xeab3a26fd7a86fe9b7a53bfa98719e2b66cdfbffd825a2f773a441c1802a7621';
+  var dbgEvent = dbgContract.dbgEvent({ txHash: txHash });
+
+  var txhEvent = dbgContract.txhEvent({ txHash: txHash });
+
+
+  dbgEvent.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ dbgEvent err: ', err)
+      return;
+    }
+
+    console.log('@@@ dbgEvent res: ', res)
+  });
+
+
+  txhEvent.watch(function(err, res) {
+    if (err) {
+      console.log('@@@ txhEvent err: ', err)
+      return;
+    }
+
+    console.log('@@@ txhEvent res: ', res)
+  });
+}
+
+
 function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
   console.log('@@@ ethClaimTicket args: ', arguments)
 
@@ -463,7 +496,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   if (callOnly) {
     console.log('@@@@ callOnly')
     var startTime = Date.now();
-
+// claimTicket(int256,bytes,int256,int256,int256[],int256)",
     var res = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
 
 
@@ -474,6 +507,8 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     return;
   }
 
+
+  dbgVerifyTx();
 
 
   var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
