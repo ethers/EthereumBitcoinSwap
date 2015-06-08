@@ -446,7 +446,7 @@ function doClaimTicket(viewm) {
     // return new BigNumber('0x' + sib);
   });
 
-  ethClaimTicket(ticketId, txHex, txHash, merkleProof.txIndex, merkleSibling, txBlockHash);
+  ethClaimTicket(ticketId, txHex, txHash, parseInt(merkleProof.txIndex, 10), merkleSibling, txBlockHash);
 }
 
 
@@ -459,6 +459,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   var vmResultStatus = ViewModel.byId('vmResultStatus');
 
   var objParam = {from:gFromAccount, gas: 3000000};
+
   if (callOnly) {
     console.log('@@@@ callOnly')
     var startTime = Date.now();
