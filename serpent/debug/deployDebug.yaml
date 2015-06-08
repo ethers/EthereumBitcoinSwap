@@ -1,0 +1,6 @@
+-
+  deploy:
+    VerifyTxForDebug:
+      contract: verifyTxForDebug.py
+      gas: 3000000
+      wait: True
