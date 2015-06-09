@@ -131,9 +131,11 @@ class TestEthBtcSwap(object):
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
+        assert self.contractBalance() == 0
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
         assert ticketId == 1
+        assert self.contractBalance() == numWei
 
         claimer = tester.k1
         addrClaimer = tester.a1
@@ -142,6 +144,7 @@ class TestEthBtcSwap(object):
         res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
+        assert self.contractBalance() == numWei + depositRequired
 
         approxCostOfReserve = res['gas']
         boundedCostOfReserve = int(1.05*approxCostOfReserve)
@@ -158,6 +161,7 @@ class TestEthBtcSwap(object):
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == ticketId
+        assert self.contractBalance() == 0
 
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
@@ -743,3 +747,6 @@ class TestEthBtcSwap(object):
     # actor/user/claimer balance (as opposed to contract's balance)
     def coinbaseBalance(self):
         return self.s.block.get_balance(self.s.block.coinbase)
+
+    def contractBalance(self):
+        return self.s.block.get_balance(self.c.address)
