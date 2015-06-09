@@ -361,38 +361,26 @@ function doReserveTicket(viewm) {
 }
 
 function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
-  var callOnly;
-  callOnly = true;  // if commented, it will do sendTransaction
-
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {value: bnWeiDeposit, from:gFromAccount, gas: 500000};
 
   var vmResultStatus = ViewModel.byId('vmResultStatus');
 
-  if (callOnly) {
-    console.log('@@@@ callOnly')
-    var startTime = Date.now();
+  var startTime = Date.now();
 
+  var callResult = gContract.reserveTicket.call(ticketId, txHash, objParam);
 
-    var res = gContract.reserveTicket.call(ticketId, txHash, objParam);
+  var endTime = Date.now();
+  var durationSec = (endTime - startTime) / 1000;
+  console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
+  vmResultStatus.msg(callResult.toString(10) + "    " + durationSec+ "secs");
 
-
-    var endTime = Date.now();
-    var durationSec = (endTime - startTime) / 1000;
-    console.log('@@@@ call res: ', res, ' duration: ', durationSec)
-    vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
-
-    if (res.toNumber() === ticketId) {
-      console.log('@@@@ call GOOD so now sendTx...')
-    }
-    else {
-      return;
-    }
+  if (callResult.toNumber() === ticketId) {
+    console.log('@@@@ call GOOD so now sendTx...')
   }
-
-
-  // var startTime = Date.now();
-
+  else {
+    return;
+  }
 
 
   var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
