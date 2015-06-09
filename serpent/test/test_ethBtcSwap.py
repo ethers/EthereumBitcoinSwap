@@ -746,19 +746,19 @@ class TestEthBtcSwap(object):
 
     # offer is 1.7 ETH for 0.0017 BTC; buyer states zero fee
     def testBalances(self):
-        # block 300k
-        txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
-        txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
-        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        txIndex = 190
-        sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
+        # testnet block 447771
+        txBlockHash = 0x000000007971768c5a88699e5cf20cad19d2404d16bbd6d3305824b131f6b3f5
+        txStr = '0100000001c6e4ac5a14c1fa273d1511248d504522afc04b6af805c8c8732c9a26c3ee6c54010000008c493046022100b1a346052813d4e141c92d5f60107a61a24134205876b88d86917cac4f423732022100dda77724092d1ed746f583c80315e316fd5081805b35a83d88a394bd1f8eafc4014104858527cb6bf730cbd1bcf636bc7e77bbaf0784b9428ec5cca2d8378a0adc75f5ca893d14d9db2034cbb7e637aacf28088a68db311ff6f1ebe6d00a62fed9951effffffff0210980200000000001976a914a0dc485fc3ade71be5e1b68397abded386c0adb788ac10270000000000001976a914cd2a3d9f938e13cd947ec05abc7fe734df8dd82688ac00000000'
+        txHash = 0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012
+        txIndex = 8
+        sibling = [0x6155584c5555baf187ac6e409a3278de39a02a1020871ec034044c13f27dc3cd]
         satoshiOutputOne = 170000
         satoshiOutputTwo = 10000
 
-        btcAddr = 0x956bfc5575c0a7134c7effef268e51d887ba7015
+        btcAddr = 0xa0dc485fc3ade71be5e1b68397abded386c0adb7
         numWei = 1700000000000000000
         weiPerSatoshi = 10000000000000
-        ethAddrStr = '587488c119f40666b4a0c807b0d7a1acfe3b6917'
+        ethAddrStr = 'cd2a3d9f938e13cd947ec05abc7fe734df8dd826'
 
         depositRequired = numWei / 20
 
@@ -778,6 +778,7 @@ class TestEthBtcSwap(object):
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
         assert self.contractBalance() == numWei + depositRequired
+        assert self.s.block.get_balance(ethAddrStr.decode('hex')) == 0
 
         approxCostOfReserve = res['gas']
         boundedCostOfReserve = int(1.05*approxCostOfReserve)
@@ -809,10 +810,10 @@ class TestEthBtcSwap(object):
         boundedCostToClaim = int(2.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
-# assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
+        assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
         assert endClaimerBal > balPreClaim + depositRequired + feeToClaimer - boundedCostToClaim
 
-# assert endClaimerBal < claimerBalPreReserve + feeToClaimer - approxCostToClaim - approxCostOfReserve
+        assert endClaimerBal < claimerBalPreReserve + feeToClaimer - approxCostToClaim - approxCostOfReserve
         assert endClaimerBal > claimerBalPreReserve + feeToClaimer - boundedCostToClaim - boundedCostOfReserve
 
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
@@ -822,7 +823,7 @@ class TestEthBtcSwap(object):
 
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
 
-        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
+        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, int(ethAddrStr, 16), satoshiOutputTwo, ticketId)
 
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
