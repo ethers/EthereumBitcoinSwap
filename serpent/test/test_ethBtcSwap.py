@@ -744,6 +744,97 @@ class TestEthBtcSwap(object):
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
 
+    # offer is 1.7 ETH for 0.0017 BTC; buyer states zero fee
+    def testBalances(self):
+        # block 300k
+        txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
+        txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        txIndex = 190
+        sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
+        satoshiOutputOne = 170000
+        satoshiOutputTwo = 10000
+
+        btcAddr = 0x956bfc5575c0a7134c7effef268e51d887ba7015
+        numWei = 1700000000000000000
+        weiPerSatoshi = 10000000000000
+        ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
+
+        depositRequired = numWei / 20
+
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
+        assert self.contractBalance() == 0
+
+        ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei, sender=tester.k2)
+        assert ticketId == 1
+        assert self.contractBalance() == numWei
+
+        claimer = tester.k1
+        addrClaimer = tester.a1
+
+        claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
+        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        # print('GAS: '+str(res['gas']))
+        assert res['output'] == 1
+        assert self.contractBalance() == numWei + depositRequired
+
+        approxCostOfReserve = res['gas']
+        boundedCostOfReserve = int(1.05*approxCostOfReserve)
+        balPreClaim = self.s.block.get_balance(addrClaimer)
+        assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
+        assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
+
+
+        eventArr = []
+        self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
+
+
+        balPreClaim = self.s.block.get_balance(addrClaimer)
+        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
+        # print('GAS claimTicket() ', claimRes['gas'])
+        assert claimRes['output'] == ticketId
+        assert self.contractBalance() == 0
+
+
+        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
+        assert claimerFeePercent == 0
+        feeToClaimer = int(claimerFeePercent * numWei)  # int() is needed
+
+
+        # gas from profiling claimTicket() is inaccurate so assert that the
+        # balance is within 2.4X of approxCostToClaim
+        # TODO why 2.4X ?
+        approxCostToClaim = claimRes['gas']
+        boundedCostToClaim = int(2.4*approxCostToClaim)
+
+        endClaimerBal = self.s.block.get_balance(addrClaimer)
+# assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
+        assert endClaimerBal > balPreClaim + depositRequired + feeToClaimer - boundedCostToClaim
+
+# assert endClaimerBal < claimerBalPreReserve + feeToClaimer - approxCostToClaim - approxCostOfReserve
+        assert endClaimerBal > claimerBalPreReserve + feeToClaimer - boundedCostToClaim - boundedCostOfReserve
+
+        indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
+        ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
+        buyerEthBalance = self.s.block.get_balance(ethAddrBin)
+
+        assert buyerEthBalance == (1 - claimerFeePercent) * numWei
+
+        self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
+
+        # re-claim is not allowed
+        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
+        # print('GAS claimTicket() ', claimRes['gas'])
+        assert claimRes['output'] == 0
+
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100  # a claim sets the claimer to 0, thus this failure
+            }]
+        eventArr.pop()
+
+
     # actor/user/claimer balance (as opposed to contract's balance)
     def coinbaseBalance(self):
         return self.s.block.get_balance(self.s.block.coinbase)
