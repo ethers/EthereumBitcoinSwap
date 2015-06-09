@@ -523,7 +523,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
         resultText = 'Failed: Bitcoin transaction did not send enough Bitcoins';
         break;
       case CLAIM_FAIL_FALLTHRU:
-        resultText = 'Failed: Unknown';
+        resultText = 'Failed: Bitcoin transaction needs at least 6 confirmations';
         break;
       default:
         resultText = 'ERROR Unexpected';
