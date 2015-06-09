@@ -446,48 +446,48 @@ function doClaimTicket(viewm) {
     // return new BigNumber('0x' + sib);
   });
 
-  ethClaimTicket(ticketId, txHex, txHash, parseInt(merkleProof.txIndex, 10), merkleSibling, txBlockHash);
+  ethClaimTicket(ticketId, txHex, txHash, merkleProof.txIndex, merkleSibling, txBlockHash);
 }
 
 
 
-function dbgVerifyTx() {
-  // TODO don't forget to update the ABI
-  var dbgAddress = '0x90439a6495ee8e7d86a4acd2cbe649ed21e2ef6e';
-  var dbgContract = web3.eth.contract(externaDebugVerifyTxAbi).at(dbgAddress);
-
-  var txHash = '0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012';
-  var dbgEvent = dbgContract.dbgEvent({ txHash: txHash });
-
-  var txhEvent = dbgContract.txhEvent({ txHash: txHash });
-
-
-  dbgEvent.watch(function(err, res) {
-    if (err) {
-      console.log('@@@ dbgEvent err: ', err)
-      return;
-    }
-
-    console.log('@@@ dbgEvent res: ', res)
-  });
-
-
-  txhEvent.watch(function(err, res) {
-    if (err) {
-      console.log('@@@ txhEvent err: ', err)
-      return;
-    }
-
-    console.log('@@@ txhEvent res: ', res)
-  });
-}
+// function dbgVerifyTx() {
+//   // TODO don't forget to update the ABI
+//   var dbgAddress = '0x90439a6495ee8e7d86a4acd2cbe649ed21e2ef6e';
+//   var dbgContract = web3.eth.contract(externaDebugVerifyTxAbi).at(dbgAddress);
+//
+//   var txHash = '0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012';
+//   var dbgEvent = dbgContract.dbgEvent({ txHash: txHash });
+//
+//   var txhEvent = dbgContract.txhEvent({ txHash: txHash });
+//
+//
+//   dbgEvent.watch(function(err, res) {
+//     if (err) {
+//       console.log('@@@ dbgEvent err: ', err)
+//       return;
+//     }
+//
+//     console.log('@@@ dbgEvent res: ', res)
+//   });
+//
+//
+//   txhEvent.watch(function(err, res) {
+//     if (err) {
+//       console.log('@@@ txhEvent err: ', err)
+//       return;
+//     }
+//
+//     console.log('@@@ txhEvent res: ', res)
+//   });
+// }
 
 
 function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
   console.log('@@@ ethClaimTicket args: ', arguments)
 
   var callOnly;
-  // callOnly = true;  // if commented, it will call sendTransaction
+  callOnly = true;  // if commented, it will call sendTransaction
 
   var vmResultStatus = ViewModel.byId('vmResultStatus');
 
@@ -496,7 +496,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   if (callOnly) {
     console.log('@@@@ callOnly')
     var startTime = Date.now();
-// claimTicket(int256,bytes,int256,int256,int256[],int256)",
+
     var res = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
 
 
@@ -507,9 +507,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     return;
   }
 
-
-  dbgVerifyTx();
-
+  // dbgVerifyTx();
 
   var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
   rvalFilter.watch(function(err, res) {
