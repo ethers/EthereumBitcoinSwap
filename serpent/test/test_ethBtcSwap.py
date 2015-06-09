@@ -758,7 +758,7 @@ class TestEthBtcSwap(object):
         btcAddr = 0x956bfc5575c0a7134c7effef268e51d887ba7015
         numWei = 1700000000000000000
         weiPerSatoshi = 10000000000000
-        ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
+        ethAddrStr = '587488c119f40666b4a0c807b0d7a1acfe3b6917'
 
         depositRequired = numWei / 20
 
@@ -817,6 +817,7 @@ class TestEthBtcSwap(object):
 
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
         ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
+        assert ethAddrStr.decode('hex') == ethAddrBin
         buyerEthBalance = self.s.block.get_balance(ethAddrBin)
 
         assert buyerEthBalance == (1 - claimerFeePercent) * numWei
