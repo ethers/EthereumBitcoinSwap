@@ -98,7 +98,7 @@ Template.claimTicket.viewmodel(
 
   isReservable: function() {
     return this.txSatisfiesTicket()
-      && this.claimerAddr() === EMPTY_CLAIMER
+      && !this.claimerAddr()
       && this.bnClaimTxHash().isZero()
       && this.ticketNeedsToBeReserved()
       && currentUserBalance().gte(this.bnWeiDeposit());

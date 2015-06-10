@@ -50,7 +50,7 @@ formatState = function(bnClaimExpiry) {
 
 formatClaimer = function(bnClaimer) {
   var claimer = formatHash(bnClaimer);
-  return claimer === '0' ? EMPTY_CLAIM_TX_HASH : claimer;
+  return claimer === '0' ? '' : claimer;
 }
 
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
