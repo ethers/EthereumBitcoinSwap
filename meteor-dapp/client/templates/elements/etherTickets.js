@@ -38,7 +38,7 @@ Template.etherTickets.helpers({
           { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'ascending', fn: displayUnitPrice },
           { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
           { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
-          { key: 'numClaimExpiry', label: 'Reserved', sortByValue: true, fn: displayTicketStatus },
+          { key: 'numClaimExpiry', label: 'Reservable', sortByValue: true, fn: displayTicketStatus },
           { key: 'numClaimExpiry', label: '', sortByValue: true, fn: displayTicketAction }
         ]
       };

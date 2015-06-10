@@ -47,6 +47,11 @@ Template.claimTicket.viewmodel(
     return this.claimerAddr() || EMPTY_CLAIMER;
   },
 
+  uiClaimExpiry: function() {
+    unixExpiry = this.claimExpiry();
+    return unixExpiry === FRESH_TICKET_EXPIRY ? UNRESERVED_TICKET_DESC : humanRelativeTime(unixExpiry);
+  },
+
   btcPayment: '',
   paymentAddr: '',
   etherAddr: '',
@@ -201,7 +206,7 @@ function lookupTicket(viewm) {
   var bnClaimTxHash = ticketInfo[5];
 
   // renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
-  viewm.claimExpiry(formatState(bnClaimExpiry));
+  viewm.claimExpiry(bnClaimExpiry.toNumber());
   viewm.claimerAddr(toHash(bnClaimer));
   viewm.claimTxHash(toHash(bnClaimTxHash));
 

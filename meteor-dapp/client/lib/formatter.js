@@ -1,7 +1,8 @@
 
 EMPTY_CLAIMER = '-';
-EMPTY_CLAIM_TX_HASH = '-';
+FRESH_TICKET_EXPIRY = 1;  // 1 comes from the contract; 0 means ticket does not exist
 
+UNRESERVED_TICKET_DESC = 'OPEN';
 
 
 
@@ -48,11 +49,16 @@ formatWeiToEther = function(bnWei) {
 }
 
 formatState = function(bnClaimExpiry) {
-  var expiry = bnClaimExpiry.toString(10);
+  var expiry = bnClaimExpiry.toNumber();
   if (isTicketAvailable(expiry)) {
-    return 'OPEN';
+    return UNRESERVED_TICKET_DESC;
   }
-  return expiry;
+  return humanRelativeTime(expiry);
+}
+
+
+humanRelativeTime = function(unixTime) {
+  return moment(unixTime * 1000).fromNow();
 }
 
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
@@ -64,7 +70,7 @@ bignumToHex = function(bn) {
 
 function isTicketAvailable(claimExpiry) {
     // TODO: check block timestamp
-    return claimExpiry === '1';
+    return claimExpiry === 1;
 }
 
 
