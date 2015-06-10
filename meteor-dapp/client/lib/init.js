@@ -1,5 +1,7 @@
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
+ZERO = new BigNumber(0);
+
 TWO_POW_256 = new BigNumber(2).pow(256);
 
 WEI_PER_ETHER = new BigNumber(10).pow(18);

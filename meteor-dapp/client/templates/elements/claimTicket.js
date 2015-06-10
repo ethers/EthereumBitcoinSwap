@@ -9,12 +9,14 @@ Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
   btcRawTx: '',
-  btcTxHash: '',
+  bnBtcTxHash: ZERO,
 
   uiBtcTxHash: function() {
-    return this.btcTxHash();
+    var bnBtcTxHash = this.bnBtcTxHash();
+    return bnBtcTxHash.isZero() ? '' : formatHash(bnBtcTxHash);
   },
 
+  // TODO use ZERO
   bnWei: '',
   bnWeiPerSatoshi: '',
   bnEther: function() {
@@ -34,19 +36,16 @@ Template.claimTicket.viewmodel(
         return formatTotalPrice(bnTotalPrice);
       }
     }
+    return '';
   },
   btcAddr: '',
 
   claimerAddr: '',
   claimExpiry: '',
-  claimTxHash: '',
+  bnClaimTxHash: ZERO,
 
   uiClaimerAddr: function() {
     return this.claimerAddr() || EMPTY_CLAIMER;
-  },
-
-  uiClaimTxHash: function() {
-    return this.claimTxHash() || EMPTY_CLAIM_TX_HASH;
   },
 
   btcPayment: '',
@@ -100,7 +99,7 @@ Template.claimTicket.viewmodel(
   isReservable: function() {
     return this.txSatisfiesTicket()
       && !this.claimerAddr()
-      && !this.claimTxHash()
+      && this.bnClaimTxHash().isZero()
       && this.ticketNeedsToBeReserved()
       && currentUserBalance().gte(this.bnWeiDeposit());
   },
@@ -134,7 +133,7 @@ Template.claimTicket.viewmodel(
 
   ticketIsReserved: function() {
     return this.claimerAddr()
-      && this.claimTxHash()
+      && !this.bnClaimTxHash().isZero()
       // TODO check expiration and block timestamp
   },
 
@@ -169,10 +168,10 @@ Template.claimTicket.viewmodel(
 function doLookup(viewm, reset) {
   if (reset) {
     var ticketId = viewm.ticketId();
-    var btcTxHash = viewm.btcTxHash();
+    var btcRawTx = viewm.btcRawTx();
     viewm.reset();
     viewm.ticketId(ticketId);
-    viewm.btcTxHash(btcTxHash);
+    viewm.btcRawTx(btcRawTx);
   }
   else {
     viewm.merkleProof('');
@@ -190,7 +189,7 @@ function lookupTicket(viewm) {
   var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
-  if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].eq(0)) {
+  if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].isZero()) {
     var vmResultStatus = ViewModel.byId('vmResultStatus');
     vmResultStatus.msg('Ticket has been claimed or does not exist');
     // TODO
@@ -206,9 +205,9 @@ function lookupTicket(viewm) {
   var bnClaimTxHash = ticketInfo[5];
 
   // renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
-  viewm.claimExpiry(formatState(bnClaimExpiry));  // TODO remove formatState
-  viewm.claimerAddr(bnClaimer);
-  viewm.claimTxHash(bnClaimTxHash);
+  viewm.claimExpiry(formatState(bnClaimExpiry));
+  viewm.claimerAddr(formatClaimer(bnClaimer));
+  viewm.bnClaimTxHash(bnClaimTxHash);
 
   // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
@@ -220,7 +219,7 @@ function lookupTicket(viewm) {
 
 
 function lookupBtcTx(viewm) {
-  if (viewm.claimTxHash()) {
+  if (!viewm.bnClaimTxHash().isZero()) {
     lookupBitcoinTxHash(viewm);
   }
   else {
@@ -237,7 +236,7 @@ function lookupRawBitcoinTx(viewm) {
     return;
   }
 
-  viewm.btcTxHash(hashTx(viewm.btcRawTx()));
+  viewm.bnBtcTxHash(new BigNumber(hashTx(rawTx), 16));
 
   var decodeEndpoint;
   if (useBtcTestnet) {
@@ -254,11 +253,11 @@ function lookupRawBitcoinTx(viewm) {
 
 
 function lookupBitcoinTxHash(viewm) {
-  var claimTxHash = viewm.claimTxHash();
-  var btcTxHash = viewm.btcTxHash();
-  if (claimTxHash !== btcTxHash) {
-    if (!btcTxHash) {
-      viewm.btcTxHash(claimTxHash);
+  var bnClaimTxHash = viewm.bnClaimTxHash();
+  var bnBtcTxHash = viewm.bnBtcTxHash();
+  if (!bnClaimTxHash.equals(bnBtcTxHash)) {
+    if (bnBtcTxHash.isZero()) {
+      viewm.bnBtcTxHash(bnClaimTxHash);
     }
     else {
       var vmResultStatus = ViewModel.byId('vmResultStatus');
@@ -275,10 +274,11 @@ function lookupBitcoinTxHash(viewm) {
   else {
       urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/";
   }
-  urlJsonTx += claimTxHash;
+  var hexTxHash = formatHash(bnClaimTxHash);
+  urlJsonTx += hexTxHash;
   $.getJSON(urlJsonTx, function(txResponse) {
     setBtcTxDetails(viewm, txResponse);
-    setBtcTxExtendedDetails(viewm, txResponse, claimTxHash);
+    setBtcTxExtendedDetails(viewm, txResponse, hexTxHash);
   });
 }
 
@@ -376,7 +376,7 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
 
 function doReserveTicket(viewm) {
   var ticketId = viewm.ticketId();
-  var txHash = '0x' + viewm.btcTxHash();
+  var txHash = '0x' + formatHash(viewm.bnBtcTxHash());
 
   ethReserveTicket(ticketId, txHash, viewm.bnWeiDeposit());
 }
@@ -443,7 +443,7 @@ function doClaimTicket(viewm) {
   var ticketId = viewm.ticketId();
   var txHex = viewm.rawTx();
 
-  var txHash = '0x' + viewm.claimTxHash();
+  var txHash = '0x' + formatHash(viewm.bnClaimTxHash());
 
   // TODO shouldn't need new BigNumber here
   var txBlockHash = '0x' + viewm.blockHashOfTx();

@@ -53,12 +53,8 @@ formatClaimer = function(bnClaimer) {
   return claimer === '0' ? EMPTY_CLAIM_TX_HASH : claimer;
 }
 
-formatClaimTx = function(bnClaimTxHash) {
-  return bnClaimTxHash.eq(0) ? '-' : formatHash(bnClaimTxHash);
-}
-
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
-function formatHash(bn) {
+formatHash = function(bn) {
   return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
 
   // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
