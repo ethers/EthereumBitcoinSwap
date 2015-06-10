@@ -98,7 +98,7 @@ Template.claimTicket.viewmodel(
 
   isReservable: function() {
     return this.txSatisfiesTicket()
-      && !this.claimerAddr()
+      && this.claimerAddr() === EMPTY_CLAIMER
       && this.bnClaimTxHash().isZero()
       && this.ticketNeedsToBeReserved()
       && currentUserBalance().gte(this.bnWeiDeposit());
@@ -190,10 +190,7 @@ function lookupTicket(viewm) {
   console.log('@@@ tinfo: ', ticketInfo);
 
   if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].isZero()) {
-    var vmResultStatus = ViewModel.byId('vmResultStatus');
-    vmResultStatus.msg('Ticket has been claimed or does not exist');
-    // TODO
-    $('#result').addClass('alert-danger');
+    swal('Ticket does not exist...', 'or may have been claimed', 'error');
     return;
   }
 
@@ -260,10 +257,9 @@ function lookupBitcoinTxHash(viewm) {
       viewm.bnBtcTxHash(bnClaimTxHash);
     }
     else {
-      var vmResultStatus = ViewModel.byId('vmResultStatus');
       var msg = 'btc and claim tx hashes mismatch';
-      vmResultStatus.msg(msg);
-      throw new Error('btc and claim tx hashes mismatch');
+      swal('Unexepected error', msg, 'error');
+      throw new Error(msg);
     }
   }
 
@@ -385,8 +381,6 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
   // TODO confirmation to deposit ether, from account, gasprice
   var objParam = {value: bnWeiDeposit, from:gFromAccount, gas: 500000};
 
-  var vmResultStatus = ViewModel.byId('vmResultStatus');
-
   var startTime = Date.now();
 
   var callResult = gContract.reserveTicket.call(ticketId, txHash, objParam);
@@ -394,7 +388,7 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
   var endTime = Date.now();
   var durationSec = (endTime - startTime) / 1000;
   console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
-  vmResultStatus.msg(callResult.toString(10) + "    " + durationSec+ "secs");
+  swal(callResult.toString(10) + "    " + durationSec+ "secs");
 
   if (callResult.toNumber() === ticketId) {
     console.log('@@@@ call GOOD so now sendTx...')
@@ -415,10 +409,10 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
 
     var eventArgs = res.args;
     if (eventArgs.rval.toNumber() === ticketId) {
-      vmResultStatus.msg('SUCCESS Ticket has been reserved');
+      swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      vmResultStatus.msg('Failed. Did you send enough deposit or specify correct ticket id?');
+      swal('Did you send enough deposit or specify correct ticket id?', '', 'error');
     }
 
     rvalFilter.stopWatching();
@@ -433,7 +427,7 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
     // result is a txhash
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
-  vmResultStatus.msg('Ethereum transaction is in progress...')
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 
@@ -498,8 +492,6 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   var callOnly;
   callOnly = true;  // if commented, it will call sendTransaction
 
-  var vmResultStatus = ViewModel.byId('vmResultStatus');
-
   var objParam = {from:gFromAccount, gas: 3000000};
 
   if (callOnly) {
@@ -512,7 +504,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     var endTime = Date.now();
     var durationSec = (endTime - startTime) / 1000;
     console.log('@@@@ verifyTx res: ', res, ' duration: ', durationSec)
-    vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
+    swal(res.toString(10) + "    " + durationSec+ "secs");
     return;
   }
 
@@ -532,26 +524,24 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     console.log('@@@ rvalFilter rval: ', rval)
     switch (rval) {
       case ticketId:
-        resultText = 'SUCCESS Ticket has been claimed';
+        swal('Ticket claimed', 'ticket id '+ticketId, 'success');
         break;
-      case CLAIM_FAIL_CLAIMER:
-        resultText = 'Failed: someone else has reserved the ticket';
+      case CLAIM_FAIL_CLAIMER:  // should not happen since UI prevents it
+        swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
         break;
-      case CLAIM_FAIL_TX_HASH:
-        resultText = 'Failed: you need to use the transaction used in the reservation';
+      case CLAIM_FAIL_TX_HASH:  // should not happen since UI prevents it
+        swal('You need to use the transaction used in the reservation', '', 'error');
         break;
-      case CLAIM_FAIL_INSUFFICIENT_SATOSHI:
-        resultText = 'Failed: Bitcoin transaction did not send enough Bitcoins';
+      case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
+        swal('Bitcoin transaction did not send enough bitcoins', 'Need to send the ticket\'s total price', 'error');
         break;
-      case CLAIM_FAIL_FALLTHRU:
-        resultText = 'Failed: Bitcoin transaction needs at least 6 confirmations';
+      case CLAIM_FAIL_FALLTHRU:  // should not happen since we use call-then-sendtx pattern
+        swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
         break;
       default:
-        resultText = 'ERROR Unexpected';
+        swal('Unexpected error', '', 'error');
         break;
     }
-
-    vmResultStatus.msg(resultText);
 
     rvalFilter.stopWatching();
   });
@@ -566,7 +556,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     console.log('@@@ claimTicket result: ', result)
 
   });
-  vmResultStatus.msg('Ethereum transaction is in progress...')
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
 }
 
 
