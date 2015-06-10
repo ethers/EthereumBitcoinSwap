@@ -36,8 +36,7 @@ Template.offerEther.events({
       addrHex = '0x' + decodeBase58Check(vmOfferEther.btcAddr());
     }
     catch (err) {
-      var vmResultStatus = ViewModel.byId('vmResultStatus');
-      vmResultStatus.msg('Bad Bitcoin address: ' + err.message);
+      swal('Bad Bitcoin address', err.message, 'error');
       return;
     }
     var numWei = web3.toWei(vmOfferEther.numEther(), 'ether');
@@ -52,8 +51,6 @@ Template.offerEther.events({
 
 
 function submitOffer(addrHex, numWei, weiPerSatoshi) {
-  var vmResultStatus = ViewModel.byId('vmResultStatus');
-
   var callOnly;
   // callOnly = true;  // if commented, it will do sendTransaction
   //
@@ -71,7 +68,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
     var endTime = Date.now();
     var durationSec = (endTime - startTime) / 1000;
     console.log('@@@@ call res: ', res, ' duration: ', durationSec)
-    vmResultStatus.msg(res.toString(10) + "    " + durationSec+ "secs");
+    swal(res.toString(10) + "    " + durationSec+ "secs");
     return;
   }
 
@@ -86,11 +83,12 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
     console.log('@@@ rvalFilter res: ', res)
 
     var eventArgs = res.args;
-    if (eventArgs.rval.toNumber() > 0) {
-      vmResultStatus.msg('SUCCESS Ticket created');
+    var ticketId = eventArgs.rval.toNumber();
+    if (ticketId > 0) {
+      swal('Ticket created', 'ticket id '+ticketId, 'success');
     }
     else {
-      vmResultStatus.msg('Failed. You need to send the ethers to the Ticket contract');
+      swal('Failed', 'You need to send the ethers to the Ticket contract', 'error');
     }
 
     rvalFilter.stopWatching();
@@ -108,7 +106,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
     console.log('@@@ createTicket result: ', result)
 
   });
-  vmResultStatus.msg('Ethereum transaction is in progress...');
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 
