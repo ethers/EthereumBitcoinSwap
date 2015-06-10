@@ -20,6 +20,13 @@ toTotalPrice = function(bnEther, bnUnitPrice) {
   return bnEther.mul(bnUnitPrice).round(8);
 }
 
+toHash = function(bignum) {
+  var hash = bignumToHex(bignum);
+  return hash === '0' ? '' : hash;
+}
+
+
+
 formatEtherAmount = function(bnEther) {
   return bnEther.toString(10);
 }
@@ -48,13 +55,8 @@ formatState = function(bnClaimExpiry) {
   return expiry;
 }
 
-formatClaimer = function(bnClaimer) {
-  var claimer = formatHash(bnClaimer);
-  return claimer === '0' ? '' : claimer;
-}
-
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
-formatHash = function(bn) {
+bignumToHex = function(bn) {
   return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
 
   // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
@@ -67,6 +69,7 @@ function isTicketAvailable(claimExpiry) {
 
 
 formatBtcAddr = function(bn) {
+  // TODO use bignumToHex()
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), gVersionAddr).toString();
 }
