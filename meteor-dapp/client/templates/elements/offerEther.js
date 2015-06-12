@@ -73,7 +73,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
   }
 
 
-  var rvalFilter = gContract.ticketEvent({ ticketId: 0 });
+  var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: web3.eth.blockNumber, toBlock: 'latest'});
   rvalFilter.watch(function(err, res) {
     if (err) {
       console.log('@@@ rvalFilter err: ', err)
