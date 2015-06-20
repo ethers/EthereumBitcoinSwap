@@ -16,7 +16,6 @@ Template.pow.viewmodel({
 
 
     src = ku.hexStringToBytes(bnSrc.toString(16));
-
     src = new Uint32Array(src.buffer);
     var dst = new Uint32Array(8);
     new ku.Keccak().digestWords(dst, 0, dst.length, src, 0, src.length);
@@ -25,10 +24,14 @@ Template.pow.viewmodel({
     bnHash = new BigNumber('0x' + strHash);
 
 
+    startTime = new Date().getTime();
+    console.log("startTime: ", startTime)
+
     var i=0;
-    while (bnHash.gte(bnTarget) && i < 10) {
+    while (bnHash.gte(bnTarget) && i < 100000000) {
       bnSrc = bnSrc.add(1);
 
+      src = ku.hexStringToBytes(bnSrc.toString(16));
       src = new Uint32Array(src.buffer);
       var dst = new Uint32Array(8);
       new ku.Keccak().digestWords(dst, 0, dst.length, src, 0, src.length);
@@ -36,10 +39,15 @@ Template.pow.viewmodel({
       strHash = ku.wordsToHexString(dst);
       bnHash = new BigNumber('0x' + strHash);
 
+
       i+= 1;
     }
 
+    console.log("endTime: ", new Date().getTime())
+    console.log("duration: ", (new Date().getTime() - startTime) / 1000.0)
+
     console.log('@@@@ i: ', i)
+    console.log('@@@ strHash: ', strHash)
 
   }
 });
