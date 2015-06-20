@@ -92,6 +92,17 @@ def reserveTicket(ticketId, txHash):
     return(0)
 
 
+def reserveWithPow(ticketId, txHash, powNonce):
+    return(m_keccakPow(txHash, powNonce))
+
+
+macro m_keccakPow($txHash, $powNonce):
+    with $x = ~alloc(40):
+        ~mstore($x, $txHash)
+        ~mstore($x + 32, $powNonce*2**192)
+        sha3($x, chars=40)
+
+
 
 macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
