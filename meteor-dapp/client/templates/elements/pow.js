@@ -1,5 +1,5 @@
 var ku = require('keccak');
-var bnTarget = new BigNumber(2).pow(232);
+var bnTarget = new BigNumber(2).pow(235);
 var kecc = new ku.Keccak();
 
 Template.pow.viewmodel({
@@ -18,7 +18,7 @@ Template.pow.viewmodel({
     src = ku.hexStringToBytes(bnSrc.toString(16));
     src = new Uint32Array(src.buffer);
     var dst = new Uint32Array(8);
-    new ku.Keccak().digestWords(dst, 0, dst.length, src, 0, src.length);
+    kecc.digestWords(dst, 0, 8, src, 0, 10);
 
     strHash = ku.wordsToHexString(dst);
     bnHash = new BigNumber('0x' + strHash);
@@ -33,8 +33,7 @@ Template.pow.viewmodel({
 
       src = ku.hexStringToBytes(bnSrc.toString(16));
       src = new Uint32Array(src.buffer);
-      var dst = new Uint32Array(8);
-      new ku.Keccak().digestWords(dst, 0, dst.length, src, 0, src.length);
+      kecc.digestWords(dst, 0, 8, src, 0, 10);
 
       strHash = ku.wordsToHexString(dst);
       bnHash = new BigNumber('0x' + strHash);
