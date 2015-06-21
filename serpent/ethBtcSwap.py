@@ -93,16 +93,16 @@ def reserveTicket(ticketId, txHash):
 
 
 macro POW_TARGET: 2**235
-def reserveWithPow(ticketId, txHash, powNonce):
-    if m_keccakPow(txHash, powNonce) < POW_TARGET:
+def reserveWithPow(ticketId, txHash, nonce):
+    if m_keccak(txHash, nonce) < POW_TARGET:
         return(1)
     return(0)
 
 
-macro m_keccakPow($txHash, $powNonce):
+macro m_keccak($txHash, $nonce):
     with $x = ~alloc(40):
         ~mstore($x, $txHash)
-        ~mstore($x + 32, $powNonce*2**192)
+        ~mstore($x + 32, $nonce*2**192)
         sha3($x, chars=40)
 
 

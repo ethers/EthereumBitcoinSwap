@@ -125,12 +125,13 @@ class TestEthBtcSwap(object):
             }]
         eventArr.pop()
 
-    def testPow(self):
+    def testKeccak(self):
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        powNonce = 396618
+        nonce = 396618
         expHash = 0x0000075ed33326562ac52364b1a96841187e73ce290745bffcd1bed9c5efd84a
-        res = self.c.funcKeccakPow(txHash, powNonce)
+        res = self.c.funcKeccak(txHash, nonce)
         assert res == expHash
+
 
     def testClaimerFee(self):
         # block 300k
