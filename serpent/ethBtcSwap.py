@@ -92,8 +92,11 @@ def reserveTicket(ticketId, txHash):
     return(0)
 
 
+macro POW_TARGET: 2**235
 def reserveWithPow(ticketId, txHash, powNonce):
-    return(m_keccakPow(txHash, powNonce))
+    if m_keccakPow(txHash, powNonce) < POW_TARGET:
+        return(1)
+    return(0)
 
 
 macro m_keccakPow($txHash, $powNonce):

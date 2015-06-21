@@ -22,14 +22,14 @@ logging.getLogger('eth.msg').setLevel('INFO')
 
 class TestEthBtcSwap(object):
 
-    CONTRACT = 'ethBtcSwap.py'
+    CONTRACT_DEBUG = 'test/ethBtcSwap_debug.py'
 
     ETHER = 10 ** 18
 
     def setup_class(cls):
         tester.gas_limit = int(2.6e6)  # 2.4e6 should be ok if testingOnly methods are commented out
         cls.s = tester.state()
-        cls.c = cls.s.abi_contract(cls.CONTRACT)
+        cls.c = cls.s.abi_contract(cls.CONTRACT_DEBUG)
         cls.snapshot = cls.s.snapshot()
         cls.seed = tester.seed
 
@@ -129,7 +129,7 @@ class TestEthBtcSwap(object):
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
         powNonce = 396618
         expHash = 0x0000075ed33326562ac52364b1a96841187e73ce290745bffcd1bed9c5efd84a
-        res = self.c.reserveWithPow(99, txHash, powNonce)
+        res = self.c.funcKeccakPow(txHash, powNonce)
         assert res == expHash
 
     def testClaimerFee(self):
