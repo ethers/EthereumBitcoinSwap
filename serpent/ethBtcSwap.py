@@ -164,7 +164,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         encodedFee = (satoshiIn2ndOutput % 10000)  # encodedFee of 1234 means 12.34%
         feeToClaimer = weiBuyable * encodedFee / 10000
 
-        weiToClaimer = feeToClaimer + weiBuyable / 20 # fee + refund of deposit
+        weiToClaimer = feeToClaimer
 
         res1 = send(msg.sender, weiToClaimer)
         res2 = send(ethAddr, weiBuyable - feeToClaimer)

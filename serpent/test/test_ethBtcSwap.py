@@ -55,8 +55,6 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        depositRequired = numWei / 20
-
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
@@ -67,12 +65,12 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a0
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
         balPreClaim = self.s.block.get_balance(addrClaimer)
-        assert balPreClaim == claimerBalPreReserve - depositRequired
+        assert balPreClaim == claimerBalPreReserve
 
 
         eventArr = []
@@ -89,7 +87,7 @@ class TestEthBtcSwap(object):
         feeToClaimer = int(claimerFeePercent * numWei)  # int() is needed
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
-        assert endClaimerBal == balPreClaim + depositRequired + feeToClaimer
+        assert endClaimerBal == balPreClaim + feeToClaimer
 
         indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
         ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
@@ -129,8 +127,12 @@ class TestEthBtcSwap(object):
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
         nonce = 396618
         expHash = 0x0000075ed33326562ac52364b1a96841187e73ce290745bffcd1bed9c5efd84a
-        res = self.c.funcKeccak(txHash, nonce)
-        assert res == expHash
+        assert self.c.funcKeccak(txHash, nonce) == expHash
+
+        txHash = 0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012
+        nonce = 1225993
+        expHash = 0x00000261bbaec8cac549d3fbe6e22b5b2c96c00a31b8c5325db1706a1b7b4c3b
+        assert self.c.funcKeccak(txHash, nonce) == expHash
 
     def testClaimerFee(self):
         # block 300k
@@ -161,7 +163,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
         assert self.contractBalance() == numWei + depositRequired
@@ -237,8 +239,6 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 200000000000  # numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        depositRequired = numWei / 20
-
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
@@ -249,15 +249,15 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
         approxCostOfReserve = res['gas']
         boundedCostOfReserve = int(1.05*approxCostOfReserve)
         balPreClaim = self.s.block.get_balance(addrClaimer)
-        assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
-        assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
+        assert balPreClaim < claimerBalPreReserve - approxCostOfReserve
+        assert balPreClaim > claimerBalPreReserve - boundedCostOfReserve
 
 
         eventArr = []
@@ -281,8 +281,8 @@ class TestEthBtcSwap(object):
         boundedCostToClaim = int(2.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
-        assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
-        assert endClaimerBal > balPreClaim + depositRequired + feeToClaimer - boundedCostToClaim
+        assert endClaimerBal < balPreClaim + feeToClaimer - approxCostToClaim
+        assert endClaimerBal > balPreClaim + feeToClaimer - boundedCostToClaim
 
         assert endClaimerBal < claimerBalPreReserve + feeToClaimer - approxCostToClaim - approxCostOfReserve
         assert endClaimerBal > claimerBalPreReserve + feeToClaimer - boundedCostToClaim - boundedCostOfReserve
@@ -313,8 +313,6 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538461  # floor of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        depositRequired = numWei / 20
-
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
@@ -325,7 +323,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
@@ -372,7 +370,7 @@ class TestEthBtcSwap(object):
         reserver = tester.k1
         claimer = tester.k2
 
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=reserver, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=reserver, profiling=True)
         assert res['output'] == 1
 
 
@@ -445,8 +443,6 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        depositRequired = numWei / 20
-
         MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
 
@@ -457,15 +453,15 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
         approxCostOfReserve = res['gas']
         boundedCostOfReserve = int(1.05*approxCostOfReserve)
         balPreClaim = self.s.block.get_balance(addrClaimer)
-        assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
-        assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
+        assert balPreClaim < claimerBalPreReserve - approxCostOfReserve
+        assert balPreClaim > claimerBalPreReserve - boundedCostOfReserve
 
         contractBalance = self.s.block.get_balance(self.c.address)
 
@@ -771,6 +767,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000007971768c5a88699e5cf20cad19d2404d16bbd6d3305824b131f6b3f5
         txStr = '0100000001c6e4ac5a14c1fa273d1511248d504522afc04b6af805c8c8732c9a26c3ee6c54010000008c493046022100b1a346052813d4e141c92d5f60107a61a24134205876b88d86917cac4f423732022100dda77724092d1ed746f583c80315e316fd5081805b35a83d88a394bd1f8eafc4014104858527cb6bf730cbd1bcf636bc7e77bbaf0784b9428ec5cca2d8378a0adc75f5ca893d14d9db2034cbb7e637aacf28088a68db311ff6f1ebe6d00a62fed9951effffffff0210980200000000001976a914a0dc485fc3ade71be5e1b68397abded386c0adb788ac10270000000000001976a914cd2a3d9f938e13cd947ec05abc7fe734df8dd82688ac00000000'
         txHash = 0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012
+        nonce = 1225993
         txIndex = 8
         sibling = [0x6155584c5555baf187ac6e409a3278de39a02a1020871ec034044c13f27dc3cd]
         satoshiOutputOne = 170000
@@ -780,8 +777,6 @@ class TestEthBtcSwap(object):
         numWei = 1700000000000000000
         weiPerSatoshi = 10000000000000
         ethAddrStr = 'cd2a3d9f938e13cd947ec05abc7fe734df8dd826'
-
-        depositRequired = numWei / 20
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
@@ -795,17 +790,17 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
-        assert self.contractBalance() == numWei + depositRequired
+        assert self.contractBalance() == numWei
         assert self.s.block.get_balance(ethAddrStr.decode('hex')) == 0
 
         approxCostOfReserve = res['gas']
         boundedCostOfReserve = int(1.05*approxCostOfReserve)
         balPreClaim = self.s.block.get_balance(addrClaimer)
-        assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
-        assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
+        assert balPreClaim < claimerBalPreReserve - approxCostOfReserve
+        assert balPreClaim > claimerBalPreReserve - boundedCostOfReserve
 
 
         eventArr = []
@@ -831,8 +826,8 @@ class TestEthBtcSwap(object):
         boundedCostToClaim = int(2.4*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
-        assert endClaimerBal < balPreClaim + depositRequired + feeToClaimer - approxCostToClaim
-        assert endClaimerBal > balPreClaim + depositRequired + feeToClaimer - boundedCostToClaim
+        assert endClaimerBal < balPreClaim + feeToClaimer - approxCostToClaim
+        assert endClaimerBal > balPreClaim + feeToClaimer - boundedCostToClaim
 
         assert endClaimerBal < claimerBalPreReserve + feeToClaimer - approxCostToClaim - approxCostOfReserve
         assert endClaimerBal > claimerBalPreReserve + feeToClaimer - boundedCostToClaim - boundedCostOfReserve
