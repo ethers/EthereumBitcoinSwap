@@ -27,7 +27,7 @@ class TestEthBtcSwap(object):
     ETHER = 10 ** 18
 
     def setup_class(cls):
-        tester.gas_limit = int(2.6e6)  # 2.4e6 should be ok if testingOnly methods are commented out
+        tester.gas_limit = int(2.7e6)  # 2.4e6 should be ok if testingOnly methods are commented out
         cls.s = tester.state()
         cls.c = cls.s.abi_contract(cls.CONTRACT_DEBUG)
         cls.snapshot = cls.s.snapshot()
@@ -131,7 +131,6 @@ class TestEthBtcSwap(object):
         expHash = 0x0000075ed33326562ac52364b1a96841187e73ce290745bffcd1bed9c5efd84a
         res = self.c.funcKeccak(txHash, nonce)
         assert res == expHash
-
 
     def testClaimerFee(self):
         # block 300k
@@ -615,7 +614,8 @@ class TestEthBtcSwap(object):
 
         expExpiry = self.s.block.timestamp + 3600*4
         expSender = int(self.s.block.coinbase.encode('hex'), 16)
-        txHash = 0xbeef
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        nonce = 396618
 
         assert self.c.getOpenTickets() == []
 
@@ -630,7 +630,7 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2]+baseTicket + [3]+baseTicket
 
         timePreReserve = self.s.block.timestamp
-        assert 2 == self.c.reserveTicket(2, txHash, value=numWei/20, sender=tester.k0)
+        assert 2 == self.c.reserveWithPow(2, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         self.s.block.timestamp += 3600 * 4 + 1
@@ -643,16 +643,16 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(2, 3) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         expiry2 = self.s.block.timestamp + 3600*4
-        assert 3 == self.c.reserveTicket(3, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert 3 == self.c.reserveWithPow(3, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
-        assert 1 == self.c.reserveTicket(1, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert 1 == self.c.reserveWithPow(1, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
-        assert 4 == self.c.reserveTicket(4, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert 4 == self.c.reserveWithPow(4, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash]
 
-        assert 2 == self.c.reserveTicket(2, 0xbeef, value=numWei/20, sender=tester.k0)
+        assert 2 == self.c.reserveWithPow(2, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash]
 
 
@@ -699,7 +699,8 @@ class TestEthBtcSwap(object):
         assert postBal == preBal
 
 
-        txHash = 0xbeef
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        nonce = 396618
         depositRequired = numWei / 20
 
         # no deposit
