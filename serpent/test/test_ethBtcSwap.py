@@ -701,56 +701,55 @@ class TestEthBtcSwap(object):
 
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
         nonce = 396618
-        depositRequired = numWei / 20
 
-        # no deposit
+        # invalid PoW
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(1, txHash)
-        assert 0 == self.c.reserveTicket(2, txHash)
+        assert 0 == self.c.reserveWithPow(1, txHash, 0)
+        assert 0 == self.c.reserveWithPow(2, txHash, 1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
-        # deposit < required
+        # invalid PoW
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, value=depositRequired - 1)
+        assert 0 == self.c.reserveWithPow(2, txHash, -1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
-        # deposit == required
+        # valid PoW
         preBal = self.s.block.get_balance(self.s.block.coinbase)
-        assert 2 == self.c.reserveTicket(2, txHash, value=depositRequired, sender=tester.k0)
+        assert 2 == self.c.reserveWithPow(2, txHash, nonce, sender=tester.k0)
         postBal = self.coinbaseBalance()
-        assert postBal == preBal - depositRequired
+        assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
-        # deposit > required ok since using unclaimed ticketId0
+        # valid PoW
         preBal = self.coinbaseBalance()
-        assert 1 == self.c.reserveTicket(1, txHash, value=depositRequired + 1)
+        assert 1 == self.c.reserveWithPow(1, txHash, nonce)
         postBal = self.coinbaseBalance()
-        assert postBal == preBal - depositRequired - 1
+        assert postBal == preBal
         assert self.c.lookupTicket(1) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
-        # deposit > required, but ticketId2 still reserved
+        # valid PoW, but ticketId2 still reserved
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, value=depositRequired + 1)
+        assert 0 == self.c.reserveWithPow(2, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
-        # deposit == required and previous ticketId2 reservation has expired
+        # valid PoW and previous ticketId2 reservation has expired
         preBal = self.coinbaseBalance()
         self.s.block.timestamp += 3600 * 5
         timePreReserve = self.s.block.timestamp
-        assert 2 == self.c.reserveTicket(2, txHash, value=depositRequired)
+        assert 2 == self.c.reserveWithPow(2, txHash, nonce)
         postBal = self.coinbaseBalance()
-        assert postBal == preBal - depositRequired
+        assert postBal == preBal
         expExpiry = timePreReserve + 3600*4
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         # close but not yet expired
         self.s.block.timestamp += 3600 * 4
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, value=depositRequired)
+        assert 0 == self.c.reserveWithPow(2, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
@@ -759,9 +758,9 @@ class TestEthBtcSwap(object):
         self.s.block.timestamp += 100
         timePreReserve = self.s.block.timestamp
         preBal = self.coinbaseBalance()
-        assert 2 == self.c.reserveTicket(2, txHash, value=depositRequired)
+        assert 2 == self.c.reserveWithPow(2, txHash, nonce)
         postBal = self.coinbaseBalance()
-        assert postBal == preBal - depositRequired
+        assert postBal == preBal
         expExpiry = timePreReserve + 3600*4
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
