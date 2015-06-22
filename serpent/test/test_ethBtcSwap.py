@@ -600,11 +600,14 @@ class TestEthBtcSwap(object):
         assert self.c.claimTicket(1, txStr, 1, txIndex, sibling, txBlockHash) == 0
 
 
-    def skiptestReserveInvalidTicket(self):
-        assert self.c.reserveTicket(-1, 0xbeef) == 0
-        assert self.c.reserveTicket(0, 0xbeef) == 0
-        assert self.c.reserveTicket(1, 0xbeef) == 0
-        assert self.c.reserveTicket(1000, 0xbeef) == 0
+    def testReserveInvalidTicket(self):
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        nonce = 396618
+
+        assert self.c.reserveWithPow(-1, txHash, nonce) == 0
+        assert self.c.reserveWithPow(0, txHash, nonce) == 0
+        assert self.c.reserveWithPow(1, txHash, nonce) == 0
+        assert self.c.reserveWithPow(1000, txHash, nonce) == 0
 
 
     def testOpenTickets(self):
