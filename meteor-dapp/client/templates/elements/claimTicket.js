@@ -136,8 +136,8 @@ Template.claimTicket.viewmodel(
   },
 
   ticketIsReserved: function() {
-    return this.claimerAddr()
-      && this.claimTxHash()
+    return !!this.claimerAddr()
+      && !!this.claimTxHash()
       // TODO check expiration and block timestamp
   },
 
@@ -383,7 +383,7 @@ function doReserveTicket(viewm) {
 
 function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
   // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: bnWeiDeposit, from:gFromAccount, gas: 500000};
+  var objParam = {value: bnWeiDeposit, gas: 500000};
 
   var startTime = Date.now();
 
@@ -496,7 +496,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   var callOnly;
   callOnly = true;  // if commented, it will call sendTransaction
 
-  var objParam = {from:gFromAccount, gas: 3000000};
+  var objParam = {gas: 3000000};
 
   if (callOnly) {
     console.log('@@@@ callOnly')

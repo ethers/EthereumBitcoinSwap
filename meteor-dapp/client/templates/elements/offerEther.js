@@ -55,7 +55,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
   // callOnly = true;  // if commented, it will do sendTransaction
   //
   // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: numWei, from:gFromAccount, gas: 500000};
+  var objParam = {value: numWei, gas: 500000};
 
   if (callOnly) {
     console.log('@@@@ callOnly')
