@@ -219,24 +219,35 @@ function lookupTicket(viewm) {
 
 
 function lookupBtcTx(viewm) {
-  if (viewm.claimTxHash()) {
-    lookupBitcoinTxHash(viewm);
-  }
+  lookupBitcoinTxHash(viewm);
 }
 
 
 function lookupBitcoinTxHash(viewm) {
+  var transactionHash;
   var claimTxHash = viewm.claimTxHash();
-  var btcTxHash = viewm.btcTxHash();
-  if (claimTxHash !== btcTxHash) {
-    if (!btcTxHash) {
-      viewm.btcTxHash(claimTxHash);
+  if (!!claimTxHash) {
+    transactionHash = claimTxHash;
+    var btcTxHash = viewm.btcTxHash();
+    if (claimTxHash !== btcTxHash) {
+      if (!btcTxHash) {
+        viewm.btcTxHash(claimTxHash);
+      }
+      else {
+        var msg = 'btc and claim tx hashes mismatch';
+        swal('Unexepected error', msg, 'error');
+        throw new Error(msg);
+      }
     }
-    else {
-      var msg = 'btc and claim tx hashes mismatch';
-      swal('Unexepected error', msg, 'error');
-      throw new Error(msg);
-    }
+  }
+  else {
+    transactionHash = viewm.btcTxHash();
+  }
+
+  if (!transactionHash) {
+    // this is reached when clicking Reserve on etherTicketsView, ie looking at
+    // a ticket that has not been reserved
+    return;
   }
 
   var urlJsonTx;
@@ -247,10 +258,10 @@ function lookupBitcoinTxHash(viewm) {
       urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/";
   }
 
-  urlJsonTx += claimTxHash;
+  urlJsonTx += transactionHash;
   $.getJSON(urlJsonTx, function(txResponse) {
     setBtcTxDetails(viewm, txResponse);
-    setBtcTxExtendedDetails(viewm, txResponse, claimTxHash);
+    setBtcTxExtendedDetails(viewm, txResponse, transactionHash);
   });
 }
 
