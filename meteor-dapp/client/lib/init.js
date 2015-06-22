@@ -1,5 +1,7 @@
 web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
 
+web3.eth.defaultAccount = web3.eth.coinbase;
+
 ZERO = new BigNumber(0);
 
 TWO_POW_256 = new BigNumber(2).pow(256);
@@ -27,9 +29,6 @@ else {
   // hex is 956bfc5575c0a7134c7effef268e51d887ba7015
   // gOurBtcAddr = '1Ed53ZSJiL5hF9qLonNPQ6CAckKYsNeWwJ';
 }
-
-
-gFromAccount = '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826';
 
 
 // TODO don't forget to update the ABI
