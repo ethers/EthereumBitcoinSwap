@@ -9,10 +9,12 @@ Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
   btcTxHash: '',
+  powNonce: '',
 
-  uiBtcTxHash: function() {
-    return this.btcTxHash() || '';
-  },
+  // TODO may not be needed
+  // uiBtcTxHash: function() {
+  //   return this.btcTxHash() || '';
+  // },
 
   // TODO use ZERO
   bnWei: '',
@@ -131,7 +133,7 @@ Template.claimTicket.viewmodel(
   ticketNeedsToBeReserved: function() {
     // hacky and needs to check if expired
     var claimExpiry = this.claimExpiry();
-    return claimExpiry === '' || claimExpiry === 'OPEN';
+    return claimExpiry === FRESH_TICKET_EXPIRY;
   },
 
 
@@ -344,16 +346,16 @@ function doReserveTicket(viewm) {
   var ticketId = viewm.ticketId();
   var txHash = '0x' + viewm.btcTxHash();
 
-  ethReserveTicket(ticketId, txHash, viewm.bnWeiDeposit());
+  ethReserveTicket(ticketId, txHash, viewm.powNonce());
 }
 
-function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
+function ethReserveTicket(ticketId, txHash, powNonce) {
   // TODO confirmation of gasprice ?
   var objParam = {gas: 500000};
 
   var startTime = Date.now();
 
-  var callResult = gContract.reserveTicket.call(ticketId, txHash, objParam);
+  var callResult = gContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
 
   var endTime = Date.now();
   var durationSec = (endTime - startTime) / 1000;
@@ -388,7 +390,7 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
     rvalFilter.stopWatching();
   });
 
-  gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+  gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
     if (err) {
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;

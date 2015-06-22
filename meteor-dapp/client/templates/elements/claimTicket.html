@@ -49,6 +49,9 @@
       <!-- to save space, we will toggle #txHash to readonly when a ticket is reserved -->
       <!-- <h5>Bitcoin Transaction Hash: <strong data-bind="text: claimTxHash"></strong></h5> -->
       <h5>Claimer will receive ether: <strong data-bind="text: computedFee"></strong></h5>
+
+      <label>Proof of Work</label>
+      <input type="text" class="form-control" data-bind="value: powNonce">
       <button type="button" class="btn btn-default"
         data-bind="click: reserveClicked,
           disabled: !isReservable,
