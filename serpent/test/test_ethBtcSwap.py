@@ -507,12 +507,13 @@ class TestEthBtcSwap(object):
 
 
 
-    def skiptestZeroFee(self):
+    def testZeroFee(self):
         # tx is fff2525b8931402dd09222c50775608f75787bd2b87e56995a7bdd30f79702c4
         # from block100K
         txBlockHash = 0x000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506
         txStr = '0100000001032e38e9c0a84c6046d687d10556dcacc41d275ec55fc00779ac88fdf357a187000000008c493046022100c352d3dd993a981beba4a63ad15c209275ca9470abfcd57da93b58e4eb5dce82022100840792bc1f456062819f15d33ee7055cf7b5ee1af1ebcc6028d9cdb1c3af7748014104f46db5e9d61a9dc27b8d64ad23e7383a4e6ca164593c2527c038c0857eb67ee8e825dca65046b82c9331586c82e0fd1f633f25f87c161bc6f8a630121df2b3d3ffffffff0200e32321000000001976a914c398efa9c392ba6013c5e04ee729755ef7f58b3288ac000fe208010000001976a914948c765a6914d43f2a7ac177da2c2f6b52de3d7c88ac00000000'
         txHash = int(dbl_sha256(txStr.decode('hex')), 16)
+        nonce = 1379808
         txIndex = 1
         sibling = [0x8c14f0db3df150123e6f3dbbf30f8b955a8249b62ac1d1ff16284aefa3d06d87, 0x8e30899078ca1813be036a073bbf80b86cdddde1c96e9e9c99e9e3782df4ae49]
         satoshiOutputOne = int(5.56e8)
@@ -522,8 +523,6 @@ class TestEthBtcSwap(object):
         numWei = self.ETHER
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c
-
-        depositRequired = numWei / 20
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
@@ -541,7 +540,7 @@ class TestEthBtcSwap(object):
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
         gasPrice = int(10e12)  # 10 szabo
-        res = self.c.reserveTicket(ticketId, txHash, value=depositRequired, sender=claimer, profiling=True)
+        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == ticketId
 
@@ -550,8 +549,8 @@ class TestEthBtcSwap(object):
         approxCostOfReserve = res['gas']
         boundedCostOfReserve = int(1.05*approxCostOfReserve)
         balPreClaim = self.s.block.get_balance(addrClaimer)
-        assert balPreClaim < claimerBalPreReserve - depositRequired - approxCostOfReserve
-        assert balPreClaim > claimerBalPreReserve - depositRequired - boundedCostOfReserve
+        assert balPreClaim < claimerBalPreReserve - approxCostOfReserve
+        assert balPreClaim > claimerBalPreReserve - boundedCostOfReserve
 
 
         eventArr = []
@@ -569,8 +568,8 @@ class TestEthBtcSwap(object):
         boundedCostToClaim = int(2*approxCostToClaim)
 
         endClaimerBal = self.s.block.get_balance(addrClaimer)
-        assert endClaimerBal < balPreClaim + depositRequired - approxCostToClaim
-        assert endClaimerBal > balPreClaim + depositRequired - boundedCostToClaim
+        assert endClaimerBal < balPreClaim - approxCostToClaim
+        assert endClaimerBal > balPreClaim - boundedCostToClaim
 
         assert endClaimerBal < claimerBalPreReserve - approxCostToClaim - approxCostOfReserve
         assert endClaimerBal > claimerBalPreReserve - boundedCostToClaim - boundedCostOfReserve
