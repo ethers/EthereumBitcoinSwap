@@ -362,8 +362,6 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        depositRequired = numWei / 20
-
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
@@ -404,8 +402,6 @@ class TestEthBtcSwap(object):
         numWei = self.ETHER
         weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
-
-        depositRequired = numWei / 20
 
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)

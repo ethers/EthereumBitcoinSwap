@@ -30,9 +30,6 @@ def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, 
 
 # def ttLastAvail():
 #     return(m_ticketAvailable(LAST_TID))
-#
-# def ttLastHasDeposit():
-#     return(m_ticketHasDeposit(LAST_TID))
 
 def ttClaimHash():
     return(self.gTicket[LAST_TID]._claimTxHash)
@@ -87,7 +84,6 @@ def reserveTicket(ticketId, txHash, nonce):
         log(type=ticketEvent, ticketId, ticketId)
         return(ticketId)
 
-    send(msg.sender, msg.value)  # refund whatever deposit provided
     log(type=ticketEvent, ticketId, 0)
     return(0)
 
