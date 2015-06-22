@@ -77,19 +77,6 @@ Template.claimTicket.viewmodel(
     return '';
   },
 
-  // ethers
-  depositRequired: function() {
-    var bnWei = this.bnWei();
-    if (bnWei) {
-      return formatWeiToEther(bnWei.div(20));
-    }
-  },
-
-  // 5% of the ticket's wei
-  bnWeiDeposit: function() {
-    return this.bnWei().div(20);
-  },
-
   merkleProof: '',
   rawTx: '',
   blockHashOfTx: '',
@@ -103,8 +90,7 @@ Template.claimTicket.viewmodel(
     return this.txSatisfiesTicket()
       && !this.claimerAddr()
       && !this.claimTxHash()
-      && this.ticketNeedsToBeReserved()
-      && currentUserBalance().gte(this.bnWeiDeposit());
+      && this.ticketNeedsToBeReserved();
   },
 
   isClaimable: function() {
@@ -209,12 +195,9 @@ function lookupTicket(viewm) {
   viewm.claimerAddr(toHash(bnClaimer));
   viewm.claimTxHash(toHash(bnClaimTxHash));
 
-  // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
   viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
   viewm.btcAddr(btcAddr);
-
-  // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 }
 
 
@@ -365,8 +348,8 @@ function doReserveTicket(viewm) {
 }
 
 function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
-  // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: bnWeiDeposit, gas: 500000};
+  // TODO confirmation of gasprice ?
+  var objParam = {gas: 500000};
 
   var startTime = Date.now();
 
@@ -399,7 +382,7 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Did you send enough deposit or specify correct ticket id?', '', 'error');
+      swal('Did you specify correct ticket id?', '', 'error');
     }
 
     rvalFilter.stopWatching();
