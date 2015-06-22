@@ -63,7 +63,7 @@
       <button type="button" class="btn btn-default"
         data-bind="click: claimClicked,
           disabled: !isClaimable,
-          class: { btn-primary: !ticketNeedsToBeReserved }">Claim</button>
+          class: { btn-primary: isClaimable }">Claim</button>
     </div>
   </div>
 </template>
