@@ -8,7 +8,6 @@ var CLAIM_FAIL_FALLTHRU = 99999999
 Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
-  btcRawTx: '',
   btcTxHash: '',
 
   uiBtcTxHash: function() {
@@ -118,7 +117,7 @@ Template.claimTicket.viewmodel(
 
 
   lookupFormComplete: function() {
-    return this.ticketId() && this.btcRawTx();
+    return this.ticketId() && this.btcTxHash();
   },
 
   txSatisfiesTicket: function() {
@@ -172,10 +171,10 @@ Template.claimTicket.viewmodel(
 function doLookup(viewm, reset) {
   if (reset) {
     var ticketId = viewm.ticketId();
-    var btcRawTx = viewm.btcRawTx();
+    var btcTxHash = viewm.btcTxHash();
     viewm.reset();
     viewm.ticketId(ticketId);
-    viewm.btcRawTx(btcRawTx);
+    viewm.btcTxHash(btcTxHash);
   }
   else {
     viewm.merkleProof('');
@@ -223,33 +222,6 @@ function lookupBtcTx(viewm) {
   if (viewm.claimTxHash()) {
     lookupBitcoinTxHash(viewm);
   }
-  else {
-    lookupRawBitcoinTx(viewm);
-  }
-}
-
-
-function lookupRawBitcoinTx(viewm) {
-  var rawTx = viewm.btcRawTx();
-
-  if (!rawTx) {
-    console.log('@@@@  empty rawTx')
-    return;
-  }
-
-  viewm.btcTxHash(hashTx(rawTx));
-
-  var decodeEndpoint;
-  if (useBtcTestnet) {
-    decodeEndpoint = 'http://tbtc.blockr.io/api/v1/tx/decode';
-  }
-  else {
-    decodeEndpoint = 'http://btc.blockr.io/api/v1/tx/decode';
-  }
-
-  $.post(decodeEndpoint, {'hex': rawTx}, function(txResponse) {
-    setBtcTxDetails(viewm, txResponse);
-  });
 }
 
 
