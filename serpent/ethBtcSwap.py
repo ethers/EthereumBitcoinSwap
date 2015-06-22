@@ -78,22 +78,8 @@ def lookupTicket(ticketId):
 
 # data[0] is the return value / error code
 event ticketEvent(ticketId:indexed, rval)
-def reserveTicket(ticketId, txHash):
-    # required deposit is 5% numWei
-    if (m_ticketAvailable(ticketId) && (msg.value >= self.gTicket[ticketId]._numWei / 20)):
-        self.gTicket[ticketId]._claimer = msg.sender
-        self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
-        self.gTicket[ticketId]._claimTxHash = txHash
-        log(type=ticketEvent, ticketId, ticketId)
-        return(ticketId)
-
-    send(msg.sender, msg.value)  # refund whatever deposit provided
-    log(type=ticketEvent, ticketId, 0)
-    return(0)
-
-
 macro POW_TARGET: 2**235
-def reserveWithPow(ticketId, txHash, nonce):
+def reserveTicket(ticketId, txHash, nonce):
     if m_ticketAvailable(ticketId) && m_keccak(txHash, nonce) < POW_TARGET:
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS

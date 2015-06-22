@@ -66,7 +66,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a0
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
@@ -163,7 +163,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
         assert self.contractBalance() == numWei
@@ -250,7 +250,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
@@ -325,7 +325,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
@@ -373,7 +373,7 @@ class TestEthBtcSwap(object):
         reserver = tester.k1
         claimer = tester.k2
 
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=reserver, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=reserver, profiling=True)
         assert res['output'] == 1
 
 
@@ -457,7 +457,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
@@ -540,7 +540,7 @@ class TestEthBtcSwap(object):
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
         gasPrice = int(10e12)  # 10 szabo
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == ticketId
 
@@ -603,10 +603,10 @@ class TestEthBtcSwap(object):
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
         nonce = 396618
 
-        assert self.c.reserveWithPow(-1, txHash, nonce) == 0
-        assert self.c.reserveWithPow(0, txHash, nonce) == 0
-        assert self.c.reserveWithPow(1, txHash, nonce) == 0
-        assert self.c.reserveWithPow(1000, txHash, nonce) == 0
+        assert self.c.reserveTicket(-1, txHash, nonce) == 0
+        assert self.c.reserveTicket(0, txHash, nonce) == 0
+        assert self.c.reserveTicket(1, txHash, nonce) == 0
+        assert self.c.reserveTicket(1000, txHash, nonce) == 0
 
 
     def testOpenTickets(self):
@@ -632,7 +632,7 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2]+baseTicket + [3]+baseTicket
 
         timePreReserve = self.s.block.timestamp
-        assert 2 == self.c.reserveWithPow(2, txHash, nonce, sender=tester.k0)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         self.s.block.timestamp += 3600 * 4 + 1
@@ -645,16 +645,16 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(2, 3) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         expiry2 = self.s.block.timestamp + 3600*4
-        assert 3 == self.c.reserveWithPow(3, txHash, nonce, sender=tester.k0)
+        assert 3 == self.c.reserveTicket(3, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
-        assert 1 == self.c.reserveWithPow(1, txHash, nonce, sender=tester.k0)
+        assert 1 == self.c.reserveTicket(1, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
-        assert 4 == self.c.reserveWithPow(4, txHash, nonce, sender=tester.k0)
+        assert 4 == self.c.reserveTicket(4, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash]
 
-        assert 2 == self.c.reserveWithPow(2, txHash, nonce, sender=tester.k0)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce, sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash]
 
 
@@ -706,34 +706,34 @@ class TestEthBtcSwap(object):
 
         # invalid PoW
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveWithPow(1, txHash, 0)
-        assert 0 == self.c.reserveWithPow(2, txHash, 1)
+        assert 0 == self.c.reserveTicket(1, txHash, 0)
+        assert 0 == self.c.reserveTicket(2, txHash, 1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # invalid PoW
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveWithPow(2, txHash, -1)
+        assert 0 == self.c.reserveTicket(2, txHash, -1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # valid PoW
         preBal = self.s.block.get_balance(self.s.block.coinbase)
-        assert 2 == self.c.reserveWithPow(2, txHash, nonce, sender=tester.k0)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce, sender=tester.k0)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         # valid PoW
         preBal = self.coinbaseBalance()
-        assert 1 == self.c.reserveWithPow(1, txHash, nonce)
+        assert 1 == self.c.reserveTicket(1, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(1) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         # valid PoW, but ticketId2 still reserved
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveWithPow(2, txHash, nonce)
+        assert 0 == self.c.reserveTicket(2, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
@@ -742,7 +742,7 @@ class TestEthBtcSwap(object):
         preBal = self.coinbaseBalance()
         self.s.block.timestamp += 3600 * 5
         timePreReserve = self.s.block.timestamp
-        assert 2 == self.c.reserveWithPow(2, txHash, nonce)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         expExpiry = timePreReserve + 3600*4
@@ -751,7 +751,7 @@ class TestEthBtcSwap(object):
         # close but not yet expired
         self.s.block.timestamp += 3600 * 4
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveWithPow(2, txHash, nonce)
+        assert 0 == self.c.reserveTicket(2, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
@@ -760,7 +760,7 @@ class TestEthBtcSwap(object):
         self.s.block.timestamp += 100
         timePreReserve = self.s.block.timestamp
         preBal = self.coinbaseBalance()
-        assert 2 == self.c.reserveWithPow(2, txHash, nonce)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         expExpiry = timePreReserve + 3600*4
@@ -796,7 +796,7 @@ class TestEthBtcSwap(object):
         addrClaimer = tester.a1
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        res = self.c.reserveWithPow(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
         assert self.contractBalance() == numWei
