@@ -98,15 +98,15 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
   //
   gContract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
     if (err) {
-      console.log('@@@ err: ', err)
+      swal('Error', err, 'error');
       return;
     }
 
+    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
+
     // result is a txhash
     console.log('@@@ createTicket result: ', result)
-
   });
-  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 
