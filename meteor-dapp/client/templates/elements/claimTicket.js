@@ -92,7 +92,8 @@ Template.claimTicket.viewmodel(
     return this.txSatisfiesTicket()
       && !this.claimerAddr()
       && !this.claimTxHash()
-      && this.ticketNeedsToBeReserved();
+      && this.ticketNeedsToBeReserved()
+      && !!this.powNonce();
   },
 
   isClaimable: function() {

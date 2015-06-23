@@ -35,9 +35,9 @@ window.externalEthBtcSwapAbi = [{
     "outputs": [{ "name": "out", "type": "int256[]" }]
 },
 {
-    "name": "reserveTicket(int256,int256)",
+    "name": "reserveTicket(int256,int256,int256)",
     "type": "function",
-    "inputs": [{ "name": "ticketId", "type": "int256" }, { "name": "txHash", "type": "int256" }],
+    "inputs": [{ "name": "ticketId", "type": "int256" }, { "name": "txHash", "type": "int256" }, { "name": "nonce", "type": "int256" }],
     "outputs": [{ "name": "out", "type": "int256" }]
 },
 {
