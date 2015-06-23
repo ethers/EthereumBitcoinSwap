@@ -16,7 +16,7 @@ WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 useBtcTestnet = true;
 if (useBtcTestnet) {
-  gTicketContractAddr = '0x9fec21cff232687e6105b1a95f1cee47c493a5b1';
+  gTicketContractAddr = '0xb007e8d073af6b6487261bc06660f87ea8740230';
   gVersionAddr = 111;
   //
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';

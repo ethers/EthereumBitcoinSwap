@@ -9,10 +9,12 @@ Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
   btcTxHash: '',
+  powNonce: '',
 
-  uiBtcTxHash: function() {
-    return this.btcTxHash() || '';
-  },
+  // TODO may not be needed
+  // uiBtcTxHash: function() {
+  //   return this.btcTxHash() || '';
+  // },
 
   // TODO use ZERO
   bnWei: '',
@@ -77,19 +79,6 @@ Template.claimTicket.viewmodel(
     return '';
   },
 
-  // ethers
-  depositRequired: function() {
-    var bnWei = this.bnWei();
-    if (bnWei) {
-      return formatWeiToEther(bnWei.div(20));
-    }
-  },
-
-  // 5% of the ticket's wei
-  bnWeiDeposit: function() {
-    return this.bnWei().div(20);
-  },
-
   merkleProof: '',
   rawTx: '',
   blockHashOfTx: '',
@@ -104,7 +93,7 @@ Template.claimTicket.viewmodel(
       && !this.claimerAddr()
       && !this.claimTxHash()
       && this.ticketNeedsToBeReserved()
-      && currentUserBalance().gte(this.bnWeiDeposit());
+      && !!this.powNonce();
   },
 
   isClaimable: function() {
@@ -145,7 +134,7 @@ Template.claimTicket.viewmodel(
   ticketNeedsToBeReserved: function() {
     // hacky and needs to check if expired
     var claimExpiry = this.claimExpiry();
-    return claimExpiry === '' || claimExpiry === 'OPEN';
+    return claimExpiry === FRESH_TICKET_EXPIRY;
   },
 
 
@@ -209,12 +198,9 @@ function lookupTicket(viewm) {
   viewm.claimerAddr(toHash(bnClaimer));
   viewm.claimTxHash(toHash(bnClaimTxHash));
 
-  // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
   viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
   viewm.btcAddr(btcAddr);
-
-  // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 }
 
 
@@ -361,16 +347,16 @@ function doReserveTicket(viewm) {
   var ticketId = viewm.ticketId();
   var txHash = '0x' + viewm.btcTxHash();
 
-  ethReserveTicket(ticketId, txHash, viewm.bnWeiDeposit());
+  ethReserveTicket(ticketId, txHash, viewm.powNonce());
 }
 
-function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
-  // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: bnWeiDeposit, gas: 500000};
+function ethReserveTicket(ticketId, txHash, powNonce) {
+  // TODO confirmation of gasprice ?
+  var objParam = {gas: 500000};
 
   var startTime = Date.now();
 
-  var callResult = gContract.reserveTicket.call(ticketId, txHash, objParam);
+  var callResult = gContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
 
   var endTime = Date.now();
   var durationSec = (endTime - startTime) / 1000;
@@ -399,13 +385,13 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Did you send enough deposit or specify correct ticket id?', '', 'error');
+      swal('Did you specify correct ticket id?', '', 'error');
     }
 
     rvalFilter.stopWatching();
   });
 
-  gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+  gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
     if (err) {
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;
