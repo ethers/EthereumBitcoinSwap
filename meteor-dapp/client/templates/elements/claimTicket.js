@@ -144,9 +144,9 @@ Template.claimTicket.viewmodel(
 
 
   ticketNeedsToBeReserved: function() {
-    // hacky and needs to check if expired
+    // TODO needs to check if expired
     var claimExpiry = this.claimExpiry();
-    return claimExpiry === '' || claimExpiry === 'OPEN';
+    return claimExpiry === FRESH_TICKET_EXPIRY;
   },
 
 
