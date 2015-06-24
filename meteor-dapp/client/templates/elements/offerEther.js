@@ -55,7 +55,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
   // callOnly = true;  // if commented, it will do sendTransaction
   //
   // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: numWei, gas: 500000};
+  var objParam = {value: numWei, from:gFromAccount, gas: 500000};
 
   if (callOnly) {
     console.log('@@@@ callOnly')
@@ -98,15 +98,15 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
   //
   gContract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
     if (err) {
-      swal('Error', err, 'error');
+      console.log('@@@ err: ', err)
       return;
     }
 
-    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
-
     // result is a txhash
     console.log('@@@ createTicket result: ', result)
+
   });
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 

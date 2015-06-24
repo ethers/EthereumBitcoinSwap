@@ -8,13 +8,12 @@ var CLAIM_FAIL_FALLTHRU = 99999999
 Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
+  btcRawTx: '',
   btcTxHash: '',
-  powNonce: '',
 
-  // TODO may not be needed
-  // uiBtcTxHash: function() {
-  //   return this.btcTxHash() || '';
-  // },
+  uiBtcTxHash: function() {
+    return this.btcTxHash() || '';
+  },
 
   // TODO use ZERO
   bnWei: '',
@@ -79,6 +78,19 @@ Template.claimTicket.viewmodel(
     return '';
   },
 
+  // ethers
+  depositRequired: function() {
+    var bnWei = this.bnWei();
+    if (bnWei) {
+      return formatWeiToEther(bnWei.div(20));
+    }
+  },
+
+  // 5% of the ticket's wei
+  bnWeiDeposit: function() {
+    return this.bnWei().div(20);
+  },
+
   merkleProof: '',
   rawTx: '',
   blockHashOfTx: '',
@@ -93,7 +105,7 @@ Template.claimTicket.viewmodel(
       && !this.claimerAddr()
       && !this.claimTxHash()
       && this.ticketNeedsToBeReserved()
-      && !!this.powNonce();
+      && currentUserBalance().gte(this.bnWeiDeposit());
   },
 
   isClaimable: function() {
@@ -106,7 +118,7 @@ Template.claimTicket.viewmodel(
 
 
   lookupFormComplete: function() {
-    return this.ticketId() && this.btcTxHash();
+    return this.ticketId() && this.btcRawTx();
   },
 
   txSatisfiesTicket: function() {
@@ -124,8 +136,8 @@ Template.claimTicket.viewmodel(
   },
 
   ticketIsReserved: function() {
-    return !!this.claimerAddr()
-      && !!this.claimTxHash()
+    return this.claimerAddr()
+      && this.claimTxHash()
       // TODO check expiration and block timestamp
   },
 
@@ -134,7 +146,7 @@ Template.claimTicket.viewmodel(
   ticketNeedsToBeReserved: function() {
     // hacky and needs to check if expired
     var claimExpiry = this.claimExpiry();
-    return claimExpiry === FRESH_TICKET_EXPIRY;
+    return claimExpiry === '' || claimExpiry === 'OPEN';
   },
 
 
@@ -160,10 +172,10 @@ Template.claimTicket.viewmodel(
 function doLookup(viewm, reset) {
   if (reset) {
     var ticketId = viewm.ticketId();
-    var btcTxHash = viewm.btcTxHash();
+    var btcRawTx = viewm.btcRawTx();
     viewm.reset();
     viewm.ticketId(ticketId);
-    viewm.btcTxHash(btcTxHash);
+    viewm.btcRawTx(btcRawTx);
   }
   else {
     viewm.merkleProof('');
@@ -198,42 +210,61 @@ function lookupTicket(viewm) {
   viewm.claimerAddr(toHash(bnClaimer));
   viewm.claimTxHash(toHash(bnClaimTxHash));
 
+  // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
   viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
   viewm.btcAddr(btcAddr);
+
+  // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 }
 
 
 function lookupBtcTx(viewm) {
-  lookupBitcoinTxHash(viewm);
+  if (viewm.claimTxHash()) {
+    lookupBitcoinTxHash(viewm);
+  }
+  else {
+    lookupRawBitcoinTx(viewm);
+  }
+}
+
+
+function lookupRawBitcoinTx(viewm) {
+  var rawTx = viewm.btcRawTx();
+
+  if (!rawTx) {
+    console.log('@@@@  empty rawTx')
+    return;
+  }
+
+  viewm.btcTxHash(hashTx(rawTx));
+
+  var decodeEndpoint;
+  if (useBtcTestnet) {
+    decodeEndpoint = 'http://tbtc.blockr.io/api/v1/tx/decode';
+  }
+  else {
+    decodeEndpoint = 'http://btc.blockr.io/api/v1/tx/decode';
+  }
+
+  $.post(decodeEndpoint, {'hex': rawTx}, function(txResponse) {
+    setBtcTxDetails(viewm, txResponse);
+  });
 }
 
 
 function lookupBitcoinTxHash(viewm) {
-  var transactionHash;
   var claimTxHash = viewm.claimTxHash();
-  if (!!claimTxHash) {
-    transactionHash = claimTxHash;
-    var btcTxHash = viewm.btcTxHash();
-    if (claimTxHash !== btcTxHash) {
-      if (!btcTxHash) {
-        viewm.btcTxHash(claimTxHash);
-      }
-      else {
-        var msg = 'btc and claim tx hashes mismatch';
-        swal('Unexepected error', msg, 'error');
-        throw new Error(msg);
-      }
+  var btcTxHash = viewm.btcTxHash();
+  if (claimTxHash !== btcTxHash) {
+    if (!btcTxHash) {
+      viewm.btcTxHash(claimTxHash);
     }
-  }
-  else {
-    transactionHash = viewm.btcTxHash();
-  }
-
-  if (!transactionHash) {
-    // this is reached when clicking Reserve on etherTicketsView, ie looking at
-    // a ticket that has not been reserved
-    return;
+    else {
+      var msg = 'btc and claim tx hashes mismatch';
+      swal('Unexepected error', msg, 'error');
+      throw new Error(msg);
+    }
   }
 
   var urlJsonTx;
@@ -244,10 +275,10 @@ function lookupBitcoinTxHash(viewm) {
       urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/";
   }
 
-  urlJsonTx += transactionHash;
+  urlJsonTx += claimTxHash;
   $.getJSON(urlJsonTx, function(txResponse) {
     setBtcTxDetails(viewm, txResponse);
-    setBtcTxExtendedDetails(viewm, txResponse, transactionHash);
+    setBtcTxExtendedDetails(viewm, txResponse, claimTxHash);
   });
 }
 
@@ -347,16 +378,16 @@ function doReserveTicket(viewm) {
   var ticketId = viewm.ticketId();
   var txHash = '0x' + viewm.btcTxHash();
 
-  ethReserveTicket(ticketId, txHash, viewm.powNonce());
+  ethReserveTicket(ticketId, txHash, viewm.bnWeiDeposit());
 }
 
-function ethReserveTicket(ticketId, txHash, powNonce) {
-  // TODO confirmation of gasprice ?
-  var objParam = {gas: 500000};
+function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
+  // TODO confirmation to deposit ether, from account, gasprice
+  var objParam = {value: bnWeiDeposit, from:gFromAccount, gas: 500000};
 
   var startTime = Date.now();
 
-  var callResult = gContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
+  var callResult = gContract.reserveTicket.call(ticketId, txHash, objParam);
 
   var endTime = Date.now();
   var durationSec = (endTime - startTime) / 1000;
@@ -385,13 +416,13 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Did you specify correct ticket id?', '', 'error');
+      swal('Did you send enough deposit or specify correct ticket id?', '', 'error');
     }
 
     rvalFilter.stopWatching();
   });
 
-  gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
+  gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
     if (err) {
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;
@@ -465,7 +496,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
   var callOnly;
   callOnly = true;  // if commented, it will call sendTransaction
 
-  var objParam = {gas: 3000000};
+  var objParam = {from:gFromAccount, gas: 3000000};
 
   if (callOnly) {
     console.log('@@@@ callOnly')

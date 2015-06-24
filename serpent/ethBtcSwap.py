@@ -30,6 +30,9 @@ def testingOnlyClaimTicketLatestTicket(txStr:str, txHash, txIndex, sibling:arr, 
 
 # def ttLastAvail():
 #     return(m_ticketAvailable(LAST_TID))
+#
+# def ttLastHasDeposit():
+#     return(m_ticketHasDeposit(LAST_TID))
 
 def ttClaimHash():
     return(self.gTicket[LAST_TID]._claimTxHash)
@@ -75,24 +78,18 @@ def lookupTicket(ticketId):
 
 # data[0] is the return value / error code
 event ticketEvent(ticketId:indexed, rval)
-macro POW_TARGET: 2**235
-def reserveTicket(ticketId, txHash, nonce):
-    if m_ticketAvailable(ticketId) && m_keccak(txHash, nonce) < POW_TARGET:
+def reserveTicket(ticketId, txHash):
+    # required deposit is 5% numWei
+    if (m_ticketAvailable(ticketId) && (msg.value >= self.gTicket[ticketId]._numWei / 20)):
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
         log(type=ticketEvent, ticketId, ticketId)
         return(ticketId)
 
+    send(msg.sender, msg.value)  # refund whatever deposit provided
     log(type=ticketEvent, ticketId, 0)
     return(0)
-
-
-macro m_keccak($txHash, $nonce):
-    with $x = ~alloc(40):
-        ~mstore($x, $txHash)
-        ~mstore($x + 32, $nonce*2**192)
-        sha3($x, chars=40)
 
 
 
@@ -146,7 +143,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         encodedFee = (satoshiIn2ndOutput % 10000)  # encodedFee of 1234 means 12.34%
         feeToClaimer = weiBuyable * encodedFee / 10000
 
-        weiToClaimer = feeToClaimer
+        weiToClaimer = feeToClaimer + weiBuyable / 20 # fee + refund of deposit
 
         res1 = send(msg.sender, weiToClaimer)
         res2 = send(ethAddr, weiBuyable - feeToClaimer)

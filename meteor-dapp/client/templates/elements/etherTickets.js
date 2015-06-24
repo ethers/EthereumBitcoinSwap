@@ -6,7 +6,7 @@ Template.etherTickets.helpers({
       // console.log('@@@@@@@@@@@@ start & end tid: ', this.startTicketId(), this.endTicketId())
 
       // TODO confirmation to deposit ether, from account, gasprice
-      var objParam = {gas: 3000000};
+      var objParam = {from:gFromAccount, gas: 3000000};
 
       // var ticketArr = gContract.getOpenTickets.call(this.startTicketId(), this.endTicketId(), objParam);
 

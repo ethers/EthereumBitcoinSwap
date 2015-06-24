@@ -3,43 +3,46 @@
   </h2>
 
   <div class="row">
-    <div class="col-md-6">
-      <h3>Ticket</h3>
-      <h5>Ether amount: <strong data-bind="text: numEther"></strong></h5>
-      <h5>Total Price BTC: <strong data-bind="text: totalPrice"></strong></h5>
-      <h5>Bitcoin Address: <strong data-bind="text: btcAddr"></strong></h5>
+    <div class="col-md-5">
+      <form class="form">
+        <div class="form-group">
+          <div class="row">
+            <label>Ticket ID</label>
+            <input type="text" class="form-control" data-bind="value: ticketId">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <label>Bitcoin Transaction (raw hex)</label>
+            <textarea class="form-control" rows="10"
+              data-bind="value: btcRawTx, disabled: !ticketNeedsToBeReserved"></textarea>
+          </div>
+        </div>
+        <button type="button" class="btn btn-default"
+          data-bind="click: lookupClicked(true),
+            disabled: !lookupFormComplete,
+            class: { btn-primary: isLookupNeeded }">Lookup</button>
+      </form>
+    </div>
+    <div class="col-md-1">
     </div>
     <div class="col-md-6">
-      <h3>Bitcoin Transaction</h3>
-      <h5>Ether Fee to Claimer: <strong data-bind="text: encodedFee"></strong></h5>
-      <h5>BTC: <strong data-bind="text: btcPayment"></strong></h5>
-      <h5>Bitcoin Address: <strong data-bind="text: paymentAddr"></strong></h5>
-      <h5>Ether address: <strong data-bind="text: etherAddr"></strong></h5>
+      <div class="row">
+        <h3>Ticket</h3>
+        <h5>Ether amount: <strong data-bind="text: numEther"></strong></h5>
+        <h5>Total Price BTC: <strong data-bind="text: totalPrice"></strong></h5>
+        <h5>Bitcoin Address: <strong data-bind="text: btcAddr"></strong></h5>
+      </div>
+      <div class="row">
+        <h3>Bitcoin Transaction</h3>
+        <h5>Ether Fee to Claimer: <strong data-bind="text: encodedFee"></strong></h5>
+        <h5>BTC: <strong data-bind="text: btcPayment"></strong></h5>
+        <h5>Bitcoin Address: <strong data-bind="text: paymentAddr"></strong></h5>
+        <h5>Ether address: <strong data-bind="text: etherAddr"></strong></h5>
+        <h5>Transaction hash: <strong data-bind="text: uiBtcTxHash"></strong></h5>
+      </div>
     </div>
   </div>
-
-  <form class="form">
-    <div class="form-group">
-      <div class="row">
-        <div class="col-md-2">
-          <label>Ticket ID</label>
-          <input type="text" class="form-control" data-bind="value: ticketId">
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <div class="row">
-        <div class="col-md-7">
-          <label>Bitcoin Transaction Hash</label>
-          <input type="text" class="form-control" data-bind="value: btcTxHash, disabled: isClaimable">
-        </div>
-      </div>
-    </div>
-    <button type="button" class="btn btn-default"
-      data-bind="click: lookupClicked(true),
-        disabled: !lookupFormComplete,
-        class: { btn-primary: isLookupNeeded }">Lookup</button>
-  </form>
 
   <div class="row">
     <div class="col-md-6">
@@ -49,9 +52,7 @@
       <!-- to save space, we will toggle #txHash to readonly when a ticket is reserved -->
       <!-- <h5>Bitcoin Transaction Hash: <strong data-bind="text: claimTxHash"></strong></h5> -->
       <h5>Claimer will receive ether: <strong data-bind="text: computedFee"></strong></h5>
-
-      <label>Proof of Work</label>
-      <input type="text" class="form-control" data-bind="value: powNonce">
+      <h5>Claimer needs to provide ether security deposit: <strong data-bind="text: depositRequired"></strong></h5>
       <button type="button" class="btn btn-default"
         data-bind="click: reserveClicked,
           disabled: !isReservable,
@@ -65,7 +66,7 @@
       <button type="button" class="btn btn-default"
         data-bind="click: claimClicked,
           disabled: !isClaimable,
-          class: { btn-primary: isClaimable }">Claim</button>
+          class: { btn-primary: !ticketNeedsToBeReserved }">Claim</button>
     </div>
   </div>
 </template>
