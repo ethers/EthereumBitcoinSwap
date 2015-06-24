@@ -424,14 +424,15 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
 
   gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
     if (err) {
-      console.log('@@@ reserveTicket sendtx err: ', err)
+      swal('Error', err, 'error');
       return;
     }
+
+    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 
     // result is a txhash
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
-  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 
@@ -552,15 +553,15 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
   gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
-      console.log('@@@ err: ', err)
+      swal('Error', err, 'error');
       return;
     }
 
+    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
+
     // result is a txhash
     console.log('@@@ claimTicket result: ', result)
-
   });
-  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
 }
 
 
