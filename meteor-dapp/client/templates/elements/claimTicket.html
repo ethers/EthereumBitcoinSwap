@@ -51,7 +51,7 @@
       <h5>Claimer will receive ether: <strong data-bind="text: computedFee"></strong></h5>
 
       <label>Proof of Work</label>
-      <input type="text" class="form-control" data-bind="value: powNonce, disabled: !ticketNeedsToBeReserved">
+      <input type="text" class="form-control" data-bind="value: powNonce">
       <button type="button" class="btn btn-default"
         data-bind="click: reserveClicked,
           disabled: !isReservable,
