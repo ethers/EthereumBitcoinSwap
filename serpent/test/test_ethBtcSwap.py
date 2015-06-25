@@ -1,10 +1,23 @@
 from ethereum import tester
+import logging
 
 from bitcoin import *
 
 
 import pytest
 slow = pytest.mark.slow
+
+logging.getLogger('eth.pb').setLevel('INFO')
+logging.getLogger('eth.pb.msg').setLevel('INFO')
+logging.getLogger('eth.pb.msg.state').setLevel('INFO')
+logging.getLogger('eth.pb.tx').setLevel('INFO')
+logging.getLogger('eth.vm').setLevel('INFO')
+logging.getLogger('eth.vm.op').setLevel('INFO')
+logging.getLogger('eth.vm.exit').setLevel('INFO')
+logging.getLogger('eth.chain.tx').setLevel('INFO')
+logging.getLogger('transactions.py').setLevel('INFO')
+logging.getLogger('eth.msg').setLevel('INFO')
+
 
 class TestEthBtcSwap(object):
 
