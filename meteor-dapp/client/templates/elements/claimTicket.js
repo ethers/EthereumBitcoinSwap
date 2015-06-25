@@ -8,12 +8,13 @@ var CLAIM_FAIL_FALLTHRU = 99999999
 Template.claimTicket.viewmodel(
   'vmClaimTicket', {
   ticketId: '',
-  btcRawTx: '',
   btcTxHash: '',
+  powNonce: '',
 
-  uiBtcTxHash: function() {
-    return this.btcTxHash() || '';
-  },
+  // TODO may not be needed
+  // uiBtcTxHash: function() {
+  //   return this.btcTxHash() || '';
+  // },
 
   // TODO use ZERO
   bnWei: '',
@@ -78,19 +79,6 @@ Template.claimTicket.viewmodel(
     return '';
   },
 
-  // ethers
-  depositRequired: function() {
-    var bnWei = this.bnWei();
-    if (bnWei) {
-      return formatWeiToEther(bnWei.div(20));
-    }
-  },
-
-  // 5% of the ticket's wei
-  bnWeiDeposit: function() {
-    return this.bnWei().div(20);
-  },
-
   merkleProof: '',
   rawTx: '',
   blockHashOfTx: '',
@@ -105,7 +93,7 @@ Template.claimTicket.viewmodel(
       && !this.claimerAddr()
       && !this.claimTxHash()
       && this.ticketNeedsToBeReserved()
-      && currentUserBalance().gte(this.bnWeiDeposit());
+      && !!this.powNonce();
   },
 
   isClaimable: function() {
@@ -118,7 +106,7 @@ Template.claimTicket.viewmodel(
 
 
   lookupFormComplete: function() {
-    return this.ticketId() && this.btcRawTx();
+    return this.ticketId() && this.btcTxHash();
   },
 
   txSatisfiesTicket: function() {
@@ -144,7 +132,7 @@ Template.claimTicket.viewmodel(
 
 
   ticketNeedsToBeReserved: function() {
-    // TODO needs to check if expired
+    // hacky and needs to check if expired
     var claimExpiry = this.claimExpiry();
     return claimExpiry === FRESH_TICKET_EXPIRY;
   },
@@ -172,10 +160,10 @@ Template.claimTicket.viewmodel(
 function doLookup(viewm, reset) {
   if (reset) {
     var ticketId = viewm.ticketId();
-    var btcRawTx = viewm.btcRawTx();
+    var btcTxHash = viewm.btcTxHash();
     viewm.reset();
     viewm.ticketId(ticketId);
-    viewm.btcRawTx(btcRawTx);
+    viewm.btcTxHash(btcTxHash);
   }
   else {
     viewm.merkleProof('');
@@ -210,61 +198,42 @@ function lookupTicket(viewm) {
   viewm.claimerAddr(toHash(bnClaimer));
   viewm.claimTxHash(toHash(bnClaimTxHash));
 
-  // gWeiDeposit = bnWei.div(20);
   viewm.bnWei(bnWei);
   viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
   viewm.btcAddr(btcAddr);
-
-  // $('#depositRequired').text(formatWeiToEther(gWeiDeposit));
 }
 
 
 function lookupBtcTx(viewm) {
-  if (viewm.claimTxHash()) {
-    lookupBitcoinTxHash(viewm);
-  }
-  else {
-    lookupRawBitcoinTx(viewm);
-  }
-}
-
-
-function lookupRawBitcoinTx(viewm) {
-  var rawTx = viewm.btcRawTx();
-
-  if (!rawTx) {
-    console.log('@@@@  empty rawTx')
-    return;
-  }
-
-  viewm.btcTxHash(hashTx(rawTx));
-
-  var decodeEndpoint;
-  if (useBtcTestnet) {
-    decodeEndpoint = 'http://tbtc.blockr.io/api/v1/tx/decode';
-  }
-  else {
-    decodeEndpoint = 'http://btc.blockr.io/api/v1/tx/decode';
-  }
-
-  $.post(decodeEndpoint, {'hex': rawTx}, function(txResponse) {
-    setBtcTxDetails(viewm, txResponse);
-  });
+  lookupBitcoinTxHash(viewm);
 }
 
 
 function lookupBitcoinTxHash(viewm) {
+  var transactionHash;
   var claimTxHash = viewm.claimTxHash();
-  var btcTxHash = viewm.btcTxHash();
-  if (claimTxHash !== btcTxHash) {
-    if (!btcTxHash) {
-      viewm.btcTxHash(claimTxHash);
+  if (!!claimTxHash) {
+    transactionHash = claimTxHash;
+    var btcTxHash = viewm.btcTxHash();
+    if (claimTxHash !== btcTxHash) {
+      if (!btcTxHash) {
+        viewm.btcTxHash(claimTxHash);
+      }
+      else {
+        var msg = 'btc and claim tx hashes mismatch';
+        swal('Unexepected error', msg, 'error');
+        throw new Error(msg);
+      }
     }
-    else {
-      var msg = 'btc and claim tx hashes mismatch';
-      swal('Unexepected error', msg, 'error');
-      throw new Error(msg);
-    }
+  }
+  else {
+    transactionHash = viewm.btcTxHash();
+  }
+
+  if (!transactionHash) {
+    // this is reached when clicking Reserve on etherTicketsView, ie looking at
+    // a ticket that has not been reserved
+    return;
   }
 
   var urlJsonTx;
@@ -275,10 +244,10 @@ function lookupBitcoinTxHash(viewm) {
       urlJsonTx = "https://btc.blockr.io/api/v1/tx/raw/";
   }
 
-  urlJsonTx += claimTxHash;
+  urlJsonTx += transactionHash;
   $.getJSON(urlJsonTx, function(txResponse) {
     setBtcTxDetails(viewm, txResponse);
-    setBtcTxExtendedDetails(viewm, txResponse, claimTxHash);
+    setBtcTxExtendedDetails(viewm, txResponse, transactionHash);
   });
 }
 
@@ -378,16 +347,16 @@ function doReserveTicket(viewm) {
   var ticketId = viewm.ticketId();
   var txHash = '0x' + viewm.btcTxHash();
 
-  ethReserveTicket(ticketId, txHash, viewm.bnWeiDeposit());
+  ethReserveTicket(ticketId, txHash, viewm.powNonce());
 }
 
-function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
-  // TODO confirmation to deposit ether, from account, gasprice
-  var objParam = {value: bnWeiDeposit, gas: 500000};
+function ethReserveTicket(ticketId, txHash, powNonce) {
+  // TODO confirmation of gasprice ?
+  var objParam = {gas: 500000};
 
   var startTime = Date.now();
 
-  var callResult = gContract.reserveTicket.call(ticketId, txHash, objParam);
+  var callResult = gContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
 
   var endTime = Date.now();
   var durationSec = (endTime - startTime) / 1000;
@@ -416,23 +385,22 @@ function ethReserveTicket(ticketId, txHash, bnWeiDeposit) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Did you send enough deposit or specify correct ticket id?', '', 'error');
+      swal('Did you specify correct ticket id?', '', 'error');
     }
 
     rvalFilter.stopWatching();
   });
 
-  gContract.reserveTicket.sendTransaction(ticketId, txHash, objParam, function(err, txHash) {
+  gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
     if (err) {
-      swal('Error', err, 'error');
+      console.log('@@@ reserveTicket sendtx err: ', err)
       return;
     }
-
-    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 
     // result is a txhash
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 
@@ -553,15 +521,15 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
   gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
-      swal('Error', err, 'error');
+      console.log('@@@ err: ', err)
       return;
     }
 
-    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
-
     // result is a txhash
     console.log('@@@ claimTicket result: ', result)
+
   });
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
 }
 
 
