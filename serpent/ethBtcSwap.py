@@ -119,7 +119,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_UNRESERVED)
         return(0)
 
-    if (block.timestamp <= claimExpiry - ANYONE_CAN_CLAIM_AFTER_SECS && msg.sender != self.gTicket[ticketId]._claimer):
+    if (block.timestamp <= claimExpiry - EXPIRY_TIME_SECS + ANYONE_CAN_CLAIM_AFTER_SECS && msg.sender != self.gTicket[ticketId]._claimer):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
         return(0)
 
