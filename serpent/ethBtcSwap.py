@@ -19,6 +19,9 @@ data trustedBtcRelay
 
 macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
+macro ANYONE_CAN_CLAIM_AFTER_SECS: 1 * ONE_HOUR_IN_SECS  # TODO change this and expiry constant above
+
+macro FRESH_TICKET_EXPIRY: 1
 
 # TODO disable testingOnly methods
 event claimSuccess(btcAddr, numSatoshi, ethAddr, satoshiIn2ndOutput)
@@ -61,7 +64,7 @@ def createTicket(btcAddr, numWei, weiPerSatoshi):
     self.gTicket[self.gTicketId]._btcAddr = btcAddr
     self.gTicket[self.gTicketId]._numWei = numWei
     self.gTicket[self.gTicketId]._weiPerSatoshi = weiPerSatoshi
-    self.gTicket[self.gTicketId]._claimExpiry = 1 # allow to be reserved; see m_ticketAvailable()
+    self.gTicket[self.gTicketId]._claimExpiry = FRESH_TICKET_EXPIRY # allow to be reserved; see m_ticketAvailable()
 
     log(type=ticketEvent, 0, self.gTicketId)
     return(self.gTicketId)
@@ -98,6 +101,7 @@ macro m_keccak($txHash, $nonce):
 
 
 macro CLAIM_FAIL_INVALID_TICKET: 99990050
+macro CLAIM_FAIL_UNRESERVED: 99990070
 macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
@@ -106,15 +110,20 @@ macro CLAIM_FAIL_FALLTHRU: 99999999
 # a ticket can only be claimed once, and thus the Bitcoin tx should send enough
 # bitcoins so that all the ether can be claimed
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
-
     claimExpiry = self.gTicket[ticketId]._claimExpiry
     if (claimExpiry == 0):  # claimExpiry 0 means ticket doesn't exist
         log(type=ticketEvent, ticketId, CLAIM_FAIL_INVALID_TICKET)
         return(0)
 
-    if (msg.sender != self.gTicket[ticketId]._claimer):
+    if (claimExpiry == FRESH_TICKET_EXPIRY):
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_UNRESERVED)
+        return(0)
+
+    if (block.timestamp <= claimExpiry - ANYONE_CAN_CLAIM_AFTER_SECS && msg.sender != self.gTicket[ticketId]._claimer):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
         return(0)
+
+    claimerAddr = msg.sender
 
     if (txHash != self.gTicket[ticketId]._claimTxHash):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_TX_HASH)
@@ -156,7 +165,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         weiToClaimer = feeToClaimer
 
-        res1 = send(msg.sender, weiToClaimer)
+        res1 = send(claimerAddr, weiToClaimer)
         res2 = send(ethAddr, weiBuyable - feeToClaimer)
 
         m_deleteTicket(ticketId)

@@ -421,7 +421,7 @@ class TestEthBtcSwap(object):
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
-            'rval': 99990100
+            'rval': 99990070
             }]
         eventArr.pop()
 
