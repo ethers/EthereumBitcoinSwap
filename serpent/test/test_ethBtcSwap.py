@@ -105,7 +105,7 @@ class TestEthBtcSwap(object):
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
-            'rval': 99990100  # a claim sets the claimer to 0, thus this failure
+            'rval': 99990050  # a claimed ticket no longer exists
             }]
         eventArr.pop()
 
@@ -218,7 +218,7 @@ class TestEthBtcSwap(object):
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
-            'rval': 99990100  # a claim sets the claimer to 0, thus this failure
+            'rval': 99990050  # a claimed ticket no longer exists
             }]
         eventArr.pop()
 
@@ -850,7 +850,7 @@ class TestEthBtcSwap(object):
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
-            'rval': 99990100  # a claim sets the claimer to 0, thus this failure
+            'rval': 99990050  # a claimed ticket no longer exists
             }]
         eventArr.pop()
 

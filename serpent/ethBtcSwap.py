@@ -9,6 +9,7 @@ inset('btcSpecialTx.py')
 extern relayContract: [verifyTx:iiai:i]
 
 
+# claimExpiry 0 means ticket doesn't exist
 data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _claimTxHash)
 
 data gTicketId  # last ticket id.  first valid id is 1
@@ -96,6 +97,7 @@ macro m_keccak($txHash, $nonce):
 
 
 
+macro CLAIM_FAIL_INVALID_TICKET: 99990050
 macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
@@ -104,6 +106,12 @@ macro CLAIM_FAIL_FALLTHRU: 99999999
 # a ticket can only be claimed once, and thus the Bitcoin tx should send enough
 # bitcoins so that all the ether can be claimed
 def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
+
+    claimExpiry = self.gTicket[ticketId]._claimExpiry
+    if (claimExpiry == 0):  # claimExpiry 0 means ticket doesn't exist
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_INVALID_TICKET)
+        return(0)
+
     if (msg.sender != self.gTicket[ticketId]._claimer):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
         return(0)
