@@ -85,11 +85,11 @@ Template.claimTicket.viewmodel(
 
 
   isReservable: function() {
-    return this.txSatisfiesTicket()
+    return !!this.btcTxHash()
+      && !!this.powNonce()  // TODO verify pow instead
       && !this.claimerAddr()
       && !this.claimTxHash()
-      && this.ticketNeedsToBeReserved()
-      && !!this.powNonce();
+      && this.ticketNeedsToBeReserved();
   },
 
   isClaimable: function() {
