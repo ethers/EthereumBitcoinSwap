@@ -27,7 +27,7 @@ class TestEthBtcSwap(object):
     ETHER = 10 ** 18
 
     EXPIRY_SECS = 3600*4
-    ANYONE_CAN_CLAIM_AFTER_SECS = 3600*1
+    ONLY_RESERVER_CLAIM_SECS = 3600*1
 
     def setup_class(cls):
         tester.gas_limit = int(2.7e6)  # 2.4e6 should be ok if testingOnly methods are commented out
@@ -159,7 +159,7 @@ class TestEthBtcSwap(object):
         eventArr.pop()
 
         # ticket can only still be claimed by the reserver
-        self.s.block.timestamp += self.ANYONE_CAN_CLAIM_AFTER_SECS
+        self.s.block.timestamp += self.ONLY_RESERVER_CLAIM_SECS
 
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)

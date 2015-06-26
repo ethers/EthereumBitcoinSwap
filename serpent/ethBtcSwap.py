@@ -19,7 +19,9 @@ data trustedBtcRelay
 
 macro ONE_HOUR_IN_SECS: 60*60
 macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
-macro ANYONE_CAN_CLAIM_AFTER_SECS: 1 * ONE_HOUR_IN_SECS  # TODO change this and expiry constant above
+
+# period when a ticket can only be claimed by the reserver (afterwards anyone can claim)
+macro ONLY_RESERVER_CLAIM_SECS: 1 * ONE_HOUR_IN_SECS  # TODO change this and expiry constant above
 
 macro FRESH_TICKET_EXPIRY: 1
 
@@ -119,7 +121,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_UNRESERVED)
         return(0)
 
-    if (block.timestamp <= claimExpiry - EXPIRY_TIME_SECS + ANYONE_CAN_CLAIM_AFTER_SECS && msg.sender != self.gTicket[ticketId]._claimer):
+    if (block.timestamp <= claimExpiry - EXPIRY_TIME_SECS + ONLY_RESERVER_CLAIM_SECS && msg.sender != self.gTicket[ticketId]._claimer):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
         return(0)
 
