@@ -84,10 +84,6 @@ Template.claimTicket.viewmodel(
   blockHashOfTx: '',
 
 
-  isLookupNeeded: function() {
-    return this.lookupFormComplete() && !this.isReservable() && !this.isClaimable();
-  },
-
   isReservable: function() {
     return this.txSatisfiesTicket()
       && !this.claimerAddr()
@@ -106,7 +102,7 @@ Template.claimTicket.viewmodel(
 
 
   lookupFormComplete: function() {
-    return this.ticketId() && this.btcTxHash();
+    return this.ticketId();
   },
 
   txSatisfiesTicket: function() {
