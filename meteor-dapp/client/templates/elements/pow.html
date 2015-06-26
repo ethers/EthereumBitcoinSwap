@@ -13,8 +13,16 @@
             Bitcoin transaction hash</label>
           <input type="text" class="form-control" data-bind="value: btcTxHash">
         </div>
+        <div class="form-group">
+          <label data-toggle="tooltip" data-placement="right"
+            title="address where you want to receive bitcoins">
+            Nonce</label>
+          <input type="text" class="form-control" data-bind="value: nonce">
+        </div>
         <button type="button" class="btn btn-default"
           data-bind="click: findPoWClicked()">Find Proof of Work</button>
+        <button type="button" class="btn btn-default"
+          data-bind="click: verifyPoWClicked()">Verify PoW</button>
       </fieldset>
     </form>
   </div>

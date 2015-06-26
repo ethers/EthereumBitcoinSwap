@@ -3,8 +3,8 @@ var bnTarget = new BigNumber(2).pow(235);
 var kecc = new ku.Keccak();
 
 Template.pow.viewmodel({
-  btcTxHash: '141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566',
-  nonce: ZERO,
+  btcTxHash: '558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012',
+  nonce: 1225993,
 
   findPoWClicked: function() {
     console.log(this.btcTxHash())
@@ -48,5 +48,29 @@ Template.pow.viewmodel({
     console.log('@@@@ i: ', i)
     console.log('@@@ strHash: ', strHash)
 
+  },
+
+  verifyPoWClicked: function() {
+    var hexNonce = this.nonce().toString(16);
+
+    var padLen = 16 - hexNonce.length;
+    var zeros = Array(padLen + 1).join('0');
+
+    var bnSrc = new BigNumber('0x' + this.btcTxHash() + zeros + hexNonce);
+    var src;
+    var bnHash;
+    var strHash;
+
+
+    src = ku.hexStringToBytes(bnSrc.toString(16));
+    src = new Uint32Array(src.buffer);
+    var dst = new Uint32Array(8);
+    kecc.digestWords(dst, 0, 8, src, 0, 10);
+
+    strHash = ku.wordsToHexString(dst);
+    bnHash = new BigNumber('0x' + strHash);
+
+    var isPowValid = bnHash.lt(bnTarget);
+    console.log('@@@ isPowValid: ', isPowValid)
   }
 });
