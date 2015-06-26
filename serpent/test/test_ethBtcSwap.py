@@ -112,7 +112,7 @@ class TestEthBtcSwap(object):
             }]
         eventArr.pop()
 
-    # same as testFlowSameSender but ticket is reserved
+    # same as testFlowSameSender but ticket is claimed by a different address than the reserver
     def testClaimerDifferentThanReserver(self):
         # block 300k
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
@@ -132,57 +132,56 @@ class TestEthBtcSwap(object):
         MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
+        # k2 creates ticket
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, sender=tester.k2, value=numWei)
         assert ticketId == 1
 
-        claimer = tester.k0
-        addrClaimer = tester.a0
-
-        claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
-        balPreClaim = self.s.block.get_balance(addrClaimer)
-        assert balPreClaim == claimerBalPreReserve
-
-
+        # k1 is the reserver
         res = self.c.reserveTicket(ticketId, txHash, nonce, sender=tester.k1, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
 
-
+        claimer = tester.k0
+        addrClaimer = tester.a0
 
         eventArr = []
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
-
 
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
         assert claimRes['output'] == 0
         assert self.s.block.get_balance(addrClaimer) == balPreClaim
-
-
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100
+            }]
         eventArr.pop()
 
-
-
-        self.s.block.timestamp += self.ANYONE_CAN_CLAIM_AFTER_SECS+1
-
+        # ticket can only still be claimed by the reserver
+        self.s.block.timestamp += self.ANYONE_CAN_CLAIM_AFTER_SECS
 
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        #
+        assert claimRes['output'] == 0
+        assert self.s.block.get_balance(addrClaimer) == balPreClaim
+        assert eventArr == [{'_event_type': 'ticketEvent',
+            'ticketId': ticketId,
+            'rval': 99990100
+            }]
+        eventArr.pop()
 
-        # assert eventArr == [{'_event_type': 'ticketEvent',
-        #     'ticketId': ticketId,
-        #     'rval': 1313  # a claimed ticket no longer exists
-        #     }]
-        # eventArr.pop()
+        #
+        # 1 second later, the ticket should be claimable by anyone
+        # and the claimer gets the fee
+        #
+        self.s.block.timestamp += 1
+
+        balPreClaim = self.s.block.get_balance(addrClaimer)
+        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
 
         assert claimRes['output'] == ticketId
-
-
-
-
 
 
         claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
@@ -209,95 +208,6 @@ class TestEthBtcSwap(object):
             'rval': 99990050  # a claimed ticket no longer exists
             }]
         eventArr.pop()
-
-
-
-    # same as testFlowSameSender but ticket is reserved
-    def testZZ(self):
-
-        otherClaimerKey = tester.k1
-        otherClaimerAddr = tester.a1
-
-        balPreClaim = self.s.block.get_balance(otherClaimerAddr)
-        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=otherClaimerKey, profiling=True)
-        # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
-        assert self.s.block.get_balance(otherClaimerAddr) < balPreClaim  # less than since had to pay some gas for claimTicket
-
-
-        self.s.block.timestamp += self.ANYONE_CAN_CLAIM_AFTER_SECS
-
-        balPreClaim = self.s.block.get_balance(otherClaimerAddr)
-        claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=otherClaimerKey, profiling=True)
-        # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
-
-        claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
-        feeToClaimer = int(claimerFeePercent * numWei)  # int() is needed
-
-        endClaimerBal = self.s.block.get_balance(otherClaimerAddr)
-        assert endClaimerBal > balPreClaim
-        assert endClaimerBal < balPreClaim + feeToClaimer  # less than since had to pay some gas for claimTicket
-
-        #
-        # indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
-        # ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
-        # buyerEthBalance = self.s.block.get_balance(ethAddrBin)
-        #
-        # assert buyerEthBalance == (1 - claimerFeePercent) * numWei
-        #
-        # self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
-        #
-        # # re-claim is not allowed
-        # claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
-        # # print('GAS claimTicket() ', claimRes['gas'])
-        # assert claimRes['output'] == 0
-        #
-        # assert eventArr == [{'_event_type': 'ticketEvent',
-        #     'ticketId': ticketId,
-        #     'rval': 99990050  # a claimed ticket no longer exists
-        #     }]
-        # eventArr.pop()
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        #
-        # balPreClaim = self.s.block.get_balance(addrClaimer)
-        # claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
-        # # print('GAS claimTicket() ', claimRes['gas'])
-        # assert claimRes['output'] == ticketId
-        #
-        #
-        # claimerFeePercent = (satoshiOutputTwo % 10000) / 10000.0
-        # feeToClaimer = int(claimerFeePercent * numWei)  # int() is needed
-        #
-        # endClaimerBal = self.s.block.get_balance(addrClaimer)
-        # assert endClaimerBal == balPreClaim + feeToClaimer
-        #
-        # indexOfBtcAddr = txStr.find(format(btcAddr, 'x'))
-        # ethAddrBin = txStr[indexOfBtcAddr+68:indexOfBtcAddr+108].decode('hex') # assumes ether addr is after btcAddr
-        # buyerEthBalance = self.s.block.get_balance(ethAddrBin)
-        #
-        # assert buyerEthBalance == (1 - claimerFeePercent) * numWei
-        #
-        # self.assertClaimSuccessLogs(eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId)
-        #
-        # # re-claim is not allowed
-        # claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
-        # # print('GAS claimTicket() ', claimRes['gas'])
-        # assert claimRes['output'] == 0
-        #
-        # assert eventArr == [{'_event_type': 'ticketEvent',
-        #     'ticketId': ticketId,
-        #     'rval': 99990050  # a claimed ticket no longer exists
-        #     }]
-        # eventArr.pop()
-
 
 
     def assertClaimSuccessLogs(self, eventArr, satoshiOutputOne, btcAddr, ethAddr, satoshiOutputTwo, ticketId):
