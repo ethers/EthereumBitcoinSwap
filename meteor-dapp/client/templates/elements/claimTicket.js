@@ -363,6 +363,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
     console.log('@@@@ call GOOD so now sendTx...')
   }
   else {
+    swal('Proof of Work is invalid', '', 'error');
     return;
   }
 
@@ -381,7 +382,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Did you specify correct ticket id?', '', 'error');
+      swal('Proof of Work is invalid', '', 'error');
     }
 
     rvalFilter.stopWatching();
@@ -389,14 +390,16 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
 
   gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
     if (err) {
+      swal('Error', err, 'error');
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;
     }
 
+    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
+
     // result is a txhash
     console.log('@@@ reserveTicket txHash: ', txHash)
   });
-  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }
 
 
@@ -517,15 +520,16 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
   gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
+      swal('Error', err, 'error');
       console.log('@@@ err: ', err)
       return;
     }
 
+    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
+
     // result is a txhash
     console.log('@@@ claimTicket result: ', result)
-
   });
-  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
 }
 
 
