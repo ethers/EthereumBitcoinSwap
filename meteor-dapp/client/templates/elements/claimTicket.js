@@ -1,9 +1,21 @@
 var btcproof = require('btcproof');
 
-var CLAIM_FAIL_CLAIMER = 99990100
-var CLAIM_FAIL_TX_HASH = 99990200
-var CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400
-var CLAIM_FAIL_FALLTHRU = 99999999
+var CLAIM_FAIL_CLAIMER = 99990100;
+var CLAIM_FAIL_TX_HASH = 99990200;
+var CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400;
+var CLAIM_FAIL_FALLTHRU = 99999999;
+
+var TICKET_OPEN = 'OPEN';
+var TICKET_RESERVED = 'RESERVED';
+var TICKET_ANYCLAIM = 'ANYCLAIM';
+
+var ONE_HOUR_IN_SECS = 60*60;
+var EXPIRY_TIME_SECS = 4 * ONE_HOUR_IN_SECS;
+var ONLY_RESERVER_CLAIM_SECS = 1 * ONE_HOUR_IN_SECS;  // TODO change this and expiry constant above
+
+
+var ANYONE_CAN_CLAIM = 'Anyone';
+
 
 Template.claimTicket.viewmodel(
   'vmClaimTicket', {
@@ -45,11 +57,21 @@ Template.claimTicket.viewmodel(
   claimTxHash: '',
 
   uiClaimerAddr: function() {
-    return this.claimerAddr() || EMPTY_CLAIMER;
+    var state = this.ticketState();
+    switch (state) {
+      case TICKET_OPEN:
+        return EMPTY_CLAIMER;
+      case TICKET_RESERVED:
+        return this.claimerAddr();
+      case TICKET_ANYCLAIM:
+        return ANYONE_CAN_CLAIM + '(You ' + web3.eth.defaultAccount +')';
+      default:
+        throw new Error('Unexpected Ticket State');
+    }
   },
 
   uiClaimExpiry: function() {
-    unixExpiry = this.claimExpiry();
+    var unixExpiry = this.claimExpiry();
     return unixExpiry === FRESH_TICKET_EXPIRY ? UNRESERVED_TICKET_DESC : humanRelativeTime(unixExpiry);
   },
 
@@ -128,9 +150,30 @@ Template.claimTicket.viewmodel(
 
 
   ticketNeedsToBeReserved: function() {
-    // hacky and needs to check if expired
+    // TODO hacky and needs to check if expired; use ticketState()
     var claimExpiry = this.claimExpiry();
     return claimExpiry === FRESH_TICKET_EXPIRY;
+  },
+
+  ticketState: function() {
+    // TODO is CLAIMED state needed?
+
+    var unixExpiry = this.claimExpiry();
+    var nextOpen = moment(unixExpiry);
+    var now = moment();
+
+    if (unixExpiry === FRESH_TICKET_EXPIRY ||
+      now.isAfter(nextOpen)) {
+      return TICKET_OPEN;
+    }
+
+    var reserverDeadline = nextOpen.subtract(EXPIRY_TIME_SECS, 'seconds').add(ONLY_RESERVER_CLAIM_SECS, 'seconds');
+
+    if (now.isAfter(reserverDeadline)) {
+      return TICKET_ANYCLAIM;
+    }
+
+    return TICKET_RESERVED;
   },
 
 
