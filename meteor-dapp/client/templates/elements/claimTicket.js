@@ -159,7 +159,7 @@ Template.claimTicket.viewmodel(
     // TODO is CLAIMED state needed?
 
     var unixExpiry = this.claimExpiry();
-    var nextOpen = moment(unixExpiry);
+    var nextOpen = moment.unix(unixExpiry);
     var now = moment();
 
     if (unixExpiry === FRESH_TICKET_EXPIRY ||
