@@ -174,7 +174,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
 
         log(type=ticketEvent, ticketId, ticketId)
 
-        # for testing only; remove when deploying
+        # TODO for testing only; remove when deploying
         log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
         return(ticketId)

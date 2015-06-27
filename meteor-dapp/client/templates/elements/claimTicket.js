@@ -64,7 +64,7 @@ Template.claimTicket.viewmodel(
       case TICKET_RESERVED:
         return this.claimerAddr();
       case TICKET_ANYCLAIM:
-        return ANYONE_CAN_CLAIM + '(You ' + web3.eth.defaultAccount +')';
+        return ANYONE_CAN_CLAIM + ' (including You ' + web3.eth.defaultAccount +')';
       default:
         throw new Error('Unexpected Ticket State');
     }
