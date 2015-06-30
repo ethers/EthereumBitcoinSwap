@@ -207,7 +207,6 @@ function doLookup(viewm, reset) {
   else {
     viewm.merkleProof('');
   }
-  ViewModel.byId('vmResultStatus').msg('');
 
   lookupTicket(viewm);
   lookupBtcTx(viewm);
