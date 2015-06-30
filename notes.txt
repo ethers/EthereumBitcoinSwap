@@ -1,11 +1,19 @@
 June 30
 
+private chain exported as gethJune30chain.bin
+ticketContract is: 0x1af2844a588759d0de58abd568add96bb8b3b6d8
+testnet relay: 0x77045e71a7a2c50903d88e564cd72fab11e82051
+
+7 tickets, ticket 2 is reserved and claimable.
+
+Here's how to create the tx to reserve the ticket:
 send funds to intermediate address then:
 python btcToEther.py makeAndSignTx 12.34 0.0017 mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR  cd2a3d9f938e13cd947ec05abc7fe734df8dd826
 
-block 486839
+block 486842
 tx hash dd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482
 nonce 119597
+
 
 June 29
 
