@@ -1,4 +1,4 @@
-web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'));
+web3.setProvider(new web3.providers.HttpProvider('http://localhost:8999'));
 
 web3.eth.defaultAccount = web3.eth.coinbase;
 
@@ -16,7 +16,8 @@ WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 useBtcTestnet = true;
 if (useBtcTestnet) {
-  gTicketContractAddr = '0xb007e8d073af6b6487261bc06660f87ea8740230';
+  gTicketContractAddr = '0x1af2844a588759d0de58abd568add96bb8b3b6d8';  // private
+  // gTicketContractAddr = '0xb007e8d073af6b6487261bc06660f87ea8740230';
   gVersionAddr = 111;
   //
   // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
