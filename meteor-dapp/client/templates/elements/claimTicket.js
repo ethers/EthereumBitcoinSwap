@@ -199,10 +199,8 @@ Template.claimTicket.viewmodel(
 function doLookup(viewm, reset) {
   if (reset) {
     var ticketId = viewm.ticketId();
-    var btcTxHash = viewm.btcTxHash();
     viewm.reset();
     viewm.ticketId(ticketId);
-    viewm.btcTxHash(btcTxHash);
   }
   else {
     viewm.merkleProof('');
