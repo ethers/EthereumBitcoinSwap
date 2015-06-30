@@ -5,6 +5,8 @@ ticketContract is: 0x1af2844a588759d0de58abd568add96bb8b3b6d8
 testnet relay: 0x77045e71a7a2c50903d88e564cd72fab11e82051
 
 7 tickets, ticket 2 is reserved and claimable.
+The password to unlock the keystore is 'test'.  The keystore for address cd2a...
+is not committed.
 
 Here's how to create the tx to reserve the ticket:
 send funds to intermediate address then:
