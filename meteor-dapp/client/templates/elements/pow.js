@@ -2,23 +2,32 @@ var ku = require('keccak');
 var bnTarget = new BigNumber(2).pow(235);
 var kecc = new ku.Keccak();
 
+
 Template.pow.viewmodel({
   btcTxHash: 'dd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482',
-  nonce: 1225993,
+  ticketId: 2,
+  nonce: 1007349,
 
   findPoWClicked: function() {
     console.log(this.btcTxHash())
 
-    var bnSrc = new BigNumber('0x' + this.btcTxHash() + "0000000000000000")
+    var hexTicketId = this.ticketId().toString(16);
+    var padLen = 16 - hexTicketId.length;
+    var leadZerosForTicketId = Array(padLen + 1).join('0');
+
+    var bnSrc = new BigNumber('0x' + this.btcTxHash() + leadZerosForTicketId + hexTicketId + "0000000000000000");
     var src;
     var bnHash;
     var strHash;
 
+    console.log('@@@ bnSrc: ', bnSrc.toString(16))
+
 
     src = ku.hexStringToBytes(bnSrc.toString(16));
     src = new Uint32Array(src.buffer);
+    var srcLen = src.length;
     var dst = new Uint32Array(8);
-    kecc.digestWords(dst, 0, 8, src, 0, 10);
+    kecc.digestWords(dst, 0, 8, src, 0, srcLen);
 
     strHash = ku.wordsToHexString(dst);
     bnHash = new BigNumber('0x' + strHash);
@@ -33,7 +42,7 @@ Template.pow.viewmodel({
 
       src = ku.hexStringToBytes(bnSrc.toString(16));
       src = new Uint32Array(src.buffer);
-      kecc.digestWords(dst, 0, 8, src, 0, 10);
+      kecc.digestWords(dst, 0, 8, src, 0, srcLen);
 
       strHash = ku.wordsToHexString(dst);
       bnHash = new BigNumber('0x' + strHash);
@@ -52,12 +61,15 @@ Template.pow.viewmodel({
   },
 
   verifyPoWClicked: function() {
+    var hexTicketId = this.ticketId().toString(16);
+    var padLen = 16 - hexTicketId.length;
+    var leadZerosForTicketId = Array(padLen + 1).join('0');
+
     var hexNonce = this.nonce().toString(16);
+    padLen = 16 - hexNonce.length;
+    var leadZerosForNonce = Array(padLen + 1).join('0');
 
-    var padLen = 16 - hexNonce.length;
-    var zeros = Array(padLen + 1).join('0');
-
-    var bnSrc = new BigNumber('0x' + this.btcTxHash() + zeros + hexNonce);
+    var bnSrc = new BigNumber('0x' + this.btcTxHash() + leadZerosForTicketId + hexTicketId + leadZerosForNonce + hexNonce);
     var src;
     var bnHash;
     var strHash;
@@ -65,8 +77,9 @@ Template.pow.viewmodel({
 
     src = ku.hexStringToBytes(bnSrc.toString(16));
     src = new Uint32Array(src.buffer);
+    var srcLen = src.length;
     var dst = new Uint32Array(8);
-    kecc.digestWords(dst, 0, 8, src, 0, 10);
+    kecc.digestWords(dst, 0, 8, src, 0, srcLen);
 
     strHash = ku.wordsToHexString(dst);
     bnHash = new BigNumber('0x' + strHash);
