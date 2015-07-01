@@ -12,6 +12,7 @@ extern relayContract: [verifyTx:iiai:i]
 # claimExpiry 0 means ticket doesn't exist
 data gTicket[2**64](_btcAddr, _numWei, _weiPerSatoshi, _claimer, _claimExpiry, _claimTxHash)
 
+# gTicket and m_keccak assume ticketId is 64bit int
 data gTicketId  # last ticket id.  first valid id is 1
 
 data trustedBtcRelay
@@ -83,7 +84,7 @@ def lookupTicket(ticketId):
 event ticketEvent(ticketId:indexed, rval)
 macro POW_TARGET: 2**235
 def reserveTicket(ticketId, txHash, nonce):
-    if m_ticketAvailable(ticketId) && m_keccak(txHash, nonce) < POW_TARGET:
+    if m_ticketAvailable(ticketId) && m_keccak(txHash, ticketId, nonce) < POW_TARGET:
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
@@ -94,11 +95,13 @@ def reserveTicket(ticketId, txHash, nonce):
     return(0)
 
 
-macro m_keccak($txHash, $nonce):
-    with $x = ~alloc(40):
+# ticketId and nonce are 8bytes each
+macro m_keccak($txHash, $ticketId, $nonce):
+    with $x = ~alloc(48):
         ~mstore($x, $txHash)
-        ~mstore($x + 32, $nonce*2**192)
-        sha3($x, chars=40)
+        ~mstore($x + 32, $ticketId*2**192)
+        ~mstore($x + 40, $nonce*2**192)
+        sha3($x, chars=48)
 
 
 

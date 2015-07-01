@@ -1,4 +1,4 @@
 inset('../ethBtcSwap.py')
 
-def funcKeccak(txHash, nonce):
-    return(m_keccak(txHash, nonce))
+def funcKeccak(txHash, ticketId, nonce):
+    return(m_keccak(txHash, ticketId, nonce))
