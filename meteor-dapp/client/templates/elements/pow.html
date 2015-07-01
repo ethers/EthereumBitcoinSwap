@@ -2,30 +2,36 @@
 
 
 
-  <h2>PoW</h2>
+  <h2>Proof of Work</h2>
 
   <div class="row">
     <form class="form">
       <fieldset>
         <div class="form-group">
-          <label data-toggle="tooltip" data-placement="right"
-            title="address where you want to receive bitcoins">
-            Bitcoin transaction hash</label>
-          <input type="text" class="form-control" data-bind="value: btcTxHash">
+          <div class="row">
+            <div class="col-md-7">
+              <label data-toggle="tooltip" data-placement="right"
+                title="address where you want to receive bitcoins">
+                Bitcoin Transaction Hash</label>
+              <input type="text" class="form-control" data-bind="value: btcTxHash">
+            </div>
+          </div>
         </div>
         <div class="form-group">
-          <label data-toggle="tooltip" data-placement="right"
-            title="address where you want to receive bitcoins">
-            Nonce</label>
-          <input type="text" class="form-control" data-bind="value: nonce">
+          <div class="row">
+            <div class="col-md-2">
+              <label data-toggle="tooltip" data-placement="right"
+                title="address where you want to receive bitcoins">
+                Nonce</label>
+              <input type="text" class="form-control" data-bind="value: nonce">
+            </div>
+          </div>
         </div>
         <button type="button" class="btn btn-default"
-          data-bind="click: findPoWClicked()">Find Proof of Work</button>
+          data-bind="click: findPoWClicked()">Compute</button>
         <button type="button" class="btn btn-default"
-          data-bind="click: verifyPoWClicked()">Verify PoW</button>
+          data-bind="click: verifyPoWClicked()">Verify</button>
       </fieldset>
     </form>
   </div>
-
-  <div data-bind="text: nonce"></div>
 </template>

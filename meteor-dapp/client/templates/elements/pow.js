@@ -3,7 +3,7 @@ var bnTarget = new BigNumber(2).pow(235);
 var kecc = new ku.Keccak();
 
 Template.pow.viewmodel({
-  btcTxHash: '558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012',
+  btcTxHash: 'dd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482',
   nonce: 1225993,
 
   findPoWClicked: function() {
@@ -48,6 +48,7 @@ Template.pow.viewmodel({
     console.log('@@@@ i: ', i)
     console.log('@@@ strHash: ', strHash)
 
+    this.nonce(i);
   },
 
   verifyPoWClicked: function() {
@@ -72,5 +73,12 @@ Template.pow.viewmodel({
 
     var isPowValid = bnHash.lt(bnTarget);
     console.log('@@@ isPowValid: ', isPowValid)
+
+    if (isPowValid) {
+      swal('Proof of Work', 'Valid', 'success');
+    }
+    else {
+      swal('Proof of Work', 'Invalid', 'error');
+    }
   }
 });
