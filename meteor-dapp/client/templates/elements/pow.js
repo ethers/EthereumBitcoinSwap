@@ -1,5 +1,5 @@
 var ku = require('keccak');
-var bnTarget = new BigNumber(2).pow(235);
+var bnTarget = new BigNumber(2).pow(234);
 var kecc = new ku.Keccak();
 
 

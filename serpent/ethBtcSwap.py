@@ -82,7 +82,7 @@ def lookupTicket(ticketId):
 
 # data[0] is the return value / error code
 event ticketEvent(ticketId:indexed, rval)
-macro POW_TARGET: 2**235
+macro POW_TARGET: 2**234
 def reserveTicket(ticketId, txHash, nonce):
     if m_ticketAvailable(ticketId) && m_keccak(txHash, ticketId, nonce) < POW_TARGET:
         self.gTicket[ticketId]._claimer = msg.sender

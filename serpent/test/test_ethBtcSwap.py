@@ -316,16 +316,22 @@ class TestEthBtcSwap(object):
     def testKeccak(self):
         txHash = 0xdd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482
         ticketId = 2
-        nonce = 1007349
-        expHash = 0x0000076284a3a59f3cb6370e21fc53d37912e97e39ea35cf767766ba9a913ca4
-
+        nonce = 2460830
+        expHash = 0x000003cda023979d2888a9542ef2a90a52ae250856b6a559bacdf361191864cc
         assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
 
-        # txHash = 0xdd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482
-        # ticketId = 3
-        # nonce =
-        # expHash =
+        txHash = 0xdd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482
+        ticketId = 3
+        nonce = 726771
+        expHash = 0x0000013fc2168a88d89d68a2ef4d2ba9994d6aaf17ce51355d7c4a926b89f4a0
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        # txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        # ticketId = 2
+        # nonce = 1
+        # expHash = 0x0000013fc2168a88d89d68a2ef4d2ba9994d6aaf17ce51355d7c4a926b89f4a0
         # assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
 
     def testClaimerFee(self):
         # block 300k
