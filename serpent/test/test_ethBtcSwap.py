@@ -48,7 +48,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -118,7 +118,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -216,7 +216,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = [None, 2089206, 680495]
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -237,10 +237,10 @@ class TestEthBtcSwap(object):
         assert 2 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, sender=tester.k2, value=numWei)
 
         # k1 is the reserver
-        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=tester.k1, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonce[ticketId], sender=tester.k1, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == 1
-        res = self.c.reserveTicket(2, txHash, nonce, sender=tester.k1, profiling=True)
+        res = self.c.reserveTicket(2, txHash, nonce[2], sender=tester.k1, profiling=True)
         assert res['output'] == 2
 
         claimer = tester.k0
@@ -326,11 +326,47 @@ class TestEthBtcSwap(object):
         expHash = 0x0000013fc2168a88d89d68a2ef4d2ba9994d6aaf17ce51355d7c4a926b89f4a0
         assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
 
-        # txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        # ticketId = 2
-        # nonce = 1
-        # expHash = 0x0000013fc2168a88d89d68a2ef4d2ba9994d6aaf17ce51355d7c4a926b89f4a0
-        # assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        ticketId = 2
+        nonce = 680495
+        expHash = 0x00000290c7705248df8fcc6fb0c21b7cf304c5294bace5aa18dd7a4f5c0c6c79
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        ticketId = 1
+        nonce = 2089206
+        expHash = 0x0000015263afcfe8ff095e519dba81c2769f6d48c683259368dfa7c8a3afdeba
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        ticketId = 3
+        nonce = 12037620
+        expHash = 0x00000184736e7144dc389049cea44ba3b5c6fd28088af94299279070f7b0a861
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
+        ticketId = 4
+        nonce = 6492745
+        expHash = 0x000003a488f958c83be5b4d0a99b4d96deb9c803559f8472ab435214637a757e
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        txHash = 0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012
+        ticketId = 1
+        nonce = 1997185
+        expHash = 0x0000004e44fd508d602c7faa29a96086166f0e765ded0e1a41476671e72dec9a
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        txHash = 0xfff2525b8931402dd09222c50775608f75787bd2b87e56995a7bdd30f79702c4
+        ticketId = 1
+        nonce = 4392122
+        expHash = 0x0000002d691438f89ced909061a0302c05118412104d54045eb860cf500e10e5
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
+
+        txHash = 0xfff2525b8931402dd09222c50775608f75787bd2b87e56995a7bdd30f79702c4
+        ticketId = 3
+        nonce = 1896566
+        expHash = 0x000000c5dabdc3a1ece8b2794a5c973f323fd8a168e3187231d5093ad3d7ae52
+        assert self.c.funcKeccak(txHash, ticketId, nonce) == expHash
 
 
     def testClaimerFee(self):
@@ -338,7 +374,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -427,7 +463,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -502,7 +538,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -549,7 +585,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -630,7 +666,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000000000082ccf8f1557c5d40b21edabb18d2d691cfbf87118bac7254
         txStr = '0100000002a0419f78a1ef9441b1d91a5cb3e198d4a1ef8b382cd942de98a58a5f968d073f000000006a473044022032a0332c1afb753afc1bb44555c9ccefa83709ca5e1e62a608024b9cf4c087c002201a506f2c8442c390590769d5cdefc6e4e0e1f8517a060365ec527cc9b749068c012102caa12ebb756b4a3a90c8779d2ec75d7082f9c2897f0715989840f16bf3aa7adfffffffff55ad24bbc9541d9848ad64546ab4a6f4b96cb15043ddeea52fbeb3cc70987340000000008a47304402203d4cb993d6e73979c3aae2d1c4752f6b4c501c4b64fc19f212efaa54a7ba199f02204ba50d8764532c2157f7438cf2eee6e975853975eb3803823f9de4a1c1f230e30141040a424c356d3adfdc6ba29cf41474105434d01a7ad5be3ae6938f8af92da215bdb0e21bd2ad6301f43be02f1ce796229a8c00873356e11a056c8c65f731304a7fffffffff0280ba8c01000000001976a914956bfc5575c0a7134c7effef268e51d887ba701588ac4a480f00000000001976a914587488c119f40666b4a0c807b0d7a1acfe3b691788ac00000000'
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
         txIndex = 190
         sibling = [0x09636b32593267f1aec7cf7ac36b6a51b8ef158f5648d1d27882492b7908ca2e, 0xe081237dd6f75f2a0b174ac8a8f138fffd4c05ad05c0c12cc1c69a203eec79ae, 0x0c23978510ed856b5e17cba4b4feba7e8596581d604cce84f50b6ea180fd91a4, 0x1f4deef9f140251f6dc011d3b9db88586a2a313de813f803626dcdac4e1e3127, 0x266f31fc4cdca488ecf0f9cbf56e4b25aa5e49154ae192bc6982fc28827cc62b, 0xd394350ece3e0cb705c99c1db14f29d1db0e1a3dcbd3094baf695e297bea0f6b, 0x3a2e3e81c6ef3a3ff65ec6e62ead8eb5c2f8bb950ba2422038fa573a6d638812, 0xaec0b4d49d190f9ac61d0e32443ade724274de466eed4acb0498207664832d84]
         satoshiOutputOne = int(0.26e8)
@@ -707,7 +743,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000000003ba27aa200b1cecaad478d2b00432346c3f1f3986da1afd33e506
         txStr = '0100000001032e38e9c0a84c6046d687d10556dcacc41d275ec55fc00779ac88fdf357a187000000008c493046022100c352d3dd993a981beba4a63ad15c209275ca9470abfcd57da93b58e4eb5dce82022100840792bc1f456062819f15d33ee7055cf7b5ee1af1ebcc6028d9cdb1c3af7748014104f46db5e9d61a9dc27b8d64ad23e7383a4e6ca164593c2527c038c0857eb67ee8e825dca65046b82c9331586c82e0fd1f633f25f87c161bc6f8a630121df2b3d3ffffffff0200e32321000000001976a914c398efa9c392ba6013c5e04ee729755ef7f58b3288ac000fe208010000001976a914948c765a6914d43f2a7ac177da2c2f6b52de3d7c88ac00000000'
         txHash = int(dbl_sha256(txStr.decode('hex')), 16)
-        nonce = 1379808
+        nonceForTicket3 = 1896566
         txIndex = 1
         sibling = [0x8c14f0db3df150123e6f3dbbf30f8b955a8249b62ac1d1ff16284aefa3d06d87, 0x8e30899078ca1813be036a073bbf80b86cdddde1c96e9e9c99e9e3782df4ae49]
         satoshiOutputOne = int(5.56e8)
@@ -734,7 +770,7 @@ class TestEthBtcSwap(object):
 
         claimerBalPreReserve = self.s.block.get_balance(addrClaimer)
         gasPrice = int(10e12)  # 10 szabo
-        res = self.c.reserveTicket(ticketId, txHash, nonce, sender=claimer, profiling=True)
+        res = self.c.reserveTicket(ticketId, txHash, nonceForTicket3, sender=claimer, profiling=True)
         # print('GAS: '+str(res['gas']))
         assert res['output'] == ticketId
 
@@ -795,7 +831,7 @@ class TestEthBtcSwap(object):
 
     def testReserveInvalidTicket(self):
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = 2089206
 
         assert self.c.reserveTicket(-1, txHash, nonce) == 0
         assert self.c.reserveTicket(0, txHash, nonce) == 0
@@ -811,7 +847,7 @@ class TestEthBtcSwap(object):
         expExpiry = self.s.block.timestamp + 3600*4
         expSender = int(self.s.block.coinbase.encode('hex'), 16)
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonce = [None, 2089206, 680495, 12037620, 6492745]
 
         assert self.c.getOpenTickets() == []
 
@@ -826,7 +862,7 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2]+baseTicket + [3]+baseTicket
 
         timePreReserve = self.s.block.timestamp
-        assert 2 == self.c.reserveTicket(2, txHash, nonce, sender=tester.k0)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce[2], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         self.s.block.timestamp += 3600 * 4 + 1
@@ -839,16 +875,16 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(2, 3) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         expiry2 = self.s.block.timestamp + 3600*4
-        assert 3 == self.c.reserveTicket(3, txHash, nonce, sender=tester.k0)
+        assert 3 == self.c.reserveTicket(3, txHash, nonce[3], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
-        assert 1 == self.c.reserveTicket(1, txHash, nonce, sender=tester.k0)
+        assert 1 == self.c.reserveTicket(1, txHash, nonce[1], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
-        assert 4 == self.c.reserveTicket(4, txHash, nonce, sender=tester.k0)
+        assert 4 == self.c.reserveTicket(4, txHash, nonce[4], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash]
 
-        assert 2 == self.c.reserveTicket(2, txHash, nonce, sender=tester.k0)
+        assert 2 == self.c.reserveTicket(2, txHash, nonce[2], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [2, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash]
 
 
@@ -896,7 +932,8 @@ class TestEthBtcSwap(object):
 
 
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
-        nonce = 396618
+        nonceForTicket1 = 2089206
+        nonceForTicket2 = 680495
 
         # invalid PoW
         preBal = self.coinbaseBalance()
@@ -913,21 +950,21 @@ class TestEthBtcSwap(object):
 
         # valid PoW
         preBal = self.s.block.get_balance(self.s.block.coinbase)
-        assert 2 == self.c.reserveTicket(2, txHash, nonce, sender=tester.k0)
+        assert 2 == self.c.reserveTicket(2, txHash, nonceForTicket2, sender=tester.k0)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         # valid PoW
         preBal = self.coinbaseBalance()
-        assert 1 == self.c.reserveTicket(1, txHash, nonce)
+        assert 1 == self.c.reserveTicket(1, txHash, nonceForTicket1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(1) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         # valid PoW, but ticketId2 still reserved
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, nonce)
+        assert 0 == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
@@ -936,7 +973,7 @@ class TestEthBtcSwap(object):
         preBal = self.coinbaseBalance()
         self.s.block.timestamp += 3600 * 5
         timePreReserve = self.s.block.timestamp
-        assert 2 == self.c.reserveTicket(2, txHash, nonce)
+        assert 2 == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         expExpiry = timePreReserve + 3600*4
@@ -945,7 +982,7 @@ class TestEthBtcSwap(object):
         # close but not yet expired
         self.s.block.timestamp += 3600 * 4
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, nonce)
+        assert 0 == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
@@ -954,7 +991,7 @@ class TestEthBtcSwap(object):
         self.s.block.timestamp += 100
         timePreReserve = self.s.block.timestamp
         preBal = self.coinbaseBalance()
-        assert 2 == self.c.reserveTicket(2, txHash, nonce)
+        assert 2 == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         expExpiry = timePreReserve + 3600*4
@@ -967,7 +1004,7 @@ class TestEthBtcSwap(object):
         txBlockHash = 0x000000007971768c5a88699e5cf20cad19d2404d16bbd6d3305824b131f6b3f5
         txStr = '0100000001c6e4ac5a14c1fa273d1511248d504522afc04b6af805c8c8732c9a26c3ee6c54010000008c493046022100b1a346052813d4e141c92d5f60107a61a24134205876b88d86917cac4f423732022100dda77724092d1ed746f583c80315e316fd5081805b35a83d88a394bd1f8eafc4014104858527cb6bf730cbd1bcf636bc7e77bbaf0784b9428ec5cca2d8378a0adc75f5ca893d14d9db2034cbb7e637aacf28088a68db311ff6f1ebe6d00a62fed9951effffffff0210980200000000001976a914a0dc485fc3ade71be5e1b68397abded386c0adb788ac10270000000000001976a914cd2a3d9f938e13cd947ec05abc7fe734df8dd82688ac00000000'
         txHash = 0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012
-        nonce = 1225993
+        nonce = 1997185
         txIndex = 8
         sibling = [0x6155584c5555baf187ac6e409a3278de39a02a1020871ec034044c13f27dc3cd]
         satoshiOutputOne = 170000

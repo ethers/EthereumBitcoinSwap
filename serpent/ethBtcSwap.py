@@ -84,7 +84,7 @@ def lookupTicket(ticketId):
 event ticketEvent(ticketId:indexed, rval)
 macro POW_TARGET: 2**234
 def reserveTicket(ticketId, txHash, nonce):
-    if m_ticketAvailable(ticketId) && m_keccak(txHash, ticketId, nonce) < POW_TARGET:
+    if m_ticketAvailable(ticketId) && lt(m_keccak(txHash, ticketId, nonce), POW_TARGET):  # lt is required
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
