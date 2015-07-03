@@ -64,7 +64,7 @@ Template.claimTicket.viewmodel(
       case TICKET_RESERVED:
         return this.claimerAddr();
       case TICKET_ANYCLAIM:
-        return ANYONE_CAN_CLAIM + ' (including You ' + web3.eth.defaultAccount +')';
+        return ANYONE_CAN_CLAIM + ' (including You ' + web3.eth.defaultAccount.substr(2) +')';
       default:
         throw new Error('Unexpected Ticket State');
     }
@@ -430,12 +430,12 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
 
   gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
     if (err) {
-      swal('Error', err, 'error');
+      swal(err, 'send transaction failed', 'error');
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;
     }
 
-    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
+    uiTxProgress();
 
     // result is a txhash
     console.log('@@@ reserveTicket txHash: ', txHash)
@@ -551,7 +551,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
         swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
         break;
       default:
-        swal('Unexpected error', '', 'error');
+        swal('Unexpected error', rval, 'error');
         break;
     }
 
@@ -560,18 +560,22 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
   gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
-      swal('Error', err, 'error');
+      swal(err, 'send transaction failed', 'error');
       console.log('@@@ err: ', err)
       return;
     }
 
-    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined')
+    uiTxProgress();
 
     // result is a txhash
     console.log('@@@ claimTicket result: ', result)
   });
 }
 
+
+function uiTxProgress() {
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
+}
 
 function hashTx(rawTx) {
   var txByte = Crypto.util.hexToBytes(rawTx);
