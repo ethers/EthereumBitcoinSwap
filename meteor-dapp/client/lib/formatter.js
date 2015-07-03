@@ -58,7 +58,7 @@ formatState = function(bnClaimExpiry) {
 
 
 humanRelativeTime = function(unixTime) {
-  return moment(unixTime * 1000).fromNow();
+  return fromNowReactive(moment(unixTime * 1000));
 }
 
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
@@ -78,4 +78,16 @@ formatBtcAddr = function(bn) {
   // TODO use bignumToHex()
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), gVersionAddr).toString();
+}
+
+
+
+var timeTick = new Tracker.Dependency();
+Meteor.setInterval(function () {
+  timeTick.changed();
+}, 60000);
+
+var fromNowReactive = function (mmt) {
+  timeTick.depend();
+  return mmt.fromNow();
 }
