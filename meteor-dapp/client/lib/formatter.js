@@ -56,11 +56,11 @@ formatClaimExpiry = function(unixExpiry) {
 
 
 TICKET_OPEN = 'OPEN';
-TICKET_RESERVED = 'RESERVED';
-TICKET_ANYCLAIM = 'ANYCLAIM';
+TICKET_RESERVED = 'RESERVED';  // ticket can only be claimed by the reserver
+TICKET_ANYCLAIM = 'ANYCLAIM';  // means ticket is reserved to claimTxHash but can be claimed by anyone
+// returns possible ticket states, except for CLAIMED state which is never shown in UI
+// if CLAIMED state is added, also update definition of isTicketAvailable()
 stateFromClaimExpiry = function(unixExpiry) {
-  // TODO is CLAIMED state needed?
-
   var nextOpen = moment.unix(unixExpiry);
   var now = moment();
 
@@ -69,9 +69,14 @@ stateFromClaimExpiry = function(unixExpiry) {
     return TICKET_OPEN;
   }
 
+  // EXPIRY_TIME_SECS is the total time that a ticket is reserved for a given
+  // claimTxHash.  The reservation time is comprised of 2 periods:
+  // * first is when the ticket can only be claimed by the reserver: ends per reserverDeadline
+  // * remaining period is when anyone can claim the ticket
   var reserverDeadline = nextOpen.subtract(EXPIRY_TIME_SECS, 'seconds').add(ONLY_RESERVER_CLAIM_SECS, 'seconds');
 
   if (now.isAfter(reserverDeadline)) {
+    // anyone can now claim the ticket
     return TICKET_ANYCLAIM;
   }
 
