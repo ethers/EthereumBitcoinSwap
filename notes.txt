@@ -1,3 +1,9 @@
+July 2
+
+private chain
+ticket contract with ticketid as part of PoW: 0x0e19674ebc2c2b6df3e7a1417c49b50235c61924
+testnet relay: 0xda7ce79725418f4f6e13bf5f520c89cec5f6a974  (actually could have kept old chain and just deploy new ticket contract)
+
 June 30
 
 private chain exported as gethJune30chain.bin

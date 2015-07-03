@@ -2,7 +2,7 @@
 
 # TODO you must update the address of BtcRelay to whatever your BtcRelay was mined to
 # 0xcffaf1199ff8b486a20728424879dd59ecb38a92
-# testnet relay: 0xc9414a5b208b0a5af42c6ab249dd5c660d5efefe
+# testnet relay: 0xda7ce79725418f4f6e13bf5f520c89cec5f6a974
 - set:
     BtcRelay: ""
 
@@ -18,8 +18,7 @@
     SetTrustedBtcRelay:
       gas: 100000
       to: $EthBtcSwap
-      fun_name: setTrustedBtcRelay
-      sig: i
+      sig: setTrustedBtcRelay:[int256]:int256
       data:
         - $BtcRelay
       wait: True
