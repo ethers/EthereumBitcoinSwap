@@ -48,12 +48,9 @@ formatWeiToEther = function(bnWei) {
   return bnWei.div(WEI_PER_ETHER).toString(10);
 }
 
-formatState = function(bnClaimExpiry) {
-  var expiry = bnClaimExpiry.toNumber();
-  if (isTicketAvailable(expiry)) {
-    return UNRESERVED_TICKET_DESC;
-  }
-  return humanRelativeTime(expiry);
+formatClaimExpiry = function(unixExpiry) {
+  return unixExpiry === FRESH_TICKET_EXPIRY  // TODO check when expired also
+    ? UNRESERVED_TICKET_DESC : humanRelativeTime(unixExpiry);
 }
 
 
@@ -93,10 +90,6 @@ bignumToHex = function(bn) {
   // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
 }
 
-function isTicketAvailable(claimExpiry) {
-    // TODO: check block timestamp
-    return claimExpiry === 1;
-}
 
 
 formatBtcAddr = function(bn) {

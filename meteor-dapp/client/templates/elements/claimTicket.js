@@ -68,7 +68,7 @@ Template.claimTicket.viewmodel(
 
   uiClaimExpiry: function() {
     var unixExpiry = this.claimExpiry();
-    return unixExpiry === FRESH_TICKET_EXPIRY ? UNRESERVED_TICKET_DESC : humanRelativeTime(unixExpiry);
+    return formatClaimExpiry(unixExpiry);
   },
 
   btcPayment: '',

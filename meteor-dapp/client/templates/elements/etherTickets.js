@@ -68,8 +68,10 @@ function displayBtcAddr(bnstr) {
   return formatBtcAddr(new BigNumber(bnstr));
 }
 
+// Reservable column
 function displayTicketStatus(numClaimExpiry) {
-  return formatState(new BigNumber(numClaimExpiry));
+  return formatClaimExpiry(numClaimExpiry);
+  // return formatState(new BigNumber(numClaimExpiry));
 }
 
 function displayTicketAction(numClaimExpiry, object) {
