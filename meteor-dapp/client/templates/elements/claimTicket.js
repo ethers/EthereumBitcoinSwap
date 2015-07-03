@@ -208,10 +208,13 @@ function lookupTicket(viewm) {
   var bnClaimer = ticketInfo[4];
   var bnClaimTxHash = ticketInfo[5];
 
-  // renderClaimer(bnClaimExpiry, bnClaimer, bnClaimTxHash);
-  viewm.claimExpiry(bnClaimExpiry.toNumber());
-  viewm.claimerAddr(toHash(bnClaimer));
-  viewm.claimTxHash(toHash(bnClaimTxHash));
+  var unixExpiry = bnClaimExpiry.toNumber();
+  viewm.claimExpiry(unixExpiry);
+
+  if (!isTicketAvailable(unixExpiry)) {
+    viewm.claimerAddr(toHash(bnClaimer));
+    viewm.claimTxHash(toHash(bnClaimTxHash));
+  }
 
   viewm.bnWei(bnWei);
   viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
