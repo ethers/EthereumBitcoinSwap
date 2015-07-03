@@ -1,8 +1,12 @@
 
-EMPTY_CLAIMER = '-';
-FRESH_TICKET_EXPIRY = 1;  // 1 comes from the contract; 0 means ticket does not exist
+var ONE_HOUR_IN_SECS = 60*60;
+var EXPIRY_TIME_SECS = 4 * ONE_HOUR_IN_SECS;
+var ONLY_RESERVER_CLAIM_SECS = 1 * ONE_HOUR_IN_SECS;  // TODO change this and expiry constant above
 
-UNRESERVED_TICKET_DESC = 'OPEN';
+
+var FRESH_TICKET_EXPIRY = 1;  // 1 comes from the contract; 0 means ticket does not exist
+
+var UNRESERVED_TICKET_DESC = 'OPEN';
 
 
 
