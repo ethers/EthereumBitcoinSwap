@@ -1,3 +1,19 @@
+July 3
+
+When updating contract, update the abi JS
+
+On NEW private chain:
+* traddr = deploy testnet relay
+* fetchd with traddr
+* ethBtcDeploy with traddr
+
+with coinbase 0x41fcb4160fdab4afbde9d7cad9effe8cc927e1fe the 1st contract will be at: 0x770...
+testnetrelay and for fetchd: 0x77045e71a7a2c50903d88e564cd72fab11e82051
+
+the 2nd contract will be at: 0x1ed...
+ethbtcswap: 0x1ed614cd3443efd9c70f04b6d777aed947a4b0c4
+
+
 July 2
 
 private chain

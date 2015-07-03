@@ -2,7 +2,7 @@
 
 # TODO you must update the address of BtcRelay to whatever your BtcRelay was mined to
 # 0xcffaf1199ff8b486a20728424879dd59ecb38a92
-# testnet relay: 0xda7ce79725418f4f6e13bf5f520c89cec5f6a974
+# testnet relay: 0x77045e71a7a2c50903d88e564cd72fab11e82051
 - set:
     BtcRelay: ""
 
