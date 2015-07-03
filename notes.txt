@@ -4,6 +4,15 @@ private chain
 ticket contract with ticketid as part of PoW: 0x0e19674ebc2c2b6df3e7a1417c49b50235c61924
 testnet relay: 0xda7ce79725418f4f6e13bf5f520c89cec5f6a974  (actually could have kept old chain and just deploy new ticket contract)
 
+tickets 2 and 3 can be reserved with same txhash:
+txHash = 0xdd5a8f13c97c8b8d47329fa7bd487df24b7d3b7e855a65eb7fd51e8f94f7e482
+ticketId = 2
+nonce = 2460830
+
+ticketId = 3
+nonce = 726771
+
+
 June 30
 
 private chain exported as gethJune30chain.bin
