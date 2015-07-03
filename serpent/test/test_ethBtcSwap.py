@@ -29,6 +29,10 @@ class TestEthBtcSwap(object):
     EXPIRY_SECS = 3600*4
     ONLY_RESERVER_CLAIM_SECS = 3600*1
 
+    RESERVE_FAIL_UNRESERVABLE = -10
+    RESERVE_FAIL_POW = -11
+    RESERVE_FAIL_FALLTHRU = -12
+
     def setup_class(cls):
         tester.gas_limit = int(2.7e6)  # 2.4e6 should be ok if testingOnly methods are commented out
         cls.s = tester.state()
@@ -833,10 +837,10 @@ class TestEthBtcSwap(object):
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
         nonce = 2089206
 
-        assert self.c.reserveTicket(-1, txHash, nonce) == 0
-        assert self.c.reserveTicket(0, txHash, nonce) == 0
-        assert self.c.reserveTicket(1, txHash, nonce) == 0
-        assert self.c.reserveTicket(1000, txHash, nonce) == 0
+        assert self.c.reserveTicket(-1, txHash, nonce) == self.RESERVE_FAIL_UNRESERVABLE
+        assert self.c.reserveTicket(0, txHash, nonce) == self.RESERVE_FAIL_UNRESERVABLE
+        assert self.c.reserveTicket(1, txHash, nonce) == self.RESERVE_FAIL_UNRESERVABLE
+        assert self.c.reserveTicket(1000, txHash, nonce) == self.RESERVE_FAIL_UNRESERVABLE
 
 
     def testOpenTickets(self):
@@ -937,14 +941,14 @@ class TestEthBtcSwap(object):
 
         # invalid PoW
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(1, txHash, 0)
-        assert 0 == self.c.reserveTicket(2, txHash, 1)
+        assert self.RESERVE_FAIL_POW == self.c.reserveTicket(1, txHash, 0)
+        assert self.RESERVE_FAIL_POW == self.c.reserveTicket(2, txHash, 1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
         # invalid PoW
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, -1)
+        assert self.RESERVE_FAIL_POW == self.c.reserveTicket(2, txHash, -1)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
 
@@ -964,7 +968,7 @@ class TestEthBtcSwap(object):
 
         # valid PoW, but ticketId2 still reserved
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, nonceForTicket2)
+        assert self.RESERVE_FAIL_UNRESERVABLE == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
@@ -982,7 +986,7 @@ class TestEthBtcSwap(object):
         # close but not yet expired
         self.s.block.timestamp += 3600 * 4
         preBal = self.coinbaseBalance()
-        assert 0 == self.c.reserveTicket(2, txHash, nonceForTicket2)
+        assert self.RESERVE_FAIL_UNRESERVABLE == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]

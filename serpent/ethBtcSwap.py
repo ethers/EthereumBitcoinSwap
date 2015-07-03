@@ -82,16 +82,26 @@ def lookupTicket(ticketId):
 
 # data[0] is the return value / error code
 event ticketEvent(ticketId:indexed, rval)
+macro RESERVE_FAIL_UNRESERVABLE: -10
+macro RESERVE_FAIL_POW: -11
+macro RESERVE_FAIL_FALLTHRU: -12
 def reserveTicket(ticketId, txHash, nonce):
-    if m_ticketAvailable(ticketId) && m_isValidPow(txHash, ticketId, nonce):  # ensure args are in correct order: txHash then ticketId
+    if !m_ticketAvailable(ticketId):
+        log(type=ticketEvent, ticketId, RESERVE_FAIL_UNRESERVABLE)
+        return(RESERVE_FAIL_UNRESERVABLE)
+
+    if m_isValidPow(txHash, ticketId, nonce):  # ensure args are in correct order: txHash then ticketId
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
         log(type=ticketEvent, ticketId, ticketId)
         return(ticketId)
+    else:
+        log(type=ticketEvent, ticketId, RESERVE_FAIL_POW)
+        return(RESERVE_FAIL_POW)
 
-    log(type=ticketEvent, ticketId, 0)
-    return(0)
+    log(type=ticketEvent, ticketId, RESERVE_FAIL_FALLTHRU)
+    return(RESERVE_FAIL_FALLTHRU)
 
 
 macro POW_TARGET: 2**234
@@ -221,6 +231,7 @@ def getOpenTickets(startTicketId, endTicketId):
 #  macros
 #
 
+# ticket exists and is reservable
 macro m_ticketAvailable($ticketId):
     with $claimExpiry = self.gTicket[$ticketId]._claimExpiry:
         $claimExpiry > 0 && block.timestamp > $claimExpiry  # claimExpiry 0 means ticket doesn't exist
