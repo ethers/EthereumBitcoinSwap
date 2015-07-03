@@ -49,7 +49,7 @@ formatWeiToEther = function(bnWei) {
 }
 
 formatClaimExpiry = function(unixExpiry) {
-  return unixExpiry === FRESH_TICKET_EXPIRY  // TODO check when expired also
+  return isTicketAvailable(unixExpiry)
     ? UNRESERVED_TICKET_DESC : humanRelativeTime(unixExpiry);
 }
 
@@ -76,6 +76,10 @@ stateFromClaimExpiry = function(unixExpiry) {
   }
 
   return TICKET_RESERVED;
+}
+
+isTicketAvailable = function(unixExpiry) {
+  return stateFromClaimExpiry(unixExpiry) === TICKET_OPEN;
 }
 
 

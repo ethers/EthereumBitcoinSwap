@@ -146,7 +146,8 @@ Template.claimTicket.viewmodel(
 
 
   ticketNeedsToBeReserved: function() {
-    return this.ticketState() == TICKET_OPEN;
+    var unixExpiry = this.claimExpiry();
+    return isTicketAvailable(unixExpiry);
   },
 
   ticketState: function() {

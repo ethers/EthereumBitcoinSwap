@@ -71,7 +71,6 @@ function displayBtcAddr(bnstr) {
 // Reservable column
 function displayTicketStatus(numClaimExpiry) {
   return formatClaimExpiry(numClaimExpiry);
-  // return formatState(new BigNumber(numClaimExpiry));
 }
 
 function displayTicketAction(numClaimExpiry, object) {
