@@ -57,6 +57,31 @@ formatState = function(bnClaimExpiry) {
 }
 
 
+
+TICKET_OPEN = 'OPEN';
+TICKET_RESERVED = 'RESERVED';
+TICKET_ANYCLAIM = 'ANYCLAIM';
+stateFromClaimExpiry = function(unixExpiry) {
+  // TODO is CLAIMED state needed?
+
+  var nextOpen = moment.unix(unixExpiry);
+  var now = moment();
+
+  if (unixExpiry === FRESH_TICKET_EXPIRY ||
+    now.isAfter(nextOpen)) {
+    return TICKET_OPEN;
+  }
+
+  var reserverDeadline = nextOpen.subtract(EXPIRY_TIME_SECS, 'seconds').add(ONLY_RESERVER_CLAIM_SECS, 'seconds');
+
+  if (now.isAfter(reserverDeadline)) {
+    return TICKET_ANYCLAIM;
+  }
+
+  return TICKET_RESERVED;
+}
+
+
 humanRelativeTime = function(unixTime) {
   return fromNowReactive(moment(unixTime * 1000));
 }
