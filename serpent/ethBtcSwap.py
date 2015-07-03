@@ -82,9 +82,8 @@ def lookupTicket(ticketId):
 
 # data[0] is the return value / error code
 event ticketEvent(ticketId:indexed, rval)
-macro POW_TARGET: 2**234
 def reserveTicket(ticketId, txHash, nonce):
-    if m_ticketAvailable(ticketId) && lt(m_keccak(txHash, ticketId, nonce), POW_TARGET):  # lt is required
+    if m_ticketAvailable(ticketId) && m_isValidPow(txHash, ticketId, nonce):  # ensure args are in correct order: txHash then ticketId
         self.gTicket[ticketId]._claimer = msg.sender
         self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
@@ -95,12 +94,16 @@ def reserveTicket(ticketId, txHash, nonce):
     return(0)
 
 
+macro POW_TARGET: 2**234
+macro m_isValidPow($txHash, $ticketId, $powNonce):
+    lt(m_keccak($txHash, $ticketId, $powNonce), POW_TARGET)  # lt is required for unsigned comparison
+
 # ticketId and nonce are 8bytes each
-macro m_keccak($txHash, $ticketId, $nonce):
+macro m_keccak($txHash, $ticketId, $powNonce):
     with $x = ~alloc(48):
         ~mstore($x, $txHash)
         ~mstore($x + 32, $ticketId*2**192)
-        ~mstore($x + 40, $nonce*2**192)
+        ~mstore($x + 40, $powNonce*2**192)
         sha3($x, chars=48)
 
 
