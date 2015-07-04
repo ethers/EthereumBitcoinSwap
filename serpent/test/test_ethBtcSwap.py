@@ -31,17 +31,18 @@ class TestEthBtcSwap(object):
 
     RESERVE_FAIL_UNRESERVABLE = -10
     RESERVE_FAIL_POW = -11
-    RESERVE_FAIL_FALLTHRU = -12
+    RESERVE_FAIL_FALLTHRU = -12  # should not hit, otherwise probably add explicit error code
 
     CLAIM_FAIL_INVALID_TICKET = 99990050
     CLAIM_FAIL_UNRESERVED = 99990070
     CLAIM_FAIL_CLAIMER = 99990100
     CLAIM_FAIL_TX_HASH = 99990200
     CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400
-    CLAIM_FAIL_FALLTHRU = 99999999
+    CLAIM_FAIL_PROOF =  99990800
+    CLAIM_FAIL_FALLTHRU = 99999999  # should not hit, otherwise probably add explicit error code
 
     def setup_class(cls):
-        tester.gas_limit = int(2.7e6)  # 2.4e6 should be ok if testingOnly methods are commented out
+        tester.gas_limit = int(2.8e6)  # 2.5e6 should be ok if testingOnly methods are commented out
         cls.s = tester.state()
         cls.c = cls.s.abi_contract(cls.CONTRACT_DEBUG)
         cls.snapshot = cls.s.snapshot()
@@ -266,11 +267,11 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_PROOF
         assert self.s.block.get_balance(addrClaimer) == balPreClaim
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
-            'rval': self.CLAIM_FAIL_FALLTHRU
+            'rval': self.CLAIM_FAIL_PROOF
             }]
         eventArr.pop()
 
@@ -805,7 +806,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_PROOF
 
         # gas from profiling claimTicket() is inaccurate so assert that the
         # balance is within 2.2X of approxCostToClaim
@@ -829,7 +830,7 @@ class TestEthBtcSwap(object):
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
-            'rval': self.CLAIM_FAIL_FALLTHRU
+            'rval': self.CLAIM_FAIL_PROOF
             }]
         eventArr.pop()
 

@@ -123,6 +123,7 @@ macro CLAIM_FAIL_UNRESERVED: 99990070
 macro CLAIM_FAIL_CLAIMER:  99990100
 macro CLAIM_FAIL_TX_HASH:  99990200
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
+macro CLAIM_FAIL_PROOF:  99990800
 macro CLAIM_FAIL_FALLTHRU: 99999999
 
 # a ticket can only be claimed once, and thus the Bitcoin tx should send enough
@@ -194,6 +195,9 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(type=claimSuccess, addrBtcWasSentTo, numSatoshi, ethAddr, satoshiIn2ndOutput)
 
         return(ticketId)
+    else:
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_PROOF)
+        return(CLAIM_FAIL_PROOF)
 
     log(type=ticketEvent, ticketId, CLAIM_FAIL_FALLTHRU)
     return(0)
