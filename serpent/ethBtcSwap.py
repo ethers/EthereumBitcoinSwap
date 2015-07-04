@@ -133,7 +133,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_INVALID_TICKET)
         return(0)
 
-    if (claimExpiry == FRESH_TICKET_EXPIRY):
+    if (claimExpiry == FRESH_TICKET_EXPIRY || block.timestamp > claimExpiry):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_UNRESERVED)
         return(0)
 
@@ -231,7 +231,8 @@ def getOpenTickets(startTicketId, endTicketId):
 #  macros
 #
 
-# ticket exists and is reservable
+# ticket exists and is reservable.
+# also means that ticket is NOT claimable since ticket needs to be reserved first
 macro m_ticketAvailable($ticketId):
     with $claimExpiry = self.gTicket[$ticketId]._claimExpiry:
         $claimExpiry > 0 && block.timestamp > $claimExpiry  # claimExpiry 0 means ticket doesn't exist
