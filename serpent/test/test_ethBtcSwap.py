@@ -738,7 +738,7 @@ class TestEthBtcSwap(object):
         assert ticketId == self.c.reserveTicket(ticketId, txHash, nonce)
 
         # at the reservation deadline
-        self.s.block.timestamp += 3600*4
+        self.s.block.timestamp += self.EXPIRY_SECS
         assert self.c.funcTicketAvailable(ticketId) == 0
 
         # 1 second later reservation expires
@@ -942,7 +942,7 @@ class TestEthBtcSwap(object):
         numWei = self.ETHER
         weiPerSatoshi = 8
 
-        expExpiry = self.s.block.timestamp + 3600*4
+        expExpiry = self.s.block.timestamp + self.EXPIRY_SECS
         expSender = int(self.s.block.coinbase.encode('hex'), 16)
         txHash = 0x141e4ea2fa3c9bf9984d03ff081d21555f8ccc7a528326cea96221ca6d476566
         nonce = [None, 2089206, 680495, 12037620, 6492745]
@@ -963,7 +963,7 @@ class TestEthBtcSwap(object):
         assert 2 == self.c.reserveTicket(2, txHash, nonce[2], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
-        self.s.block.timestamp += 3600 * 4 + 1
+        self.s.block.timestamp += self.EXPIRY_SECS + 1
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
         assert 4 == self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -972,7 +972,7 @@ class TestEthBtcSwap(object):
         assert self.c.getOpenTickets(2, 4) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket + [4]+baseTicket
         assert self.c.getOpenTickets(2, 3) == [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3]+baseTicket
 
-        expiry2 = self.s.block.timestamp + 3600*4
+        expiry2 = self.s.block.timestamp + self.EXPIRY_SECS
         assert 3 == self.c.reserveTicket(3, txHash, nonce[3], sender=tester.k0)
         assert self.c.getOpenTickets(1, 10) == [1]+baseTicket + [2, btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash] + [3, btcAddr, numWei, weiPerSatoshi, expiry2, expSender, txHash] + [4]+baseTicket
 
@@ -996,7 +996,7 @@ class TestEthBtcSwap(object):
         numWei = self.ETHER
         weiPerSatoshi = 8
 
-        expExpiry = self.s.block.timestamp + 3600*4
+        expExpiry = self.s.block.timestamp + self.EXPIRY_SECS
         expSender = int(self.s.block.coinbase.encode('hex'), 16)
 
         # ticket missing value
@@ -1069,16 +1069,16 @@ class TestEthBtcSwap(object):
 
         # valid PoW and previous ticketId2 reservation has expired
         preBal = self.coinbaseBalance()
-        self.s.block.timestamp += 3600 * 5
+        self.s.block.timestamp += self.EXPIRY_SECS + 1
         timePreReserve = self.s.block.timestamp
         assert 2 == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
-        expExpiry = timePreReserve + 3600*4
+        expExpiry = timePreReserve + self.EXPIRY_SECS
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
         # close but not yet expired
-        self.s.block.timestamp += 3600 * 4
+        self.s.block.timestamp += self.EXPIRY_SECS
         preBal = self.coinbaseBalance()
         assert self.RESERVE_FAIL_UNRESERVABLE == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
@@ -1092,7 +1092,7 @@ class TestEthBtcSwap(object):
         assert 2 == self.c.reserveTicket(2, txHash, nonceForTicket2)
         postBal = self.coinbaseBalance()
         assert postBal == preBal
-        expExpiry = timePreReserve + 3600*4
+        expExpiry = timePreReserve + self.EXPIRY_SECS
         assert self.c.lookupTicket(2) == [btcAddr, numWei, weiPerSatoshi, expExpiry, expSender, txHash]
 
 
