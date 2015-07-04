@@ -1,0 +1,26 @@
+# this deploys the ethBtcSwap contract where reservations expire in 1 min
+#
+# assumes that the coinbase is 0x41fcb4160fdab4afbde9d7cad9effe8cc927e1fe
+#
+# Run inside the serpent directory:
+# pyepm -a 0x41fcb4160fdab4afbde9d7cad9effe8cc927e1fe ../deploy/integration/reserveFastExpiry.yaml -p ...
+
+- set:
+    BtcRelay: "0x77045e71a7a2c50903d88e564cd72fab11e82051"
+
+-
+  deploy:
+    EthBtcSwap:
+      contract: reserveFastExpiry.se
+      gas: 3000000
+      wait: True
+
+-
+  transact:
+    SetTrustedBtcRelay:
+      gas: 100000
+      to: $EthBtcSwap
+      sig: setTrustedBtcRelay:[int256]:int256
+      data:
+        - $BtcRelay
+      wait: True

@@ -1,0 +1,4 @@
+inset('ethBtcSwap.py')
+
+# override constants (the first definition is what Serpent uses)
+macro EXPIRY_TIME_SECS: 60
