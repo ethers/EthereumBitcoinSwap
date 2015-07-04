@@ -1,5 +1,9 @@
 var btcproof = require('btcproof');
 
+var RESERVE_FAIL_UNRESERVABLE = -10;
+var RESERVE_FAIL_POW = -11;
+var RESERVE_FAIL_FALLTHRU = -12;
+
 var CLAIM_FAIL_CLAIMER = 99990100;
 var CLAIM_FAIL_TX_HASH = 99990200;
 var CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400;
@@ -376,15 +380,27 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
   var endTime = Date.now();
   var durationSec = (endTime - startTime) / 1000;
   console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
-  swal(callResult.toString(10) + "    " + durationSec+ "secs");
 
-  if (callResult.toNumber() === ticketId) {
-    console.log('@@@@ call GOOD so now sendTx...')
+
+  var rval = callResult.toNumber();
+  switch (rval) {
+    case ticketId:
+      console.log('@@@@ call GOOD so now sendTx...')
+      break;
+    case RESERVE_FAIL_UNRESERVABLE:
+      swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
+      return;
+    case RESERVE_FAIL_POW:
+      swal('Proof of Work is invalid', 'see Help', 'error');
+      return;
+    case RESERVE_FAIL_FALLTHRU:
+      swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
+      return;
+    default:
+      swal('Unexpected error', rval, 'error');
+      return;
   }
-  else {
-    swal('Proof of Work is invalid', '', 'error');
-    return;
-  }
+
 
 
   var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
@@ -401,7 +417,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Proof of Work is invalid', '', 'error');
+      swal('Should not have reached this', rval, 'error');
     }
 
     rvalFilter.stopWatching();
@@ -409,7 +425,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
 
   gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
     if (err) {
-      swal(err, 'send transaction failed', 'error');
+      swal(err, 'Reserve ticket failed', 'error');
       console.log('@@@ reserveTicket sendtx err: ', err)
       return;
     }
@@ -539,7 +555,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
   gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
     if (err) {
-      swal(err, 'send transaction failed', 'error');
+      swal(err, 'Claim ticket failed', 'error');
       console.log('@@@ err: ', err)
       return;
     }
