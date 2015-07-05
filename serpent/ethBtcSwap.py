@@ -118,13 +118,13 @@ macro m_keccak($txHash, $ticketId, $powNonce):
 
 
 
-macro CLAIM_FAIL_INVALID_TICKET: 99990050
-macro CLAIM_FAIL_UNRESERVED: 99990070
-macro CLAIM_FAIL_CLAIMER:  99990100
-macro CLAIM_FAIL_TX_HASH:  99990200
-macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  99990400
-macro CLAIM_FAIL_PROOF:  99990800
-macro CLAIM_FAIL_FALLTHRU: 99999999
+macro CLAIM_FAIL_INVALID_TICKET: -20
+macro CLAIM_FAIL_UNRESERVED: -21
+macro CLAIM_FAIL_CLAIMER:  -22
+macro CLAIM_FAIL_TX_HASH:  -23
+macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  -24
+macro CLAIM_FAIL_PROOF:  -25
+macro CLAIM_FAIL_FALLTHRU: -26
 
 # a ticket can only be claimed once, and thus the Bitcoin tx should send enough
 # bitcoins so that all the ether can be claimed

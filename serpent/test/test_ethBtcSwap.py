@@ -33,13 +33,13 @@ class TestEthBtcSwap(object):
     RESERVE_FAIL_POW = -11
     RESERVE_FAIL_FALLTHRU = -12  # should not hit, otherwise probably add explicit error code
 
-    CLAIM_FAIL_INVALID_TICKET = 99990050
-    CLAIM_FAIL_UNRESERVED = 99990070
-    CLAIM_FAIL_CLAIMER = 99990100
-    CLAIM_FAIL_TX_HASH = 99990200
-    CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400
-    CLAIM_FAIL_PROOF =  99990800
-    CLAIM_FAIL_FALLTHRU = 99999999  # should not hit, otherwise probably add explicit error code
+    CLAIM_FAIL_INVALID_TICKET = -20
+    CLAIM_FAIL_UNRESERVED = -21
+    CLAIM_FAIL_CLAIMER = -22
+    CLAIM_FAIL_TX_HASH = -23
+    CLAIM_FAIL_INSUFFICIENT_SATOSHI = -24
+    CLAIM_FAIL_PROOF =  -25
+    CLAIM_FAIL_FALLTHRU = -26  # should not hit, otherwise probably add explicit error code
 
     def setup_class(cls):
         tester.gas_limit = int(2.8e6)  # 2.5e6 should be ok if testingOnly methods are commented out
