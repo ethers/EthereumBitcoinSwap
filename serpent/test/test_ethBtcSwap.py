@@ -22,7 +22,7 @@ logging.getLogger('eth.msg').setLevel('INFO')
 
 class TestEthBtcSwap(object):
 
-    CONTRACT_DEBUG = 'test/ethBtcSwap_debug.py'
+    CONTRACT_DEBUG = 'test/ethBtcSwap_debug.se'
 
     ETHER = 10 ** 18
 
@@ -71,7 +71,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -141,7 +141,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         # k2 creates ticket
@@ -240,7 +240,7 @@ class TestEthBtcSwap(object):
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
         # fail transactions
-        MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
+        MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
 
         # k2 creates ticket
@@ -276,7 +276,7 @@ class TestEthBtcSwap(object):
         eventArr.pop()
 
         # make transactions pass validation
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         balPreClaim = self.s.block.get_balance(addrClaimer)
@@ -397,7 +397,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
         assert self.contractBalance() == 0
 
@@ -486,7 +486,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 200000000000  # numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -561,7 +561,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538461  # floor of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -608,7 +608,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -650,7 +650,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -691,7 +691,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -730,7 +730,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -776,7 +776,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x587488c119f40666b4a0c807b0d7a1acfe3b6917
 
-        MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.py')
+        MOCK_VERIFY_TX_ZERO = self.s.abi_contract('./test/mockVerifyTxReturnsZero.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ZERO.address)
 
         ticketId = self.c.createTicket(btcAddr, numWei, weiPerSatoshi, value=numWei)
@@ -853,7 +853,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 38461538462  # ceiling of numWei / satoshiOutputOne
         ethAddr = 0x948c765a6914d43f2a7ac177da2c2f6b52de3d7c
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
 
         # let's claim a ticket with ID bigger than 1
@@ -1114,7 +1114,7 @@ class TestEthBtcSwap(object):
         weiPerSatoshi = 10000000000000
         ethAddrStr = 'cd2a3d9f938e13cd947ec05abc7fe734df8dd826'
 
-        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.py')
+        MOCK_VERIFY_TX_ONE = self.s.abi_contract('./test/mockVerifyTxReturnsOne.se')
         self.c.setTrustedBtcRelay(MOCK_VERIFY_TX_ONE.address)
         assert self.contractBalance() == 0
 
