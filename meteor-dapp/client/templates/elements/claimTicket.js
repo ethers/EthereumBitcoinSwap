@@ -4,10 +4,14 @@ var RESERVE_FAIL_UNRESERVABLE = -10;
 var RESERVE_FAIL_POW = -11;
 var RESERVE_FAIL_FALLTHRU = -12;
 
-var CLAIM_FAIL_CLAIMER = 99990100;
-var CLAIM_FAIL_TX_HASH = 99990200;
-var CLAIM_FAIL_INSUFFICIENT_SATOSHI = 99990400;
-var CLAIM_FAIL_FALLTHRU = 99999999;
+var CLAIM_FAIL_INVALID_TICKET = -20;
+var CLAIM_FAIL_UNRESERVED = -21;
+var CLAIM_FAIL_CLAIMER = -22;
+var CLAIM_FAIL_TX_HASH = -23;
+var CLAIM_FAIL_INSUFFICIENT_SATOSHI = -24;
+var CLAIM_FAIL_PROOF = -25;
+var CLAIM_FAIL_FALLTHRU = -26;
+
 
 var EMPTY_CLAIMER = '-';
 
@@ -533,6 +537,12 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
       case ticketId:
         swal('Ticket claimed', 'ticket id '+ticketId, 'success');
         break;
+      case CLAIM_FAIL_INVALID_TICKET:  // should not happen since UI prevents it
+        swal('Invalid Ticket ID', 'Ticket does not exist or already claimed', 'error');
+        break;
+      case CLAIM_FAIL_UNRESERVED:  // should not happen since UI prevents it
+        swal('Ticket is unreserved', 'Reserve the ticket and try again', 'error');
+        break;
       case CLAIM_FAIL_CLAIMER:  // should not happen since UI prevents it
         swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
         break;
@@ -542,8 +552,11 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
       case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
         swal('Bitcoin transaction did not send enough bitcoins', 'Need to send the ticket\'s total price', 'error');
         break;
-      case CLAIM_FAIL_FALLTHRU:  // should not happen since we use call-then-sendtx pattern
+      case CLAIM_FAIL_PROOF:  // should not happen since we use call-then-sendtx pattern
         swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
+        break;
+      case CLAIM_FAIL_FALLTHRU:  // should not happen otherwise consider adding explicit error code
+        swal('Something went wrong', 'Claim ticket failed', 'error');
         break;
       default:
         swal('Unexpected error', rval, 'error');
