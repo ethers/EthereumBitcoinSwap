@@ -601,9 +601,9 @@ function getTicketId(viewm) {
   return parseInt(viewm.ticketId(), 10);
 }
 
-// assumes currentUser is coinbase.  returns address with 0x prefix
+
 function currentUser() {
-  return web3.eth.accounts[0];
+  return web3.eth.defaultAccount;
 }
 
 function currentUserBalance() {
