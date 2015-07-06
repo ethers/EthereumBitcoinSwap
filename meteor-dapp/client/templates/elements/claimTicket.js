@@ -182,7 +182,7 @@ Template.claimTicket.viewmodel(
 
 function doLookup(viewm, reset) {
   if (reset) {
-    var ticketId = viewm.ticketId();
+    var ticketId = getTicketId(viewm);
     viewm.reset();
     viewm.ticketId(ticketId);
   }
@@ -196,7 +196,7 @@ function doLookup(viewm, reset) {
 
 
 function lookupTicket(viewm) {
-  var ticketId = parseInt(viewm.ticketId(), 10);
+  var ticketId = getTicketId(viewm);
 
   var ticketInfo = gContract.lookupTicket.call(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
@@ -367,7 +367,7 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
 
 
 function doReserveTicket(viewm) {
-  var ticketId = viewm.ticketId();
+  var ticketId = getTicketId(viewm);
   var txHash = '0x' + viewm.btcTxHash();
 
   ethReserveTicket(ticketId, txHash, viewm.powNonce());
@@ -445,7 +445,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
 function doClaimTicket(viewm) {
   console.log('@@@ in doClaimTicket')
 
-  var ticketId = viewm.ticketId();
+  var ticketId = getTicketId(viewm);
   var txHex = viewm.rawTx();
 
   var txHash = '0x' + viewm.claimTxHash();
@@ -596,6 +596,10 @@ function hashTx(rawTx) {
   return Crypto.util.bytesToHex(hashByte.reverse());
 }
 
+
+function getTicketId(viewm) {
+  return parseInt(viewm.ticketId(), 10);
+}
 
 // assumes currentUser is coinbase.  returns address with 0x prefix
 function currentUser() {
