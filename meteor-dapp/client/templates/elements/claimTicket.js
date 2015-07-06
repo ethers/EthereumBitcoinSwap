@@ -390,7 +390,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
   switch (rval) {
     case ticketId:
       console.log('@@@@ call GOOD so now sendTx...')
-      break;
+      break;  // the only result that does not return
     case RESERVE_FAIL_UNRESERVABLE:
       swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
       return;
@@ -405,7 +405,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
       return;
   }
 
-
+  // at this point, the eth_call succeeded
 
   var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
   rvalFilter.watch(function(err, res) {
@@ -421,7 +421,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
     }
     else {
-      swal('Should not have reached this', rval, 'error');
+      swal('Error ' + rval, 'reserve ticket failed', 'error');
     }
 
     rvalFilter.stopWatching();
@@ -500,24 +500,54 @@ function doClaimTicket(viewm) {
 function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
   console.log('@@@ ethClaimTicket args: ', arguments)
 
-  var callOnly;
-  callOnly = true;  // if commented, it will call sendTransaction
-
   var objParam = {gas: 3000000};
 
-  if (callOnly) {
-    console.log('@@@@ callOnly')
-    var startTime = Date.now();
+  var startTime = Date.now();
 
-    var res = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
+  var callResult = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
 
 
-    var endTime = Date.now();
-    var durationSec = (endTime - startTime) / 1000;
-    console.log('@@@@ verifyTx res: ', res, ' duration: ', durationSec)
-    swal(res.toString(10) + "    " + durationSec+ "secs");
-    return;
+  var endTime = Date.now();
+  var durationSec = (endTime - startTime) / 1000;
+  console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
+
+
+  var rval = callResult.toNumber();
+  switch (rval) {
+    case ticketId:
+      console.log('@@@@ call GOOD so now sendTx...')
+      break;  // the only result that does not return;
+    case CLAIM_FAIL_INVALID_TICKET:  // should not happen since UI prevents it
+      swal('Invalid Ticket ID', 'Ticket does not exist or already claimed', 'error');
+      return;
+    case CLAIM_FAIL_UNRESERVED:  // should not happen since UI prevents it
+      swal('Ticket is unreserved', 'Reserve the ticket and try again', 'error');
+      return;
+    case CLAIM_FAIL_CLAIMER:  // should not happen since UI prevents it
+      swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
+      return;
+    case CLAIM_FAIL_TX_HASH:  // should not happen since UI prevents it
+      swal('You need to use the transaction used in the reservation', '', 'error');
+      return;
+    case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
+      swal('Bitcoin transaction did not send enough bitcoins', 'Need to send the ticket\'s total price', 'error');
+      return;
+    case CLAIM_FAIL_PROOF:  // should not happen since we use call-then-sendtx pattern
+      swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
+      return;
+    case CLAIM_FAIL_FALLTHRU:  // should not happen otherwise consider adding explicit error code
+      swal('Something went wrong', 'Claim ticket failed', 'error');
+      return;
+    default:
+      swal('Unexpected error', rval, 'error');
+      return;
   }
+
+  // at this point, the eth_call succeeded
+
+
+  // TODO
+  return
 
   // dbgVerifyTx();
 
@@ -531,36 +561,11 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     console.log('@@@ rvalFilter res: ', res)
 
     var eventArgs = res.args;
-    var rval = eventArgs.rval.toNumber();
-    console.log('@@@ rvalFilter rval: ', rval)
-    switch (rval) {
-      case ticketId:
-        swal('Ticket claimed', 'ticket id '+ticketId, 'success');
-        break;
-      case CLAIM_FAIL_INVALID_TICKET:  // should not happen since UI prevents it
-        swal('Invalid Ticket ID', 'Ticket does not exist or already claimed', 'error');
-        break;
-      case CLAIM_FAIL_UNRESERVED:  // should not happen since UI prevents it
-        swal('Ticket is unreserved', 'Reserve the ticket and try again', 'error');
-        break;
-      case CLAIM_FAIL_CLAIMER:  // should not happen since UI prevents it
-        swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
-        break;
-      case CLAIM_FAIL_TX_HASH:  // should not happen since UI prevents it
-        swal('You need to use the transaction used in the reservation', '', 'error');
-        break;
-      case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
-        swal('Bitcoin transaction did not send enough bitcoins', 'Need to send the ticket\'s total price', 'error');
-        break;
-      case CLAIM_FAIL_PROOF:  // should not happen since we use call-then-sendtx pattern
-        swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
-        break;
-      case CLAIM_FAIL_FALLTHRU:  // should not happen otherwise consider adding explicit error code
-        swal('Something went wrong', 'Claim ticket failed', 'error');
-        break;
-      default:
-        swal('Unexpected error', rval, 'error');
-        break;
+    if (eventArgs.rval.toNumber() === ticketId) {
+      swal('Ticket claimed', 'ticket id '+ticketId, 'success');
+    }
+    else {
+      swal('Error ' + rval, 'claim ticket failed', 'error');
     }
 
     rvalFilter.stopWatching();
