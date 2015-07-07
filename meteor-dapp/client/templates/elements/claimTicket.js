@@ -2,7 +2,6 @@ var btcproof = require('btcproof');
 
 var RESERVE_FAIL_UNRESERVABLE = -10;
 var RESERVE_FAIL_POW = -11;
-var RESERVE_FAIL_FALLTHRU = -12;
 
 var CLAIM_FAIL_INVALID_TICKET = -20;
 var CLAIM_FAIL_UNRESERVED = -21;
@@ -10,8 +9,8 @@ var CLAIM_FAIL_CLAIMER = -22;
 var CLAIM_FAIL_TX_HASH = -23;
 var CLAIM_FAIL_INSUFFICIENT_SATOSHI = -24;
 var CLAIM_FAIL_PROOF = -25;
-var CLAIM_FAIL_FALLTHRU = -26;
-
+var CLAIM_FAIL_WRONG_BTC_ADDR = -26;
+var CLAIM_FAIL_TX_ENCODING = -27;
 
 var EMPTY_CLAIMER = '-';
 
@@ -397,9 +396,6 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
     case RESERVE_FAIL_POW:
       swal('Proof of Work is invalid', 'see Help', 'error');
       return;
-    case RESERVE_FAIL_FALLTHRU:
-      swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
-      return;
     default:
       swal('Unexpected error', rval, 'error');
       return;
@@ -517,26 +513,29 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
     case ticketId:
       console.log('@@@@ call GOOD so now sendTx...')
       break;  // the only result that does not return;
-    case CLAIM_FAIL_INVALID_TICKET:  // should not happen since UI prevents it
+    case CLAIM_FAIL_INVALID_TICKET:  // one way to get here is Claim, mine, then Claim without refreshing the UI
       swal('Invalid Ticket ID', 'Ticket does not exist or already claimed', 'error');
       return;
-    case CLAIM_FAIL_UNRESERVED:  // should not happen since UI prevents it
+    case CLAIM_FAIL_UNRESERVED:  // one way to get here is Reserve, let it expire, then Claim without refreshing the UI
       swal('Ticket is unreserved', 'Reserve the ticket and try again', 'error');
       return;
-    case CLAIM_FAIL_CLAIMER:  // should not happen since UI prevents it
+    case CLAIM_FAIL_CLAIMER:  // one way to get here is change web3.eth.defaultAccount
       swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
       return;
     case CLAIM_FAIL_TX_HASH:  // should not happen since UI prevents it
       swal('You need to use the transaction used in the reservation', '', 'error');
       return;
     case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
-      swal('Bitcoin transaction did not send enough bitcoins', 'Need to send the ticket\'s total price', 'error');
+      swal('Bitcoin transaction did not send enough bitcoins', 'Number of bitcoins must meet ticket\'s total price', 'error');
       return;
-    case CLAIM_FAIL_PROOF:  // should not happen since we use call-then-sendtx pattern
+    case CLAIM_FAIL_PROOF:
       swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
       return;
-    case CLAIM_FAIL_FALLTHRU:  // should not happen otherwise consider adding explicit error code
-      swal('Something went wrong', 'Claim ticket failed', 'error');
+    case CLAIM_FAIL_WRONG_BTC_ADDR:  // should not happen since UI prevents it
+      swal('Bitcoin transaction paid wrong BTC address', 'Bitcoins must be sent to the address specified by the ticket', 'error');
+      return;
+    case CLAIM_FAIL_TX_ENCODING:
+      swal('Bitcoin transaction incorrectly constructed', 'Use btcToEther tool to construct bitcoin transaction', 'error');
       return;
     default:
       swal('Unexpected error', rval, 'error');
