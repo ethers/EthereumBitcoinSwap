@@ -125,6 +125,9 @@ macro CLAIM_FAIL_TX_HASH:  -23
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  -24
 macro CLAIM_FAIL_PROOF:  -25
 macro CLAIM_FAIL_FALLTHRU: -26
+macro CLAIM_FAIL_WRONG_BTC_ADDR:  -27
+macro CLAIM_FAIL_TX_ENCODING:  -28
+
 
 # a ticket can only be claimed once, and thus the Bitcoin tx should send enough
 # bitcoins so that all the ether can be claimed
@@ -132,33 +135,34 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     claimExpiry = self.gTicket[ticketId]._claimExpiry
     if (claimExpiry == 0):  # claimExpiry 0 means ticket doesn't exist
         log(type=ticketEvent, ticketId, CLAIM_FAIL_INVALID_TICKET)
-        return(0)
+        return(CLAIM_FAIL_INVALID_TICKET)
 
     if (claimExpiry == FRESH_TICKET_EXPIRY || block.timestamp > claimExpiry):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_UNRESERVED)
-        return(0)
+        return(CLAIM_FAIL_UNRESERVED)
 
     if (block.timestamp <= claimExpiry - EXPIRY_TIME_SECS + ONLY_RESERVER_CLAIM_SECS && msg.sender != self.gTicket[ticketId]._claimer):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
-        return(0)
+        return(CLAIM_FAIL_CLAIMER)
 
     claimerAddr = msg.sender
 
     if (txHash != self.gTicket[ticketId]._claimTxHash):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_TX_HASH)
-        return(0)
+        return(CLAIM_FAIL_TX_HASH)
 
     outputData = self.getFirst2Outputs(txStr, outitems=4)
 
     if outputData == 0:
-        return(0)
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_TX_ENCODING)
+        return(CLAIM_FAIL_TX_ENCODING)
 
 
     numSatoshi = outputData[0]
     weiBuyable = numSatoshi * self.gTicket[ticketId]._weiPerSatoshi
     if weiBuyable < self.gTicket[ticketId]._numWei:
         log(type=ticketEvent, ticketId, CLAIM_FAIL_INSUFFICIENT_SATOSHI)
-        return(0)
+        return(CLAIM_FAIL_INSUFFICIENT_SATOSHI)
     weiBuyable = self.gTicket[ticketId]._numWei
 
     indexScriptOne = outputData[1]
@@ -169,7 +173,8 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     addrBtcWasSentTo = getEthAddr(indexScriptOne, txStr, 20, 6)
 
     if addrBtcWasSentTo != self.gTicket[ticketId]._btcAddr:
-        return(0)
+        log(type=ticketEvent, ticketId, CLAIM_FAIL_WRONG_BTC_ADDR)
+        return(CLAIM_FAIL_WRONG_BTC_ADDR)
 
 
     if self.trustedBtcRelay.verifyTx(txHash, txIndex, sibling, txBlockHash):
@@ -200,7 +205,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         return(CLAIM_FAIL_PROOF)
 
     log(type=ticketEvent, ticketId, CLAIM_FAIL_FALLTHRU)
-    return(0)
+    return(CLAIM_FAIL_FALLTHRU)
 
 
 macro TICKET_FIELDS: 7

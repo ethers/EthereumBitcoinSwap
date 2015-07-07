@@ -116,7 +116,7 @@ class TestEthBtcSwap(object):
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_INVALID_TICKET
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -162,7 +162,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_CLAIMER
         assert self.s.block.get_balance(addrClaimer) == balPreClaim
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -176,7 +176,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_CLAIMER
         assert self.s.block.get_balance(addrClaimer) == balPreClaim
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -213,7 +213,7 @@ class TestEthBtcSwap(object):
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_INVALID_TICKET
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -302,7 +302,7 @@ class TestEthBtcSwap(object):
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_INVALID_TICKET
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -460,7 +460,7 @@ class TestEthBtcSwap(object):
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_INVALID_TICKET
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -583,7 +583,7 @@ class TestEthBtcSwap(object):
         balPreClaim = self.s.block.get_balance(addrClaimer)
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_INSUFFICIENT_SATOSHI
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -625,7 +625,7 @@ class TestEthBtcSwap(object):
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
-        assert 0 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
+        assert self.CLAIM_FAIL_CLAIMER == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -666,7 +666,7 @@ class TestEthBtcSwap(object):
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
-        assert 0 == self.c.claimTicket(ticketId, txStr, txHash+1, txIndex, sibling, txBlockHash, sender=reserver)
+        assert self.CLAIM_FAIL_TX_HASH == self.c.claimTicket(ticketId, txStr, txHash+1, txIndex, sibling, txBlockHash, sender=reserver)
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -705,7 +705,7 @@ class TestEthBtcSwap(object):
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
 
-        assert 0 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
+        assert self.CLAIM_FAIL_UNRESERVED == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer)
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -751,7 +751,7 @@ class TestEthBtcSwap(object):
         self.s.block.log_listeners.append(lambda x: eventArr.append(self.c._translator.listen(x)))
 
         # ticket should be unclaimed since it needs to be reserved again
-        assert 0 == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash)
+        assert self.CLAIM_FAIL_UNRESERVED == self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash)
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
@@ -918,14 +918,14 @@ class TestEthBtcSwap(object):
         txIndex = 1
         sibling = []
         txBlockHash = 0xbeef2
-        assert self.c.claimTicket(-1, txStr, txHash, txIndex, sibling, txBlockHash) == 0
-        assert self.c.claimTicket(0, txStr, txHash, txIndex, sibling, txBlockHash) == 0
-        assert self.c.claimTicket(1, txStr, txHash, txIndex, sibling, txBlockHash) == 0
-        assert self.c.claimTicket(1000, txStr, txHash, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(-1, txStr, txHash, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
+        assert self.c.claimTicket(0, txStr, txHash, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
+        assert self.c.claimTicket(1, txStr, txHash, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
+        assert self.c.claimTicket(1000, txStr, txHash, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
 
-        assert self.c.claimTicket(0, txStr, 0, txIndex, sibling, txBlockHash) == 0
-        assert self.c.claimTicket(0, txStr, 1, txIndex, sibling, txBlockHash) == 0
-        assert self.c.claimTicket(1, txStr, 1, txIndex, sibling, txBlockHash) == 0
+        assert self.c.claimTicket(0, txStr, 0, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
+        assert self.c.claimTicket(0, txStr, 1, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
+        assert self.c.claimTicket(1, txStr, 1, txIndex, sibling, txBlockHash) == self.CLAIM_FAIL_INVALID_TICKET
 
 
     def testReserveInvalidTicket(self):
@@ -1180,7 +1180,7 @@ class TestEthBtcSwap(object):
         # re-claim is not allowed
         claimRes = self.c.claimTicket(ticketId, txStr, txHash, txIndex, sibling, txBlockHash, sender=claimer, profiling=True)
         # print('GAS claimTicket() ', claimRes['gas'])
-        assert claimRes['output'] == 0
+        assert claimRes['output'] == self.CLAIM_FAIL_INVALID_TICKET
 
         assert eventArr == [{'_event_type': 'ticketEvent',
             'ticketId': ticketId,
