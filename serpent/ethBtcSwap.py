@@ -84,7 +84,6 @@ def lookupTicket(ticketId):
 event ticketEvent(ticketId:indexed, rval)
 macro RESERVE_FAIL_UNRESERVABLE: -10
 macro RESERVE_FAIL_POW: -11
-macro RESERVE_FAIL_FALLTHRU: -12
 def reserveTicket(ticketId, txHash, nonce):
     if !m_ticketAvailable(ticketId):
         log(type=ticketEvent, ticketId, RESERVE_FAIL_UNRESERVABLE)
@@ -99,9 +98,6 @@ def reserveTicket(ticketId, txHash, nonce):
     else:
         log(type=ticketEvent, ticketId, RESERVE_FAIL_POW)
         return(RESERVE_FAIL_POW)
-
-    log(type=ticketEvent, ticketId, RESERVE_FAIL_FALLTHRU)
-    return(RESERVE_FAIL_FALLTHRU)
 
 
 macro POW_TARGET: 2**234
@@ -124,9 +120,8 @@ macro CLAIM_FAIL_CLAIMER:  -22
 macro CLAIM_FAIL_TX_HASH:  -23
 macro CLAIM_FAIL_INSUFFICIENT_SATOSHI:  -24
 macro CLAIM_FAIL_PROOF:  -25
-macro CLAIM_FAIL_FALLTHRU: -26
-macro CLAIM_FAIL_WRONG_BTC_ADDR:  -27
-macro CLAIM_FAIL_TX_ENCODING:  -28
+macro CLAIM_FAIL_WRONG_BTC_ADDR:  -26
+macro CLAIM_FAIL_TX_ENCODING:  -27
 
 
 # a ticket can only be claimed once, and thus the Bitcoin tx should send enough
@@ -203,9 +198,6 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
     else:
         log(type=ticketEvent, ticketId, CLAIM_FAIL_PROOF)
         return(CLAIM_FAIL_PROOF)
-
-    log(type=ticketEvent, ticketId, CLAIM_FAIL_FALLTHRU)
-    return(CLAIM_FAIL_FALLTHRU)
 
 
 macro TICKET_FIELDS: 7
