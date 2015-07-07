@@ -28,8 +28,7 @@ Template.claimTicket.viewmodel(
   //   return this.btcTxHash() || '';
   // },
 
-  // TODO use ZERO
-  bnWei: '',
+  bnWei: ZERO,
   bnWeiPerSatoshi: '',
   bnEther: function() {
     return toEther(this.bnWei());
