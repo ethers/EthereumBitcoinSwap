@@ -28,21 +28,22 @@ Template.claimTicket.viewmodel(
   //   return this.btcTxHash() || '';
   // },
 
-  bnWei: ZERO,
-  bnWeiPerSatoshi: '',
+  numWei: '',
+  weiPerSatoshi: '',
   bnEther: function() {
-    return toEther(this.bnWei());
+    var numWei = this.numWei();
+    return numWei ? toEther(new BigNumber(numWei)) : ZERO;
   },
 
   numEther: function() {
     return formatEtherAmount(this.bnEther());
   },
   totalPrice: function() {
-    var bnWeiPerSatoshi = this.bnWeiPerSatoshi();
-    if (bnWeiPerSatoshi) {
+    var weiPerSatoshi = this.weiPerSatoshi();
+    if (weiPerSatoshi) {
       var bnEther = this.bnEther();
       if (bnEther) {
-        var bnUnitPrice = toUnitPrice(bnWeiPerSatoshi);
+        var bnUnitPrice = toUnitPrice(new BigNumber(weiPerSatoshi));
         var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
         return formatTotalPrice(bnTotalPrice);
       }
@@ -78,22 +79,22 @@ Template.claimTicket.viewmodel(
   paymentAddr: '',
   etherAddr: '',
 
-  bnEncodedFee: '',
+  encodedFeeStr: '',
 
   encodedFee: function() {
-    var bnEncodedFee = this.bnEncodedFee();
-    if (bnEncodedFee) {
-      return bnEncodedFee.div(100).toString(10) + '%';
+    var encodedFeeStr = this.encodedFeeStr();
+    if (encodedFeeStr) {
+      return new BigNumber(encodedFeeStr).div(100).toString(10) + '%';
     }
     return '';
   },
 
   computedFee: function() {
-    var bnEncodedFee = this.bnEncodedFee();
-    if (bnEncodedFee) {
-      var bnWei = this.bnWei();
-      if (bnWei) {
-        var bnComputedFee = bnEncodedFee.mul(bnWei).div(10000);
+    var encodedFeeStr = this.encodedFeeStr();
+    if (encodedFeeStr) {
+      var numWei = this.numWei();
+      if (numWei) {
+        var bnComputedFee = new BigNumber(encodedFeeStr).mul(new BigNumber(numWei)).div(10000);
         return formatWeiToEther(bnComputedFee);
       }
     }
@@ -129,9 +130,9 @@ Template.claimTicket.viewmodel(
   txSatisfiesTicket: function() {
     var ticketId = this.ticketId();
     if (ticketId) {
-      var bnWei = this.bnWei();
-      if (bnWei) {
-        return bnWei.gt(0)
+      var numWei = this.numWei();
+      if (numWei) {
+        return new BigNumber(numWei).gt(0)
           && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
           && this.btcAddr() === this.paymentAddr();
       }
@@ -219,8 +220,8 @@ function lookupTicket(viewm) {
     viewm.claimTxHash(toHash(bnClaimTxHash));
   }
 
-  viewm.bnWei(bnWei);
-  viewm.bnWeiPerSatoshi(bnWeiPerSatoshi);
+  viewm.numWei(bnWei.toString());
+  viewm.weiPerSatoshi(bnWeiPerSatoshi.toString());
   viewm.btcAddr(btcAddr);
 }
 
@@ -310,7 +311,7 @@ function setBtcTxDetails(viewm, txResponse) {
   viewm.etherAddr(etherAddr);
 
   var encodedFee = data.tx.vout[1].value;
-  viewm.bnEncodedFee(SATOSHI_PER_BTC.mul(encodedFee).mod(10000));
+  viewm.encodedFeeStr(SATOSHI_PER_BTC.mul(new BigNumber(encodedFee)).mod(10000).toString());
 }
 
 
@@ -390,7 +391,7 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
       console.log('@@@@ call GOOD so now sendTx...')
       break;  // the only result that does not return
     case RESERVE_FAIL_UNRESERVABLE:
-      swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
+      swal('Ticket already reserved', 'Or ticket does not exist', 'error');
       return;
     case RESERVE_FAIL_POW:
       swal('Proof of Work is invalid', 'see Help', 'error');
