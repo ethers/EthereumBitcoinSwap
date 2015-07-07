@@ -40,5 +40,12 @@ console.log('@@@@ gContract: ', gContract)
 
 
 $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
+  $('#ticketSection a').click(function (e) {
+    e.preventDefault()
+    $(this).tab('show')
+  });
+
+  $('#appTab a:first').tab('show');
+
+  $('[data-toggle="tooltip"]').tooltip();
 })
