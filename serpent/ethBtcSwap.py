@@ -19,10 +19,10 @@ data trustedBtcRelay
 
 
 macro ONE_HOUR_IN_SECS: 60*60
-macro EXPIRY_TIME_SECS: 4 * ONE_HOUR_IN_SECS
+macro ONLY_RESERVER_CLAIM_SECS: 2 * ONE_HOUR_IN_SECS
+macro ANYONE_CLAIM_SECS: 2 * ONE_HOUR_IN_SECS
+macro TOTAL_RESERVED_SECS: ONLY_RESERVER_CLAIM_SECS + ANYONE_CLAIM_SECS
 
-# period when a ticket can only be claimed by the reserver (afterwards anyone can claim)
-macro ONLY_RESERVER_CLAIM_SECS: 1 * ONE_HOUR_IN_SECS  # TODO change this and expiry constant above
 
 macro FRESH_TICKET_EXPIRY: 1
 
@@ -91,7 +91,7 @@ def reserveTicket(ticketId, txHash, nonce):
 
     if m_isValidPow(txHash, ticketId, nonce):  # ensure args are in correct order: txHash then ticketId
         self.gTicket[ticketId]._claimer = msg.sender
-        self.gTicket[ticketId]._claimExpiry = block.timestamp + EXPIRY_TIME_SECS
+        self.gTicket[ticketId]._claimExpiry = block.timestamp + TOTAL_RESERVED_SECS
         self.gTicket[ticketId]._claimTxHash = txHash
         log(type=ticketEvent, ticketId, ticketId)
         return(ticketId)
@@ -136,7 +136,7 @@ def claimTicket(ticketId, txStr:str, txHash, txIndex, sibling:arr, txBlockHash):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_UNRESERVED)
         return(CLAIM_FAIL_UNRESERVED)
 
-    if (block.timestamp <= claimExpiry - EXPIRY_TIME_SECS + ONLY_RESERVER_CLAIM_SECS && msg.sender != self.gTicket[ticketId]._claimer):
+    if (block.timestamp <= claimExpiry - ANYONE_CLAIM_SECS && msg.sender != self.gTicket[ticketId]._claimer):
         log(type=ticketEvent, ticketId, CLAIM_FAIL_CLAIMER)
         return(CLAIM_FAIL_CLAIMER)
 
