@@ -51,47 +51,48 @@ Template.offerEther.events({
 
 
 function submitOffer(addrHex, numWei, weiPerSatoshi) {
-  var callOnly;
-  // callOnly = true;  // if commented, it will do sendTransaction
-  //
-  // TODO confirmation to deposit ether, from account, gasprice
+  // TODO user confirmation about gasprice
   var objParam = {value: numWei, gas: 500000};
 
-  if (callOnly) {
-    console.log('@@@@ callOnly')
-    var startTime = Date.now();
+  var startTime = Date.now();
 
+  var callResult = gContract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
 
-    var res = gContract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
+  var endTime = Date.now();
+  var durationSec = (endTime - startTime) / 1000;
+  console.log('@@@@ call res: ', callResult, ' duration: ', durationSec)
+  swal(callResult.toString(10) + "    " + durationSec+ "secs");
 
-
-    var endTime = Date.now();
-    var durationSec = (endTime - startTime) / 1000;
-    console.log('@@@@ call res: ', res, ' duration: ', durationSec)
-    swal(res.toString(10) + "    " + durationSec+ "secs");
+  var rval = callResult.toNumber();
+  if (rval <= 0) {
+    swal('Offer could not be created', rval, 'error');
     return;
   }
 
+  // at this point, the eth_call succeeded
 
-  var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: web3.eth.blockNumber, toBlock: 'latest'});
+  var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: 'latest', toBlock: 'latest'});
   rvalFilter.watch(function(err, res) {
-    if (err) {
-      console.log('@@@ rvalFilter err: ', err)
-      return;
-    }
+    try {
+      if (err) {
+        console.log('@@@ rvalFilter err: ', err)
+        return;
+      }
 
-    console.log('@@@ rvalFilter res: ', res)
+      console.log('@@@ rvalFilter res: ', res)
 
-    var eventArgs = res.args;
-    var ticketId = eventArgs.rval.toNumber();
-    if (ticketId > 0) {
-      swal('Ticket created', 'ticket id '+ticketId, 'success');
+      var eventArgs = res.args;
+      var ticketId = eventArgs.rval.toNumber();
+      if (ticketId > 0) {
+        swal('Offer created', 'ticket id '+ticketId, 'success');
+      }
+      else {
+        swal('Offer could not be created', ticketId, 'error');
+      }
     }
-    else {
-      swal('Failed', 'You need to send the ethers to the Ticket contract', 'error');
+    finally {
+      rvalFilter.stopWatching();
     }
-
-    rvalFilter.stopWatching();
   });
 
   // var startTime = Date.now();
