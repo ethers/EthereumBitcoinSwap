@@ -17,37 +17,32 @@ Template.offerEther.viewmodel(
     var bnBtcPrice = new BigNumber(this.btcPrice());
 
     return bnBtcPrice.div(bnEther).round(8).toString(10);
+  },
+
+  submitClicked: function() {
+    doSubmitOffer(this);
   }
 });
 
 
-Template.offerEther.events({
-  'submit form': function(event) {
-    event.preventDefault();
+function doSubmitOffer(viewm) {
+  var btcPrice = viewm.btcPrice();
 
-    console.log('@@@ in submit offerEther event: ', event)
-
-    var vmOfferEther = Template.instance().viewmodel;  //ViewModel.byId('vmOfferEther');
-    var btcPrice = vmOfferEther.btcPrice();
-
-    // these are passed to contract
-    var addrHex;
-    try {
-      addrHex = '0x' + decodeBase58Check(vmOfferEther.btcAddr());
-    }
-    catch (err) {
-      swal('Bad Bitcoin address', err.message, 'error');
-      return;
-    }
-    var numWei = web3.toWei(vmOfferEther.numEther(), 'ether');
-    var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
-    console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi);
-
-    submitOffer(addrHex, numWei, weiPerSatoshi);
+  // these are passed to contract
+  var addrHex;
+  try {
+    addrHex = '0x' + decodeBase58Check(viewm.btcAddr());
   }
-});
+  catch (err) {
+    swal('Bad Bitcoin address', err.message, 'error');
+    return;
+  }
+  var numWei = web3.toWei(viewm.numEther(), 'ether');
+  var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
+  console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi);
 
-
+  submitOffer(addrHex, numWei, weiPerSatoshi);
+}
 
 
 function submitOffer(addrHex, numWei, weiPerSatoshi) {
