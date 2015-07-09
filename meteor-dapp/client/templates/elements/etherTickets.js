@@ -16,8 +16,8 @@ Template.etherTickets.helpers({
       for (var i=0; i < len; i+= TICKET_FIELDS) {
         TicketColl.insert({
           ticketId: ticketArr[i + 0].toNumber(),
-          bnBtcAddr: ticketArr[i + 1].toString(10),
-          bnWei: ticketArr[i + 2].toNumber(),
+          bnstrBtcAddr: ticketArr[i + 1].toString(10),
+          numWei: ticketArr[i + 2].toNumber(),
           numWeiPerSatoshi: ticketArr[i + 3].negated().toNumber(),  // negated so that sort is ascending
           bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
           numClaimExpiry: ticketArr[i + 4].toNumber(),
@@ -34,10 +34,10 @@ Template.etherTickets.helpers({
         showFilter: false,
         fields: [
           { key: 'ticketId', label: 'ID' },
-          { key: 'bnWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
+          { key: 'numWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
           { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'ascending', fn: displayUnitPrice },
-          { key: 'bnWei', label: 'Total Price BTC', fn: displayTotalPrice },
-          { key: 'bnBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
+          { key: 'numWei', label: 'Total Price BTC', fn: displayTotalPrice },
+          { key: 'bnstrBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
           { key: 'numClaimExpiry', label: 'Reservable', sortByValue: true, fn: displayTicketStatus },
           { key: 'numClaimExpiry', label: '', sortByValue: true, fn: displayTicketAction }
         ]
@@ -57,9 +57,9 @@ function displayUnitPrice(ignore, object) {
 }
 
 // object is the data object per reactive-table
-function displayTotalPrice(bnWei, object) {
+function displayTotalPrice(numWei, object) {
   var bnTotalPrice = toTotalPrice(
-    toEther(new BigNumber(bnWei)),
+    toEther(new BigNumber(numWei)),
     toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi)));
   return formatTotalPrice(bnTotalPrice);
 }
