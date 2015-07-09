@@ -1,3 +1,8 @@
+July 9
+
+Able to deploy contracts using pyepm fork/receipt branch commit 24a85bc
+
+
 July 3
 
 When updating contract, update the abi JS
