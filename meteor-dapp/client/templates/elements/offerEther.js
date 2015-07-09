@@ -66,10 +66,27 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
 
   // at this point, the eth_call succeeded
 
+  gContract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
+    if (err) {
+      swal('Offer could not be created', err, 'error');
+      return;
+    }
+
+    watchCreateTicket();
+
+    uiTxProgress();
+
+    // result is a txhash
+    console.log('@@@ createTicket result: ', result)
+  });
+}
+
+function watchCreateTicket() {
   var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: 'latest', toBlock: 'latest'});
   rvalFilter.watch(function(err, res) {
     try {
       if (err) {
+        swal(err, 'watchCreateTicket', 'error');
         console.log('@@@ rvalFilter err: ', err)
         return;
       }
@@ -86,22 +103,9 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
       }
     }
     finally {
+      console.log('@@@ filter stopWatching...')
       rvalFilter.stopWatching();
     }
-  });
-
-  // var startTime = Date.now();
-  //
-  gContract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
-    if (err) {
-      swal('Error', err, 'error');
-      return;
-    }
-
-    swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
-
-    // result is a txhash
-    console.log('@@@ createTicket result: ', result)
   });
 }
 

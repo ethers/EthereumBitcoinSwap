@@ -585,10 +585,6 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 }
 
 
-function uiTxProgress() {
-  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
-}
-
 function hashTx(rawTx) {
   var txByte = Crypto.util.hexToBytes(rawTx);
   var hashByte = Crypto.SHA256(Crypto.SHA256(txByte, {asBytes: true}), {asBytes: true});

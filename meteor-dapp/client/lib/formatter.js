@@ -113,6 +113,12 @@ formatBtcAddr = function(bn) {
 
 
 
+uiTxProgress = function() {
+  swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
+}
+
+
+
 var timeTick = new Tracker.Dependency();
 Meteor.setInterval(function () {
   timeTick.changed();
