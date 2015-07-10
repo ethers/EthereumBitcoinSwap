@@ -104,7 +104,7 @@ function watchCreateTicket(addrHex, numWei, weiPerSatoshi) {
           numWei: new BigNumber(numWei).toNumber(),
           numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
           bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
-          numClaimExpiry: moment().add(4, 'hours').unix()
+          numClaimExpiry: 1
         });
 
         swal('Offer created', 'ticket id '+ticketId, 'success');
