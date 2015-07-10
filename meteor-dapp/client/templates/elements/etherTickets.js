@@ -1,5 +1,5 @@
 var TICKET_FIELDS = 7;
-var TicketColl = new Mongo.Collection(null);
+TicketColl = new Mongo.Collection(null);
 
 Template.etherTickets.helpers({
     ticketCollection: function() {

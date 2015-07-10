@@ -72,7 +72,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
       return;
     }
 
-    watchCreateTicket();
+    watchCreateTicket(addrHex, numWei, weiPerSatoshi);
 
     uiTxProgress();
 
@@ -81,7 +81,7 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
   });
 }
 
-function watchCreateTicket() {
+function watchCreateTicket(addrHex, numWei, weiPerSatoshi) {
   var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: 'latest', toBlock: 'latest'});
   rvalFilter.watch(function(err, res) {
     try {
@@ -96,6 +96,17 @@ function watchCreateTicket() {
       var eventArgs = res.args;
       var ticketId = eventArgs.rval.toNumber();
       if (ticketId > 0) {
+
+        // this is approximate for UI update
+        TicketColl.insert({
+          ticketId: ticketId,
+          bnstrBtcAddr: addrHex,
+          numWei: new BigNumber(numWei).toNumber(),
+          numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
+          bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
+          numClaimExpiry: moment().add(4, 'hours').unix()
+        });
+
         swal('Offer created', 'ticket id '+ticketId, 'success');
       }
       else {
