@@ -369,10 +369,12 @@ function doReserveTicket(viewm) {
   var ticketId = getTicketId(viewm);
   var txHash = '0x' + viewm.btcTxHash();
 
-  ethReserveTicket(ticketId, txHash, viewm.powNonce());
+  ethReserveTicket(ticketId, txHash, viewm);
 }
 
-function ethReserveTicket(ticketId, txHash, powNonce) {
+function ethReserveTicket(ticketId, txHash, viewm) {
+  var powNonce = viewm.powNonce();
+
   // TODO confirmation of gasprice ?
   var objParam = {gas: 500000};
 
@@ -414,7 +416,14 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
 
     var eventArgs = res.args;
     if (eventArgs.rval.toNumber() === ticketId) {
+
       swal('Ticket reserved', 'ticket id '+ticketId, 'success');
+
+      // update UI
+      viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
+      viewm.claimTxHash(txHash.substr(2));
+      viewm.claimExpiry(moment().add(4, 'hours').unix());
+      doLookup(viewm);
     }
     else {
       swal('Error ' + rval, 'reserve ticket failed', 'error');
