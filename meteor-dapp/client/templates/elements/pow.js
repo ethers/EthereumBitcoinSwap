@@ -10,6 +10,20 @@ Template.pow.viewmodel({
 
 
   findPoWClicked: function() {
+    if (window.Worker) {
+      var powWorker = new Worker('powWorker.js');
+
+      powWorker.onmessage = function(event) {
+        console.log('@@@ worker event: ', event)
+
+        powWorker.terminate();
+
+        this.nonce(event.data);
+      }.bind(this);
+
+      return;
+    }
+
     var powNonce = computePow(this.btcTxHash(), this.ticketId());
 
     this.nonce(powNonce);
