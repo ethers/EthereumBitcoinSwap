@@ -57,7 +57,56 @@ var EthereumBitcoinSwapClient = function() {
       numWei,
       weiPerSatoshi,
       objParam,
-      callback);
+      (function(err, result) {
+        if (err) {
+          callback(err);
+          console.log('@@@ createTicket sendtx err: ', err)
+          return;
+        }
+
+        this.watchCreateTicket(addrHex, numWei, weiPerSatoshi, callback);
+      }).bind(this)
+    );
+  },
+
+  this.watchCreateTicket = function(addrHex, numWei, weiPerSatoshi, callback) {
+    var rvalFilter = this.ethBtcSwapContract.ticketEvent({ ticketId: 0 }, { fromBlock: 'latest', toBlock: 'latest'});
+    rvalFilter.watch(function(err, res) {
+      try {
+        if (err) {
+          callback(err);
+          console.log('@@@ rvalFilter err: ', err)
+          return;
+        }
+
+        console.log('@@@ rvalFilter res: ', res)
+
+        var eventArgs = res.args;
+        var ticketId = eventArgs.rval.toNumber();
+        if (ticketId > 0) {
+
+          // this is approximate for UI update
+          // TicketColl.insert({
+          //   ticketId: ticketId,
+          //   bnstrBtcAddr: addrHex,
+          //   numWei: new BigNumber(numWei).toNumber(),
+          //   numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
+          //   bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
+          //   numClaimExpiry: 1
+          // });
+
+          // swal('Offer created', 'ticket id '+ticketId, 'success');
+          callback(null, 'Offer created ' + ticketId);
+        }
+        else {
+          callback('Offer could not be created');
+        }
+      }
+      finally {
+        console.log('@@@ filter stopWatching...')
+        rvalFilter.stopWatching();
+      }
+    });
   },
 
   this.claimTicket = function(ticketId, txHex, txHash, txIndex, merkleSibling,
