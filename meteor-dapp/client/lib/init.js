@@ -7,7 +7,7 @@ SATOSHI_PER_BTC = new BigNumber(10).pow(8);
 WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 
-useBtcTestnet = true;
+// useBtcTestnet = true;  currently in ethereumClient.js since it is earlier alphabetically than init.js
 if (useBtcTestnet) {
   gVersionAddr = 111;
 }

@@ -1,4 +1,6 @@
 
+useBtcTestnet = true;
+
 var EthereumBitcoinSwapClient = function() {
   try {
     web3.setProvider(new web3.providers.HttpProvider('http://localhost:8999'));
@@ -23,7 +25,7 @@ var EthereumBitcoinSwapClient = function() {
 
     // TODO don't forget to update the ABI
     this.ethBtcSwapContract = web3.eth.contract(externalEthBtcSwapAbi).at(contractAddr);
-    console.log('@@@@ ethBtcSwapContract: ', ethBtcSwapContract)
+    console.log('@@@@ ethBtcSwapContract: ', this.ethBtcSwapContract)
 
   }
   catch (err) {
@@ -110,6 +112,7 @@ var EthereumBitcoinSwapClient = function() {
 
 
     // TODO
+    callback(null, 'claimTicket eth_call succeeded')
     return
 
     // dbgVerifyTx();

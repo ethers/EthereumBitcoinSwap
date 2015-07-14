@@ -555,7 +555,7 @@ function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlock
 
 
   // TODO
-  return
+  // return
 
   // dbgVerifyTx();
 
