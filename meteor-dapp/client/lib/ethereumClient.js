@@ -34,6 +34,8 @@ var EthereumBitcoinSwapClient = function() {
   this.createTicket = function(addrHex, numWei, weiPerSatoshi, callback) {
     var objParam = {value: numWei, gas: 500000};
 
+    var startTime = Date.now();
+
     var callResult = this.ethBtcSwapContract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
 
     var endTime = Date.now();
@@ -58,7 +60,66 @@ var EthereumBitcoinSwapClient = function() {
 
 
 
-  
+  this.reserveTicket = function(ticketId, txHash, powNonce, callback) {
+    var objParam = {gas: 500000};
+
+    var startTime = Date.now();
+
+    var callResult = this.ethBtcSwapContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
+
+    var endTime = Date.now();
+    var durationSec = (endTime - startTime) / 1000;
+    console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
+
+
+    var rval = callResult.toNumber();
+    switch (rval) {
+      case ticketId:
+        console.log('@@@@ call GOOD so now sendTx...')
+        break;  // the only result that does not return
+      case RESERVE_FAIL_UNRESERVABLE:
+        callback('Ticket already reserved');
+        return;
+      case RESERVE_FAIL_POW:
+        callback('Proof of Work is invalid');
+        return;
+      default:
+        console.log('Unexpected error rval: ', rval)
+        callback('Unexpected error' + rval);
+        return;
+    }
+
+    // at this point, the eth_call succeeded
+
+    var rvalFilter = this.ethBtcSwapContract.ticketEvent({ ticketId: ticketId });
+    rvalFilter.watch(function(err, res) {
+      // TODO try-finally
+      //
+      if (err) {
+        console.log('@@@ rvalFilter err: ', err)
+        return;
+      }
+
+      console.log('@@@ rvalFilter res: ', res)
+
+      var eventArgs = res.args;
+      if (eventArgs.rval.toNumber() === ticketId) {
+
+        callback(null, 'Ticket reserved ' + ticketId);
+      }
+      else {
+        callback('Reserve ticket error: ' + rval);
+      }
+
+      rvalFilter.stopWatching();
+    });
+
+    this.ethBtcSwapContract.reserveTicket.sendTransaction(ticketId,
+      txHash,
+      powNonce,
+      objParam,
+      callback);
+  },
 
 
 }
