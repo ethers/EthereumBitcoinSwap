@@ -1,5 +1,5 @@
 Template.ticketContractInfo.viewmodel({
-  address: gTicketContractAddr,
+  address: EthBtcSwapClient.ticketContractAddr,
 
   balanceChanged: true,
 
