@@ -3,14 +3,7 @@ TicketColl = new Mongo.Collection(null);
 
 Template.etherTickets.helpers({
     ticketCollection: function() {
-      // console.log('@@@@@@@@@@@@ start & end tid: ', this.startTicketId(), this.endTicketId())
-
-      // TODO confirmation to deposit ether, from account, gasprice
-      var objParam = {gas: 3000000};
-
-      // var ticketArr = gContract.getOpenTickets.call(this.startTicketId(), this.endTicketId(), objParam);
-
-      var ticketArr = gContract.getOpenTickets.call(1, 1000, objParam);
+      var ticketArr = EthBtcSwapClient.getOpenTickets(1, 1000);
 
       var len = ticketArr.length;
       for (var i=0; i < len; i+= TICKET_FIELDS) {

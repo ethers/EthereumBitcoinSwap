@@ -212,6 +212,11 @@ var EthereumBitcoinSwapClient = function() {
       powNonce,
       objParam,
       callback);
+  },
+
+  this.getOpenTickets = function(start, end) {
+    var objParam = {gas: 3000000};
+    return this.ethBtcSwapContract.getOpenTickets.call(start, end, objParam);
   }
 
 
