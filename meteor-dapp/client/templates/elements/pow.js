@@ -10,19 +10,26 @@ Template.pow.viewmodel({
 
 
   findPoWClicked: function() {
-    if (window.Worker) {
-      var powWorker = new Worker('powWorker.js');
-
-      powWorker.onmessage = function(event) {
-        console.log('@@@ worker event: ', event)
-
-        powWorker.terminate();
-
-        this.nonce(event.data);
-      }.bind(this);
-
-      return;
-    }
+    // put webworker issue #49 on hold.  changest to powWorker.js aren't seen
+    // during Meteor's hot reload.
+    // these references may help, when getting back to this work:
+    // http://stackoverflow.com/questions/28573129/meteor-loaded-worker-wont-update-on-client-after-file-change
+    // http://stackoverflow.com/questions/15959501/how-to-add-cors-headers-to-a-meteor-app?lq=1
+    // if (window.Worker) {
+    //   var powWorker = new Worker('powWorker.js');
+    //
+    //   powWorker.postMessage([this.btcTxHash(), this.ticketId()]);
+    //
+    //   powWorker.onmessage = function(event) {
+    //     console.log('@@@ worker event: ', event)
+    //
+    //     powWorker.terminate();
+    //
+    //     this.nonce(event.data);
+    //   }.bind(this);
+    //
+    //   return;
+    // }
 
     var powNonce = computePow(this.btcTxHash(), this.ticketId());
 
