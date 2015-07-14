@@ -7,6 +7,15 @@ SATOSHI_PER_BTC = new BigNumber(10).pow(8);
 WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 
+useBtcTestnet = true;
+if (useBtcTestnet) {
+  gVersionAddr = 111;
+}
+else {
+  gVersionAddr = 0;
+}
+
+
 $(function () {
   $('#ticketSection a').click(function (e) {
     e.preventDefault()
