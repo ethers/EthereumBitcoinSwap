@@ -58,6 +58,95 @@ var EthereumBitcoinSwapClient = function() {
       callback);
   },
 
+  this.claimTicket = function(ticketId, txHex, txHash, txIndex, merkleSibling,
+    txBlockHash, callback) {
+    var objParam = {gas: 3000000};
+
+    var startTime = Date.now();
+
+    var callResult = this.ethBtcSwapContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
+
+
+    var endTime = Date.now();
+    var durationSec = (endTime - startTime) / 1000;
+    console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
+
+
+    var rval = callResult.toNumber();
+    switch (rval) {
+      case ticketId:
+        console.log('@@@@ call GOOD so now sendTx...')
+        break;  // the only result that does not return;
+      case CLAIM_FAIL_INVALID_TICKET:  // one way to get here is Claim, mine, then Claim without refreshing the UI
+        callback('Invalid Ticket ID' + ' Ticket does not exist or already claimed');
+        return;
+      case CLAIM_FAIL_UNRESERVED:  // one way to get here is Reserve, let it expire, then Claim without refreshing the UI
+        callback('Ticket is unreserved' + ' Reserve the ticket and try again');
+        return;
+      case CLAIM_FAIL_CLAIMER:  // one way to get here is change web3.eth.defaultAccount
+        callback('Someone else has reserved the ticket' + ' You can only claim tickets that you have reserved');
+        return;
+      case CLAIM_FAIL_TX_HASH:  // should not happen since UI prevents it
+        callback('You need to use the transaction used in the reservation', '');
+        return;
+      case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
+        callback('Bitcoin transaction did not send enough bitcoins' + ' Number of bitcoins must meet ticket\'s total price');
+        return;
+      case CLAIM_FAIL_PROOF:
+        callback('Bitcoin transaction needs at least 6 confirmations' + ' Wait and try again');
+        return;
+      case CLAIM_FAIL_WRONG_BTC_ADDR:  // should not happen since UI prevents it
+        callback('Bitcoin transaction paid wrong BTC address' + ' Bitcoins must be sent to the address specified by the ticket');
+        return;
+      case CLAIM_FAIL_TX_ENCODING:
+        callback('Bitcoin transaction incorrectly constructed' + ' Use btcToEther tool to construct bitcoin transaction');
+        return;
+      default:
+        callback('Unexpected error ' + rval);
+        return;
+    }
+
+    // at this point, the eth_call succeeded
+
+
+    // TODO
+    return
+
+    // dbgVerifyTx();
+
+    var rvalFilter = this.ethBtcSwapContract.ticketEvent({ ticketId: ticketId });
+    rvalFilter.watch(function(err, res) {
+      // TODO try-finally
+      //
+      if (err) {
+        console.log('@@@ rvalFilter err: ', err)
+        callback(err);
+        return;
+      }
+
+      console.log('@@@ rvalFilter res: ', res)
+
+      var eventArgs = res.args;
+      if (eventArgs.rval.toNumber() === ticketId) {
+        callback(null, 'Ticket claimed ' + ticketId);
+      }
+      else {
+        callback('Claim ticket error: ' + rval);
+      }
+
+      rvalFilter.stopWatching();
+    });
+
+    this.ethBtcSwapContract.claimTicket.sendTransaction(ticketId,
+      txHex,
+      txHash,
+      txIndex,
+      merkleSibling,
+      txBlockHash,
+      objParam,
+      callback);
+  },
+
 
 
   this.reserveTicket = function(ticketId, txHash, powNonce, callback) {
@@ -97,6 +186,7 @@ var EthereumBitcoinSwapClient = function() {
       //
       if (err) {
         console.log('@@@ rvalFilter err: ', err)
+        callback(err);
         return;
       }
 
@@ -119,7 +209,7 @@ var EthereumBitcoinSwapClient = function() {
       powNonce,
       objParam,
       callback);
-  },
+  }
 
 
 }
