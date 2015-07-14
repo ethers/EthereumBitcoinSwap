@@ -41,6 +41,8 @@ function doSubmitOffer(viewm) {
   var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
   console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi);
 
+  uiTxProgress();
+
   submitOffer(addrHex, numWei, weiPerSatoshi);
 }
 
@@ -52,54 +54,10 @@ function submitOffer(addrHex, numWei, weiPerSatoshi) {
       return;
     }
 
-    // watchCreateTicket(addrHex, numWei, weiPerSatoshi);
-    //
-    // uiTxProgress();
-
     console.log('@@@ createTicket result: ', result)
     swal(result, '', 'success');
   });
 }
-
-// function watchCreateTicket(addrHex, numWei, weiPerSatoshi) {
-//   var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: 'latest', toBlock: 'latest'});
-//   rvalFilter.watch(function(err, res) {
-//     try {
-//       if (err) {
-//         swal(err, 'watchCreateTicket', 'error');
-//         console.log('@@@ rvalFilter err: ', err)
-//         return;
-//       }
-//
-//       console.log('@@@ rvalFilter res: ', res)
-//
-//       var eventArgs = res.args;
-//       var ticketId = eventArgs.rval.toNumber();
-//       if (ticketId > 0) {
-//
-//         // this is approximate for UI update
-//         TicketColl.insert({
-//           ticketId: ticketId,
-//           bnstrBtcAddr: addrHex,
-//           numWei: new BigNumber(numWei).toNumber(),
-//           numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
-//           bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
-//           numClaimExpiry: 1
-//         });
-//
-//         swal('Offer created', 'ticket id '+ticketId, 'success');
-//       }
-//       else {
-//         swal('Offer could not be created', ticketId, 'error');
-//       }
-//     }
-//     finally {
-//       console.log('@@@ filter stopWatching...')
-//       rvalFilter.stopWatching();
-//     }
-//   });
-// }
-
 
 function decodeBase58Check(btcAddr) {
   var versionAndHash = Bitcoin.Address.decodeString(btcAddr);
