@@ -242,9 +242,9 @@ var EthereumBitcoinSwapClient = function() {
         return;
     }
 
+    // callback(null, 'reserveTicket eth_call succeeded'); return // for testing only
+
     // at this point, the eth_call succeeded
-    callback(null, 'reserveTicket eth_call succeeded')
-    return
 
     var rvalFilter = this.ethBtcSwapContract.ticketEvent({ ticketId: ticketId });
     rvalFilter.watch(function(err, res) {
