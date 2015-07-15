@@ -96,19 +96,7 @@ var EthereumBitcoinSwapClient = function() {
         var eventArgs = res.args;
         var ticketId = eventArgs.rval.toNumber();
         if (ticketId > 0) {
-
-          // this is approximate for UI update
-          // TicketColl.insert({
-          //   ticketId: ticketId,
-          //   bnstrBtcAddr: addrHex,
-          //   numWei: new BigNumber(numWei).toNumber(),
-          //   numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
-          //   bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
-          //   numClaimExpiry: 1
-          // });
-
-          // swal('Offer created', 'ticket id '+ticketId, 'success');
-          callback(null, 'Offer created ' + ticketId);
+          callback(null, ticketId);
         }
         else {
           callback('Offer could not be created');

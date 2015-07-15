@@ -48,14 +48,26 @@ function doSubmitOffer(viewm) {
 
 
 function submitOffer(addrHex, numWei, weiPerSatoshi) {
-  EthBtcSwapClient.createTicket(addrHex, numWei, weiPerSatoshi, function(err, result) {
+  EthBtcSwapClient.createTicket(addrHex, numWei, weiPerSatoshi, function(err, ticketId) {
     if (err) {
       swal('Offer could not be created', err, 'error');
       return;
     }
 
-    console.log('@@@ createTicket result: ', result)
-    swal(result, '', 'success');
+    console.log('@@@ createTicket good: ', ticketId)
+
+    swal('Offer created', 'ticket id '+ticketId, 'success');
+
+    // this is approximate for UI update
+    TicketColl.insert({
+      ticketId: ticketId,
+      bnstrBtcAddr: addrHex,
+      numWei: new BigNumber(numWei).toNumber(),
+      numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
+      bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
+      numClaimExpiry: 1
+    });
+
   });
 }
 
