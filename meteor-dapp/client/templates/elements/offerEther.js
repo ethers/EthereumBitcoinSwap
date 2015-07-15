@@ -26,30 +26,13 @@ Template.offerEther.viewmodel(
 
 
 function doSubmitOffer(viewm) {
-  var btcPrice = viewm.btcPrice();
-
-  // these are passed to contract
-  var addrHex;
-  try {
-    addrHex = '0x' + decodeBase58Check(viewm.btcAddr());
-  }
-  catch (err) {
-    swal('Bad Bitcoin address', err.message, 'error');
-    return;
-  }
-  var numWei = web3.toWei(viewm.numEther(), 'ether');
-  var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
-  console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi)
-
   uiTxProgress();
 
-  submitOffer(viewm.btcAddr(), viewm.numEther(), viewm.btcPrice(),
-    addrHex, numWei, weiPerSatoshi);
+  submitOffer(viewm.btcAddr(), viewm.numEther(), viewm.btcPrice());
 }
 
 
-function submitOffer(btcAddress, numEther, btcPrice,
-  addrHex, numWei, weiPerSatoshi) {
+function submitOffer(btcAddress, numEther, btcPrice) {
   EthBtcSwapClient.createTicket(btcAddress, numEther, btcPrice, function(err, ticketId) {
     if (err) {
       swal('Offer could not be created', err, 'error');
@@ -63,10 +46,9 @@ function submitOffer(btcAddress, numEther, btcPrice,
     // this is approximate for UI update
     TicketColl.insert({
       ticketId: ticketId,
-      bnstrBtcAddr: addrHex,
-      numWei: new BigNumber(numWei).toNumber(),
-      numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
-      bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
+      btcAddr: btcAddress,
+      numEther: numEther,
+      btcPrice: btcPrice,
       numClaimExpiry: 1
     });
 
