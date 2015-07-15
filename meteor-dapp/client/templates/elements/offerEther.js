@@ -41,85 +41,23 @@ function doSubmitOffer(viewm) {
   var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
   console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi);
 
+  uiTxProgress();
+
   submitOffer(addrHex, numWei, weiPerSatoshi);
 }
 
 
 function submitOffer(addrHex, numWei, weiPerSatoshi) {
-  // TODO user confirmation about gasprice
-  var objParam = {value: numWei, gas: 500000};
-
-  var startTime = Date.now();
-
-  var callResult = gContract.createTicket.call(addrHex, numWei, weiPerSatoshi, objParam);
-
-  var endTime = Date.now();
-  var durationSec = (endTime - startTime) / 1000;
-  console.log('@@@@ call res: ', callResult, ' duration: ', durationSec)
-  swal(callResult.toString(10) + "    " + durationSec+ "secs");
-
-  var rval = callResult.toNumber();
-  if (rval <= 0) {
-    swal('Offer could not be created', rval, 'error');
-    return;
-  }
-
-  // at this point, the eth_call succeeded
-
-  gContract.createTicket.sendTransaction(addrHex, numWei, weiPerSatoshi, objParam, function(err, result) {
+  EthBtcSwapClient.createTicket(addrHex, numWei, weiPerSatoshi, function(err, result) {
     if (err) {
       swal('Offer could not be created', err, 'error');
       return;
     }
 
-    watchCreateTicket(addrHex, numWei, weiPerSatoshi);
-
-    uiTxProgress();
-
-    // result is a txhash
     console.log('@@@ createTicket result: ', result)
+    swal(result, '', 'success');
   });
 }
-
-function watchCreateTicket(addrHex, numWei, weiPerSatoshi) {
-  var rvalFilter = gContract.ticketEvent({ ticketId: 0 }, { fromBlock: 'latest', toBlock: 'latest'});
-  rvalFilter.watch(function(err, res) {
-    try {
-      if (err) {
-        swal(err, 'watchCreateTicket', 'error');
-        console.log('@@@ rvalFilter err: ', err)
-        return;
-      }
-
-      console.log('@@@ rvalFilter res: ', res)
-
-      var eventArgs = res.args;
-      var ticketId = eventArgs.rval.toNumber();
-      if (ticketId > 0) {
-
-        // this is approximate for UI update
-        TicketColl.insert({
-          ticketId: ticketId,
-          bnstrBtcAddr: addrHex,
-          numWei: new BigNumber(numWei).toNumber(),
-          numWeiPerSatoshi: new BigNumber(weiPerSatoshi).negated().toNumber(),  // negated so that sort is ascending
-          bnstrWeiPerSatoshi: new BigNumber(weiPerSatoshi).toString(10),
-          numClaimExpiry: 1
-        });
-
-        swal('Offer created', 'ticket id '+ticketId, 'success');
-      }
-      else {
-        swal('Offer could not be created', ticketId, 'error');
-      }
-    }
-    finally {
-      console.log('@@@ filter stopWatching...')
-      rvalFilter.stopWatching();
-    }
-  });
-}
-
 
 function decodeBase58Check(btcAddr) {
   var versionAndHash = Bitcoin.Address.decodeString(btcAddr);

@@ -1,17 +1,5 @@
 var btcproof = require('btcproof');
 
-var RESERVE_FAIL_UNRESERVABLE = -10;
-var RESERVE_FAIL_POW = -11;
-
-var CLAIM_FAIL_INVALID_TICKET = -20;
-var CLAIM_FAIL_UNRESERVED = -21;
-var CLAIM_FAIL_CLAIMER = -22;
-var CLAIM_FAIL_TX_HASH = -23;
-var CLAIM_FAIL_INSUFFICIENT_SATOSHI = -24;
-var CLAIM_FAIL_PROOF = -25;
-var CLAIM_FAIL_WRONG_BTC_ADDR = -26;
-var CLAIM_FAIL_TX_ENCODING = -27;
-
 var EMPTY_CLAIMER = '-';
 
 var ANYONE_CAN_CLAIM = 'Anyone';
@@ -197,7 +185,7 @@ function doLookup(viewm, reset) {
 function lookupTicket(viewm) {
   var ticketId = getTicketId(viewm);
 
-  var ticketInfo = gContract.lookupTicket.call(ticketId);
+  var ticketInfo = EthBtcSwapClient.lookupTicket(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
   if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].isZero()) {
@@ -368,84 +356,30 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
 function doReserveTicket(viewm) {
   var ticketId = getTicketId(viewm);
   var txHash = '0x' + viewm.btcTxHash();
-
-  ethReserveTicket(ticketId, txHash, viewm);
-}
-
-function ethReserveTicket(ticketId, txHash, viewm) {
   var powNonce = viewm.powNonce();
 
-  // TODO confirmation of gasprice ?
-  var objParam = {gas: 500000};
+  uiTxProgress();
 
-  var startTime = Date.now();
-
-  var callResult = gContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
-
-  var endTime = Date.now();
-  var durationSec = (endTime - startTime) / 1000;
-  console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
-
-
-  var rval = callResult.toNumber();
-  switch (rval) {
-    case ticketId:
-      console.log('@@@@ call GOOD so now sendTx...')
-      break;  // the only result that does not return
-    case RESERVE_FAIL_UNRESERVABLE:
-      swal('Ticket already reserved', 'Or ticket does not exist', 'error');
-      return;
-    case RESERVE_FAIL_POW:
-      swal('Proof of Work is invalid', 'see Help', 'error');
-      return;
-    default:
-      swal('Unexpected error', rval, 'error');
-      return;
-  }
-
-  // at this point, the eth_call succeeded
-
-  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
-  rvalFilter.watch(function(err, res) {
-    if (err) {
-      console.log('@@@ rvalFilter err: ', err)
-      return;
-    }
-
-    console.log('@@@ rvalFilter res: ', res)
-
-    var eventArgs = res.args;
-    if (eventArgs.rval.toNumber() === ticketId) {
-
-      swal('Ticket reserved', 'ticket id '+ticketId, 'success');
-
-      // update UI
-      viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
-      viewm.claimTxHash(txHash.substr(2));
-      viewm.claimExpiry(moment().add(4, 'hours').unix());
-      doLookup(viewm);
-    }
-    else {
-      swal('Error ' + rval, 'reserve ticket failed', 'error');
-    }
-
-    rvalFilter.stopWatching();
-  });
-
-  gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
-    if (err) {
-      swal(err, 'Reserve ticket failed', 'error');
-      console.log('@@@ reserveTicket sendtx err: ', err)
-      return;
-    }
-
-    uiTxProgress();
-
-    // result is a txhash
-    console.log('@@@ reserveTicket txHash: ', txHash)
-  });
+  ethReserveTicket(ticketId, txHash, powNonce, viewm);
 }
 
+function ethReserveTicket(ticketId, txHash, powNonce) {
+  EthBtcSwapClient.reserveTicket(ticketId, txHash, powNonce, function(err, result) {
+    if (err) {
+      swal('Ticket could not be reserved', err, 'error');
+      return;
+    }
+
+    console.log('@@@ reserveTicket result: ', result)
+    swal(result, '', 'success');
+
+    // update UI
+    // viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
+    // viewm.claimTxHash(txHash.substr(2));
+    // viewm.claimExpiry(moment().add(4, 'hours').unix());
+    // doLookup(viewm);
+  });
+}
 
 function doClaimTicket(viewm) {
   console.log('@@@ in doClaimTicket')
@@ -465,131 +399,22 @@ function doClaimTicket(viewm) {
     // return new BigNumber('0x' + sib);
   });
 
+  uiTxProgress();
+
   ethClaimTicket(ticketId, txHex, txHash, merkleProof.txIndex, merkleSibling, txBlockHash);
 }
 
-
-
-// function dbgVerifyTx() {
-//   // TODO don't forget to update the ABI
-//   var dbgAddress = '0x90439a6495ee8e7d86a4acd2cbe649ed21e2ef6e';
-//   var dbgContract = web3.eth.contract(externaDebugVerifyTxAbi).at(dbgAddress);
-//
-//   var txHash = '0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012';
-//   var dbgEvent = dbgContract.dbgEvent({ txHash: txHash });
-//
-//   var txhEvent = dbgContract.txhEvent({ txHash: txHash });
-//
-//
-//   dbgEvent.watch(function(err, res) {
-//     if (err) {
-//       console.log('@@@ dbgEvent err: ', err)
-//       return;
-//     }
-//
-//     console.log('@@@ dbgEvent res: ', res)
-//   });
-//
-//
-//   txhEvent.watch(function(err, res) {
-//     if (err) {
-//       console.log('@@@ txhEvent err: ', err)
-//       return;
-//     }
-//
-//     console.log('@@@ txhEvent res: ', res)
-//   });
-// }
-
-
 function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
-  console.log('@@@ ethClaimTicket args: ', arguments)
-
-  var objParam = {gas: 3000000};
-
-  var startTime = Date.now();
-
-  var callResult = gContract.claimTicket.call(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam);
-
-
-  var endTime = Date.now();
-  var durationSec = (endTime - startTime) / 1000;
-  console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
-
-
-  var rval = callResult.toNumber();
-  switch (rval) {
-    case ticketId:
-      console.log('@@@@ call GOOD so now sendTx...')
-      break;  // the only result that does not return;
-    case CLAIM_FAIL_INVALID_TICKET:  // one way to get here is Claim, mine, then Claim without refreshing the UI
-      swal('Invalid Ticket ID', 'Ticket does not exist or already claimed', 'error');
-      return;
-    case CLAIM_FAIL_UNRESERVED:  // one way to get here is Reserve, let it expire, then Claim without refreshing the UI
-      swal('Ticket is unreserved', 'Reserve the ticket and try again', 'error');
-      return;
-    case CLAIM_FAIL_CLAIMER:  // one way to get here is change web3.eth.defaultAccount
-      swal('Someone else has reserved the ticket', 'You can only claim tickets that you have reserved', 'error');
-      return;
-    case CLAIM_FAIL_TX_HASH:  // should not happen since UI prevents it
-      swal('You need to use the transaction used in the reservation', '', 'error');
-      return;
-    case CLAIM_FAIL_INSUFFICIENT_SATOSHI:  // should not happen since UI prevents it
-      swal('Bitcoin transaction did not send enough bitcoins', 'Number of bitcoins must meet ticket\'s total price', 'error');
-      return;
-    case CLAIM_FAIL_PROOF:
-      swal('Bitcoin transaction needs at least 6 confirmations', 'Wait and try again', 'error');
-      return;
-    case CLAIM_FAIL_WRONG_BTC_ADDR:  // should not happen since UI prevents it
-      swal('Bitcoin transaction paid wrong BTC address', 'Bitcoins must be sent to the address specified by the ticket', 'error');
-      return;
-    case CLAIM_FAIL_TX_ENCODING:
-      swal('Bitcoin transaction incorrectly constructed', 'Use btcToEther tool to construct bitcoin transaction', 'error');
-      return;
-    default:
-      swal('Unexpected error', rval, 'error');
-      return;
-  }
-
-  // at this point, the eth_call succeeded
-
-
-  // TODO
-  return
-
-  // dbgVerifyTx();
-
-  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
-  rvalFilter.watch(function(err, res) {
+  EthBtcSwapClient.claimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, function(err, result) {
     if (err) {
-      console.log('@@@ rvalFilter err: ', err)
+      swal('Ticket could not be claimed', err, 'error');
       return;
     }
 
-    console.log('@@@ rvalFilter res: ', res)
-
-    var eventArgs = res.args;
-    if (eventArgs.rval.toNumber() === ticketId) {
-      swal('Ticket claimed', 'ticket id '+ticketId, 'success');
-    }
-    else {
-      swal('Error ' + rval, 'claim ticket failed', 'error');
-    }
-
-    rvalFilter.stopWatching();
-  });
-
-  gContract.claimTicket.sendTransaction(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, objParam, function(err, result) {
-    if (err) {
-      swal(err, 'Claim ticket failed', 'error');
-      console.log('@@@ err: ', err)
-      return;
-    }
-
-    uiTxProgress();
-
-    // result is a txhash
     console.log('@@@ claimTicket result: ', result)
+    swal(result, '', 'success');
+
+    // TODO update UI
   });
 }
 

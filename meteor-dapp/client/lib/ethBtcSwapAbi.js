@@ -1,4 +1,4 @@
-window.externalEthBtcSwapAbi = [{
+externalEthBtcSwapAbi = [{
     "name": "claimTicket(int256,bytes,int256,int256,int256[],int256)",
     "type": "function",
     "inputs": [{ "name": "ticketId", "type": "int256" }, { "name": "txStr", "type": "bytes" }, { "name": "txHash", "type": "int256" }, { "name": "txIndex", "type": "int256" }, { "name": "sibling", "type": "int256[]" }, { "name": "txBlockHash", "type": "int256" }],
