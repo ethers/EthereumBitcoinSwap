@@ -39,16 +39,18 @@ function doSubmitOffer(viewm) {
   }
   var numWei = web3.toWei(viewm.numEther(), 'ether');
   var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
-  console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi);
+  console.log('@@@@ addrHex: ', addrHex, ' numWei: ', numWei, ' weiPerSatoshi: ', weiPerSatoshi)
 
   uiTxProgress();
 
-  submitOffer(addrHex, numWei, weiPerSatoshi);
+  submitOffer(viewm.btcAddr(), viewm.numEther(), viewm.btcPrice(),
+    addrHex, numWei, weiPerSatoshi);
 }
 
 
-function submitOffer(addrHex, numWei, weiPerSatoshi) {
-  EthBtcSwapClient.createTicket(addrHex, numWei, weiPerSatoshi, function(err, ticketId) {
+function submitOffer(btcAddress, numEther, btcPrice,
+  addrHex, numWei, weiPerSatoshi) {
+  EthBtcSwapClient.createTicket(btcAddress, numEther, btcPrice, function(err, ticketId) {
     if (err) {
       swal('Offer could not be created', err, 'error');
       return;

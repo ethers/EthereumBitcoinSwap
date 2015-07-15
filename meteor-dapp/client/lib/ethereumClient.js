@@ -45,7 +45,21 @@ var EthereumBitcoinSwapClient = function() {
   }
 
 
-  this.createTicket = function(addrHex, numWei, weiPerSatoshi, callback) {
+  this.createTicket = function(btcAddress, numEther, btcPrice, callback) {
+    var addrHex;
+    try {
+      addrHex = '0x' + decodeBase58Check(btcAddress);
+    }
+    catch (err) {
+      callback(new Error(btcAddress + ' is an invalid Bitcoin address: ' + err.message));
+      return;
+    }
+    var numWei = web3.toWei(numEther, 'ether');
+    var weiPerSatoshi = new BigNumber(numWei).div(SATOSHI_PER_BTC.mul(btcPrice)).round(0).toString(10);
+
+
+
+
     var objParam = {value: numWei, gas: 500000};
 
     var startTime = Date.now();
@@ -288,6 +302,30 @@ var EthereumBitcoinSwapClient = function() {
 
 
 EthBtcSwapClient = new EthereumBitcoinSwapClient();
+
+
+
+function decodeBase58Check(btcAddr) {
+  var versionAndHash = Bitcoin.Address.decodeString(btcAddr);
+  var byteArrayData = versionAndHash.hash;
+
+  var ret = "",
+    i = 0,
+    len = byteArrayData.length;
+
+  while (i < len) {
+    var a = byteArrayData[i];
+    var h = a.toString(16);
+    if (a < 10) {
+      h = "0" + h;
+    }
+    ret += h;
+    i++;
+  }
+
+  return ret;
+}
+
 
 
 // function dbgVerifyTx() {
