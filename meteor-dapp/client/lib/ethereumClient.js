@@ -315,7 +315,7 @@ var EthereumBitcoinSwapClient = function() {
       retArr.push({
         ticketId: ticketArr[i + 0].toNumber(),
         btcAddr: formatBtcAddr(ticketArr[i + 1]),
-        numEther: numEther,
+        numEther: numEther.toString(10),
         btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
 
 
