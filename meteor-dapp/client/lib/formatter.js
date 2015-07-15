@@ -9,37 +9,6 @@ var FRESH_TICKET_EXPIRY = 1;  // 1 comes from the contract; 0 means ticket does 
 var UNRESERVED_TICKET_DESC = 'OPEN';
 
 
-// returns BigNumber
-toUnitPrice = function(bnWeiPerSatoshi) {
-  return WEI_PER_SATOSHI.div(bnWeiPerSatoshi).round(8);
-}
-
-// returns BigNumber
-toTotalPrice = function(bnEther, bnUnitPrice) {
-  return bnEther.mul(bnUnitPrice).round(8);
-}
-
-
-
-formatEtherAmount = function(bnEther) {
-  return bnEther.toString(10);
-}
-
-formatUnitPrice = function(bnUnitPrice) {
-  return bnUnitPrice.toString(10);
-}
-
-// formatTotalPrice = function(bnTotalPrice) {
-//   return bnTotalPrice.toString(10);
-// }
-
-formatSatoshiToBTC = function(bnSatoshi) {
-  return bnSatoshi.div(SATOSHI_PER_BTC).round(8).toString(10);
-}
-
-formatWeiToEther = function(bnWei) {
-  return bnWei.div(WEI_PER_ETHER).toString(10);
-}
 
 formatClaimExpiry = function(unixExpiry) {
   return isTicketAvailable(unixExpiry)

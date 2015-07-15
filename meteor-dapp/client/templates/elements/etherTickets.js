@@ -30,11 +30,6 @@ Template.etherTickets.helpers({
 });
 
 
-// function displayEthers(nWei) {
-//   var bnEther = toEther(new BigNumber(nWei));
-//   return formatEtherAmount(bnEther);
-// }
-
 function displayUnitPrice(numEther, object) {
   return new BigNumber(object.btcPrice).div(numEther);
 }

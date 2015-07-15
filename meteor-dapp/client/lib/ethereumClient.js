@@ -1,6 +1,4 @@
 
-var TICKET_FIELDS = 7;
-
 useBtcTestnet = true;
 
 var versionAddr;
@@ -10,6 +8,10 @@ if (useBtcTestnet) {
 else {
   versionAddr = 0;
 }
+
+var TICKET_FIELDS = 7;
+
+var WEI_PER_SATOSHI = new BigNumber(10).pow(10);
 
 var RESERVE_FAIL_UNRESERVABLE = -10;
 var RESERVE_FAIL_POW = -11;
@@ -352,6 +354,16 @@ EthBtcSwapClient = new EthereumBitcoinSwapClient();
 
 
 
+
+// returns BigNumber
+function toUnitPrice(bnWeiPerSatoshi) {
+  return WEI_PER_SATOSHI.div(bnWeiPerSatoshi).round(8);
+}
+
+// returns BigNumber
+function toTotalPrice(bnEther, bnUnitPrice) {
+  return bnEther.mul(bnUnitPrice).round(8);
+}
 
 
 function displayTotalPrice(numEther, bnstrWeiPerSatoshi) {
