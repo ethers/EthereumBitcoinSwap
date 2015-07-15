@@ -34,9 +34,9 @@ formatUnitPrice = function(bnUnitPrice) {
   return bnUnitPrice.toString(10);
 }
 
-formatTotalPrice = function(bnTotalPrice) {
-  return bnTotalPrice.toString(10);
-}
+// formatTotalPrice = function(bnTotalPrice) {
+//   return bnTotalPrice.toString(10);
+// }
 
 formatSatoshiToBTC = function(bnSatoshi) {
   return bnSatoshi.div(SATOSHI_PER_BTC).round(8).toString(10);

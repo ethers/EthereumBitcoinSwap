@@ -1,5 +1,5 @@
 
-TICKET_FIELDS = 7;
+var TICKET_FIELDS = 7;
 
 useBtcTestnet = true;
 
@@ -309,14 +309,18 @@ var EthereumBitcoinSwapClient = function() {
 
     // TODO rename keys
     for (var i=0; i < len; i+= TICKET_FIELDS) {
+      var numEther = web3.fromWei(ticketArr[i + 2], 'ether');
+      var bnstrWeiPerSatoshi = ticketArr[i + 3].toString(10);
+
       retArr.push({
         ticketId: ticketArr[i + 0].toNumber(),
         btcAddr: formatBtcAddr(ticketArr[i + 1]),
-        numEther: web3.fromWei(ticketArr[i + 2], 'ether'),
+        numEther: numEther,
+        btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
 
 
         numWeiPerSatoshi: ticketArr[i + 3].negated().toNumber(),  // negated so that sort is ascending
-        bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
+        bnstrWeiPerSatoshi: bnstrWeiPerSatoshi,
         numClaimExpiry: ticketArr[i + 4].toNumber(),
         // bnClaimer: ticketArr[i + 5].toString(10),
         // bnClaimTxHash: ticketArr[i + 6].toString(10)
@@ -334,6 +338,16 @@ var EthereumBitcoinSwapClient = function() {
 
 EthBtcSwapClient = new EthereumBitcoinSwapClient();
 
+
+
+
+
+function displayTotalPrice(numEther, bnstrWeiPerSatoshi) {
+  var bnTotalPrice = toTotalPrice(
+    new BigNumber(numEther),
+    toUnitPrice(new BigNumber(bnstrWeiPerSatoshi)));
+  return bnTotalPrice.toString(10);
+}
 
 
 formatBtcAddr = function(bn) {
