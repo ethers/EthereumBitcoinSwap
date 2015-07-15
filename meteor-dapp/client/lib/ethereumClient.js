@@ -169,12 +169,9 @@ var EthereumBitcoinSwapClient = function() {
         return;
     }
 
+    // callback(null, 'claimTicket eth_call succeeded'); return // for testing only
+
     // at this point, the eth_call succeeded
-
-
-    // TODO
-    callback(null, 'claimTicket eth_call succeeded')
-    return
 
     // dbgVerifyTx();
 
@@ -208,7 +205,14 @@ var EthereumBitcoinSwapClient = function() {
       merkleSibling,
       txBlockHash,
       objParam,
-      callback);
+      function(err, result) {
+        if (err) {
+          callback(err);
+          console.log('@@@ claimTicket sendtx err: ', err)
+          return;
+        }
+      }
+    );
   },
 
 
@@ -277,7 +281,7 @@ var EthereumBitcoinSwapClient = function() {
       function(err, result) {
         if (err) {
           callback(err);
-          console.log('@@@ createTicket sendtx err: ', err)
+          console.log('@@@ reserveTicket sendtx err: ', err)
           return;
         }
       }
@@ -296,3 +300,35 @@ var EthereumBitcoinSwapClient = function() {
 
 
 EthBtcSwapClient = new EthereumBitcoinSwapClient();
+
+
+// function dbgVerifyTx() {
+//   // TODO don't forget to update the ABI
+//   var dbgAddress = '0x90439a6495ee8e7d86a4acd2cbe649ed21e2ef6e';
+//   var dbgContract = web3.eth.contract(externaDebugVerifyTxAbi).at(dbgAddress);
+//
+//   var txHash = '0x558231b40b5fdddb132f9fcc8dd82c32f124b6139ecf839656f4575a29dca012';
+//   var dbgEvent = dbgContract.dbgEvent({ txHash: txHash });
+//
+//   var txhEvent = dbgContract.txhEvent({ txHash: txHash });
+//
+//
+//   dbgEvent.watch(function(err, res) {
+//     if (err) {
+//       console.log('@@@ dbgEvent err: ', err)
+//       return;
+//     }
+//
+//     console.log('@@@ dbgEvent res: ', res)
+//   });
+//
+//
+//   txhEvent.watch(function(err, res) {
+//     if (err) {
+//       console.log('@@@ txhEvent err: ', err)
+//       return;
+//     }
+//
+//     console.log('@@@ txhEvent res: ', res)
+//   });
+// }
