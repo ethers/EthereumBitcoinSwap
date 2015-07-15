@@ -300,6 +300,7 @@ var EthereumBitcoinSwapClient = function() {
     );
   },
 
+  // returns tickets with keys ticketId, btcAddr, numEther, btcPrice, numClaimExpiry
   this.getOpenTickets = function(start, end) {
     var objParam = {gas: 3000000};
     var ticketArr = this.ethBtcSwapContract.getOpenTickets.call(start, end, objParam);
@@ -307,7 +308,6 @@ var EthereumBitcoinSwapClient = function() {
     var retArr = []
     var len = ticketArr.length;
 
-    // TODO rename keys
     for (var i=0; i < len; i+= TICKET_FIELDS) {
       var numEther = web3.fromWei(ticketArr[i + 2], 'ether');
       var bnstrWeiPerSatoshi = ticketArr[i + 3].toString(10);
@@ -317,10 +317,6 @@ var EthereumBitcoinSwapClient = function() {
         btcAddr: formatBtcAddr(ticketArr[i + 1]),
         numEther: numEther.toString(10),
         btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
-
-
-        numWeiPerSatoshi: ticketArr[i + 3].negated().toNumber(),  // negated so that sort is ascending
-        bnstrWeiPerSatoshi: bnstrWeiPerSatoshi,
         numClaimExpiry: ticketArr[i + 4].toNumber(),
         // bnClaimer: ticketArr[i + 5].toString(10),
         // bnClaimTxHash: ticketArr[i + 6].toString(10)
@@ -330,8 +326,24 @@ var EthereumBitcoinSwapClient = function() {
     return retArr;
   },
 
+
   this.lookupTicket = function(ticketId) {
-    return this.ethBtcSwapContract.lookupTicket.call(ticketId); // default gas, may get OOG
+    var arr = this.ethBtcSwapContract.lookupTicket.call(ticketId); // default gas, may get OOG
+
+    var numEther = web3.fromWei(arr[1], 'ether');
+    var bnstrWeiPerSatoshi = arr[2].toString(10);
+
+    var ticket = {
+      ticketId: ticketId,
+      btcAddr: formatBtcAddr(arr[0]),
+      numEther: numEther.toString(10),
+      btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
+      numClaimExpiry: arr[3].toNumber(),
+      // bnClaimer: arr[4].toString(10),
+      // bnClaimTxHash: arr[5].toString(10)
+    };
+
+    return ticket;
   }
 }
 

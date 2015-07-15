@@ -16,27 +16,11 @@ Template.claimTicket.viewmodel(
   //   return this.btcTxHash() || '';
   // },
 
-  numWei: '',
-  weiPerSatoshi: '',
-  bnEther: function() {
-    var numWei = this.numWei();
-    return numWei ? toEther(new BigNumber(numWei)) : ZERO;
-  },
+  numEther: '',
+  btcPrice: '',
 
-  numEther: function() {
-    return formatEtherAmount(this.bnEther());
-  },
   totalPrice: function() {
-    var weiPerSatoshi = this.weiPerSatoshi();
-    if (weiPerSatoshi) {
-      var bnEther = this.bnEther();
-      if (bnEther) {
-        var bnUnitPrice = toUnitPrice(new BigNumber(weiPerSatoshi));
-        var bnTotalPrice = toTotalPrice(bnEther, bnUnitPrice);
-        return formatTotalPrice(bnTotalPrice);
-      }
-    }
-    return '';
+    return this.btcPrice();
   },
   btcAddr: '',
 
@@ -80,10 +64,10 @@ Template.claimTicket.viewmodel(
   computedFee: function() {
     var encodedFeeStr = this.encodedFeeStr();
     if (encodedFeeStr) {
-      var numWei = this.numWei();
-      if (numWei) {
-        var bnComputedFee = new BigNumber(encodedFeeStr).mul(new BigNumber(numWei)).div(10000);
-        return formatWeiToEther(bnComputedFee);
+      var numEther = this.numEther();
+      if (numEther) {
+        var bnComputedFee = new BigNumber(encodedFeeStr).mul(new BigNumber(numEther)).div(10000);
+        return bnComputedFee.toString(10);
       }
     }
     return '';
@@ -118,9 +102,9 @@ Template.claimTicket.viewmodel(
   txSatisfiesTicket: function() {
     var ticketId = this.ticketId();
     if (ticketId) {
-      var numWei = this.numWei();
-      if (numWei) {
-        return new BigNumber(numWei).gt(0)
+      var numEther = this.numEther();
+      if (numEther) {
+        return new BigNumber(numEther).gt(0)
           && parseFloat(this.btcPayment()) >= parseFloat(this.totalPrice())
           && this.btcAddr() === this.paymentAddr();
       }
@@ -188,29 +172,28 @@ function lookupTicket(viewm) {
   var ticketInfo = EthBtcSwapClient.lookupTicket(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
-  if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].isZero()) {
+  if (!ticketInfo) {
     swal('Ticket does not exist...', 'or may have been claimed', 'error');
     return;
   }
 
-  var btcAddr = formatBtcAddr(ticketInfo[0]);
-  var bnWei = ticketInfo[1];
-  var bnWeiPerSatoshi = ticketInfo[2];
-  var bnClaimExpiry = ticketInfo[3];
-  var bnClaimer = ticketInfo[4];
-  var bnClaimTxHash = ticketInfo[5];
+  // TODO
+  // var bnClaimer = ticketInfo[4];
+  // var bnClaimTxHash = ticketInfo[5];
+  //
 
-  var unixExpiry = bnClaimExpiry.toNumber();
+
+  var unixExpiry = ticketInfo.numClaimExpiry;
   viewm.claimExpiry(unixExpiry);
 
-  if (!isTicketAvailable(unixExpiry)) {
-    viewm.claimerAddr(toHash(bnClaimer));
-    viewm.claimTxHash(toHash(bnClaimTxHash));
-  }
+  // if (!isTicketAvailable(unixExpiry)) {
+  //   viewm.claimerAddr(toHash(bnClaimer));
+  //   viewm.claimTxHash(toHash(bnClaimTxHash));
+  // }
 
-  viewm.numWei(bnWei.toString());
-  viewm.weiPerSatoshi(bnWeiPerSatoshi.toString());
-  viewm.btcAddr(btcAddr);
+  viewm.numEther(ticketInfo.numEther);
+  viewm.btcPrice(ticketInfo.btcPrice);
+  viewm.btcAddr(ticketInfo.btcAddr);
 }
 
 
