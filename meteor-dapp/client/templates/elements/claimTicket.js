@@ -340,7 +340,7 @@ function doReserveTicket(viewm) {
   ethReserveTicket(ticketId, txHash, powNonce, viewm);
 }
 
-function ethReserveTicket(ticketId, txHash, powNonce) {
+function ethReserveTicket(ticketId, txHash, powNonce, viewm) {
   EthBtcSwapClient.reserveTicket(ticketId, txHash, powNonce, function(err, result) {
     if (err) {
       swal('Ticket could not be reserved', err, 'error');
@@ -351,10 +351,10 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
     swal(result, '', 'success');
 
     // update UI
-    // viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
-    // viewm.claimTxHash(txHash.substr(2));
-    // viewm.claimExpiry(moment().add(4, 'hours').unix());
-    // doLookup(viewm);
+    viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
+    viewm.claimTxHash(txHash.substr(2));
+    viewm.claimExpiry(moment().add(4, 'hours').unix());
+    doLookup(viewm);
   });
 }
 
