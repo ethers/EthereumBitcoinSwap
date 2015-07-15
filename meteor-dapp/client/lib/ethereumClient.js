@@ -339,8 +339,8 @@ var EthereumBitcoinSwapClient = function() {
       numEther: numEther.toString(10),
       btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
       numClaimExpiry: arr[3].toNumber(),
-      // bnClaimer: arr[4].toString(10),
-      // bnClaimTxHash: arr[5].toString(10)
+      claimerAddr: toHash(arr[4]),
+      claimTxHash: toHash(arr[5])
     };
 
     return ticket;
@@ -366,6 +366,20 @@ formatBtcAddr = function(bn) {
   // TODO use bignumToHex()
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), versionAddr).toString();
+}
+
+
+function toHash(bignum) {
+  var hash = bignumToHex(bignum);
+  return hash === '0' ? '' : hash;
+}
+
+
+// http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
+function bignumToHex(bn) {
+  return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+
+  // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
 }
 
 

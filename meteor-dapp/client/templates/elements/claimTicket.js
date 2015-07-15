@@ -177,19 +177,13 @@ function lookupTicket(viewm) {
     return;
   }
 
-  // TODO
-  // var bnClaimer = ticketInfo[4];
-  // var bnClaimTxHash = ticketInfo[5];
-  //
-
-
   var unixExpiry = ticketInfo.numClaimExpiry;
   viewm.claimExpiry(unixExpiry);
 
-  // if (!isTicketAvailable(unixExpiry)) {
-  //   viewm.claimerAddr(toHash(bnClaimer));
-  //   viewm.claimTxHash(toHash(bnClaimTxHash));
-  // }
+  if (!isTicketAvailable(unixExpiry)) {
+    viewm.claimerAddr(ticketInfo.claimerAddr);
+    viewm.claimTxHash(ticketInfo.claimTxHash);
+  }
 
   viewm.numEther(ticketInfo.numEther);
   viewm.btcPrice(ticketInfo.btcPrice);

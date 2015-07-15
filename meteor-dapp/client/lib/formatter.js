@@ -19,11 +19,6 @@ toTotalPrice = function(bnEther, bnUnitPrice) {
   return bnEther.mul(bnUnitPrice).round(8);
 }
 
-toHash = function(bignum) {
-  var hash = bignumToHex(bignum);
-  return hash === '0' ? '' : hash;
-}
-
 
 
 formatEtherAmount = function(bnEther) {
@@ -90,12 +85,6 @@ humanRelativeTime = function(unixTime) {
   return fromNowReactive(moment(unixTime * 1000));
 }
 
-// http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
-bignumToHex = function(bn) {
-  return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
-
-  // return bn.mod(TWO_POW_256).add(TWO_POW_256).mod(TWO_POW_256).toString(16);
-}
 
 
 

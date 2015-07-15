@@ -8,18 +8,6 @@ Template.etherTickets.helpers({
       var len = ticketArr.length;
       for (var i=0; i < len; i++) {
         TicketColl.insert(ticketArr[i]);
-
-        // TicketColl.insert({
-        //   ticketId: ticketArr[i].ticketId,
-        //   btcAddr: ticketArr[i].btcAddr,
-        //   numEther: ticketArr[i].numEther,
-        //
-        //   numWeiPerSatoshi: ticketArr[i],
-        //   bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
-        //   numClaimExpiry: ticketArr[i + 4].toNumber(),
-        //   // bnClaimer: ticketArr[i + 5].toString(10),
-        //   // bnClaimTxHash: ticketArr[i + 6].toString(10)
-        // });
       }
 
       return TicketColl.find({});
