@@ -197,7 +197,7 @@ function doLookup(viewm, reset) {
 function lookupTicket(viewm) {
   var ticketId = getTicketId(viewm);
 
-  var ticketInfo = gContract.lookupTicket.call(ticketId);
+  var ticketInfo = EthBtcSwapClient.lookupTicket(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
   if (!ticketInfo || !ticketInfo[0] || ticketInfo[0].isZero()) {
@@ -368,84 +368,22 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
 function doReserveTicket(viewm) {
   var ticketId = getTicketId(viewm);
   var txHash = '0x' + viewm.btcTxHash();
+  var powNonce = viewm.powNonce();
 
   ethReserveTicket(ticketId, txHash, viewm);
 }
 
-function ethReserveTicket(ticketId, txHash, viewm) {
-  var powNonce = viewm.powNonce();
-
-  // TODO confirmation of gasprice ?
-  var objParam = {gas: 500000};
-
-  var startTime = Date.now();
-
-  var callResult = gContract.reserveTicket.call(ticketId, txHash, powNonce, objParam);
-
-  var endTime = Date.now();
-  var durationSec = (endTime - startTime) / 1000;
-  console.log('@@@@ callResult: ', callResult, ' duration: ', durationSec)
-
-
-  var rval = callResult.toNumber();
-  switch (rval) {
-    case ticketId:
-      console.log('@@@@ call GOOD so now sendTx...')
-      break;  // the only result that does not return
-    case RESERVE_FAIL_UNRESERVABLE:
-      swal('Ticket already reserved', 'Or ticket does not exist', 'error');
-      return;
-    case RESERVE_FAIL_POW:
-      swal('Proof of Work is invalid', 'see Help', 'error');
-      return;
-    default:
-      swal('Unexpected error', rval, 'error');
-      return;
-  }
-
-  // at this point, the eth_call succeeded
-
-  var rvalFilter = gContract.ticketEvent({ ticketId: ticketId });
-  rvalFilter.watch(function(err, res) {
+function ethReserveTicket(ticketId, txHash, powNonce) {
+  EthBtcSwapClient.reserveTicket(ticketId, txHash, powNonce, function(err, result) {
     if (err) {
-      console.log('@@@ rvalFilter err: ', err)
+      swal('Ticket could not be reserved', err, 'error');
       return;
     }
 
-    console.log('@@@ rvalFilter res: ', res)
-
-    var eventArgs = res.args;
-    if (eventArgs.rval.toNumber() === ticketId) {
-
-      swal('Ticket reserved', 'ticket id '+ticketId, 'success');
-
-      // update UI
-      viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
-      viewm.claimTxHash(txHash.substr(2));
-      viewm.claimExpiry(moment().add(4, 'hours').unix());
-      doLookup(viewm);
-    }
-    else {
-      swal('Error ' + rval, 'reserve ticket failed', 'error');
-    }
-
-    rvalFilter.stopWatching();
-  });
-
-  gContract.reserveTicket.sendTransaction(ticketId, txHash, powNonce, objParam, function(err, txHash) {
-    if (err) {
-      swal(err, 'Reserve ticket failed', 'error');
-      console.log('@@@ reserveTicket sendtx err: ', err)
-      return;
-    }
-
-    uiTxProgress();
-
-    // result is a txhash
-    console.log('@@@ reserveTicket txHash: ', txHash)
+    console.log('@@@ reserveTicket result: ', result)
+    swal(result, '', 'success');
   });
 }
-
 
 function doClaimTicket(viewm) {
   console.log('@@@ in doClaimTicket')

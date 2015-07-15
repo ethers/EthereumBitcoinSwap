@@ -231,6 +231,8 @@ var EthereumBitcoinSwapClient = function() {
     }
 
     // at this point, the eth_call succeeded
+    callback(null, 'reserveTicket eth_call succeeded')
+    return
 
     var rvalFilter = this.ethBtcSwapContract.ticketEvent({ ticketId: ticketId });
     rvalFilter.watch(function(err, res) {
@@ -260,15 +262,24 @@ var EthereumBitcoinSwapClient = function() {
       txHash,
       powNonce,
       objParam,
-      callback);
+      function(err, result) {
+        if (err) {
+          callback(err);
+          console.log('@@@ createTicket sendtx err: ', err)
+          return;
+        }
+      }
+    );
   },
 
   this.getOpenTickets = function(start, end) {
     var objParam = {gas: 3000000};
     return this.ethBtcSwapContract.getOpenTickets.call(start, end, objParam);
+  },
+
+  this.lookupTicket = function(ticketId) {
+    return this.ethBtcSwapContract.lookupTicket.call(ticketId); // default gas, may get OOG
   }
-
-
 }
 
 
