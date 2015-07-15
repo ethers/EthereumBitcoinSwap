@@ -1,17 +1,5 @@
 var btcproof = require('btcproof');
 
-var RESERVE_FAIL_UNRESERVABLE = -10;
-var RESERVE_FAIL_POW = -11;
-
-var CLAIM_FAIL_INVALID_TICKET = -20;
-var CLAIM_FAIL_UNRESERVED = -21;
-var CLAIM_FAIL_CLAIMER = -22;
-var CLAIM_FAIL_TX_HASH = -23;
-var CLAIM_FAIL_INSUFFICIENT_SATOSHI = -24;
-var CLAIM_FAIL_PROOF = -25;
-var CLAIM_FAIL_WRONG_BTC_ADDR = -26;
-var CLAIM_FAIL_TX_ENCODING = -27;
-
 var EMPTY_CLAIMER = '-';
 
 var ANYONE_CAN_CLAIM = 'Anyone';
@@ -370,7 +358,7 @@ function doReserveTicket(viewm) {
   var txHash = '0x' + viewm.btcTxHash();
   var powNonce = viewm.powNonce();
 
-  ethReserveTicket(ticketId, txHash, viewm);
+  ethReserveTicket(ticketId, txHash, powNonce, viewm);
 }
 
 function ethReserveTicket(ticketId, txHash, powNonce) {
@@ -382,6 +370,12 @@ function ethReserveTicket(ticketId, txHash, powNonce) {
 
     console.log('@@@ reserveTicket result: ', result)
     swal(result, '', 'success');
+
+    // update UI
+    // viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
+    // viewm.claimTxHash(txHash.substr(2));
+    // viewm.claimExpiry(moment().add(4, 'hours').unix());
+    // doLookup(viewm);
   });
 }
 

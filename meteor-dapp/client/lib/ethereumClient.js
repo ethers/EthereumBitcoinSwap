@@ -1,6 +1,18 @@
 
 useBtcTestnet = true;
 
+var RESERVE_FAIL_UNRESERVABLE = -10;
+var RESERVE_FAIL_POW = -11;
+
+var CLAIM_FAIL_INVALID_TICKET = -20;
+var CLAIM_FAIL_UNRESERVED = -21;
+var CLAIM_FAIL_CLAIMER = -22;
+var CLAIM_FAIL_TX_HASH = -23;
+var CLAIM_FAIL_INSUFFICIENT_SATOSHI = -24;
+var CLAIM_FAIL_PROOF = -25;
+var CLAIM_FAIL_WRONG_BTC_ADDR = -26;
+var CLAIM_FAIL_TX_ENCODING = -27;
+
 var EthereumBitcoinSwapClient = function() {
   try {
     web3.setProvider(new web3.providers.HttpProvider('http://localhost:8999'));
