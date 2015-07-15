@@ -31,7 +31,7 @@ Template.etherTickets.helpers({
         fields: [
           { key: 'ticketId', label: 'ID' },
           { key: 'numEther', label: 'Ethers', sortByValue: true },
-          { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'ascending', fn: displayUnitPrice },
+          { key: 'numEther', label: 'Unit Price BTC', sortByValue: true, sort: 'descending', fn: displayUnitPrice },
           { key: 'btcPrice', label: 'Total Price BTC' },
           { key: 'btcAddr', label: 'Bitcoin address' },
           { key: 'numClaimExpiry', label: 'Reservable', sortByValue: true, fn: displayTicketStatus },
@@ -47,9 +47,8 @@ Template.etherTickets.helpers({
 //   return formatEtherAmount(bnEther);
 // }
 
-function displayUnitPrice(ignore, object) {
-  var bnUnitPrice = toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi));
-  return formatUnitPrice(bnUnitPrice);
+function displayUnitPrice(numEther, object) {
+  return new BigNumber(object.btcPrice).div(numEther);
 }
 
 // Reservable column
