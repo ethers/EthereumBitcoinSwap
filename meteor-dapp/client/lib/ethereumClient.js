@@ -1,5 +1,15 @@
 
+TICKET_FIELDS = 7;
+
 useBtcTestnet = true;
+
+var versionAddr;
+if (useBtcTestnet) {
+  versionAddr = 111;
+}
+else {
+  versionAddr = 0;
+}
 
 var RESERVE_FAIL_UNRESERVABLE = -10;
 var RESERVE_FAIL_POW = -11;
@@ -292,7 +302,28 @@ var EthereumBitcoinSwapClient = function() {
 
   this.getOpenTickets = function(start, end) {
     var objParam = {gas: 3000000};
-    return this.ethBtcSwapContract.getOpenTickets.call(start, end, objParam);
+    var ticketArr = this.ethBtcSwapContract.getOpenTickets.call(start, end, objParam);
+
+    var retArr = []
+    var len = ticketArr.length;
+
+    // TODO rename keys
+    for (var i=0; i < len; i+= TICKET_FIELDS) {
+      retArr.push({
+        ticketId: ticketArr[i + 0].toNumber(),
+        btcAddr: formatBtcAddr(ticketArr[i + 1]),
+        numEther: web3.fromWei(ticketArr[i + 2], 'ether'),
+
+
+        numWeiPerSatoshi: ticketArr[i + 3].negated().toNumber(),  // negated so that sort is ascending
+        bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
+        numClaimExpiry: ticketArr[i + 4].toNumber(),
+        // bnClaimer: ticketArr[i + 5].toString(10),
+        // bnClaimTxHash: ticketArr[i + 6].toString(10)
+      });
+    }
+
+    return retArr;
   },
 
   this.lookupTicket = function(ticketId) {
@@ -303,6 +334,13 @@ var EthereumBitcoinSwapClient = function() {
 
 EthBtcSwapClient = new EthereumBitcoinSwapClient();
 
+
+
+formatBtcAddr = function(bn) {
+  // TODO use bignumToHex()
+  var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+  return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), versionAddr).toString();
+}
 
 
 function decodeBase58Check(btcAddr) {

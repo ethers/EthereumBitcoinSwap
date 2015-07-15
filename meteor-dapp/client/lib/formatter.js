@@ -9,12 +9,6 @@ var FRESH_TICKET_EXPIRY = 1;  // 1 comes from the contract; 0 means ticket does 
 var UNRESERVED_TICKET_DESC = 'OPEN';
 
 
-
-// returns BigNumber
-toEther = function(bnWei) {
-  return web3.fromWei(bnWei, 'ether');
-}
-
 // returns BigNumber
 toUnitPrice = function(bnWeiPerSatoshi) {
   return WEI_PER_SATOSHI.div(bnWeiPerSatoshi).round(8);
@@ -105,11 +99,11 @@ bignumToHex = function(bn) {
 
 
 
-formatBtcAddr = function(bn) {
-  // TODO use bignumToHex()
-  var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
-  return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), gVersionAddr).toString();
-}
+// formatBtcAddr = function(bn) {
+//   // TODO use bignumToHex()
+//   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+//   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), gVersionAddr).toString();
+// }
 
 
 

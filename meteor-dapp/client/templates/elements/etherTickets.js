@@ -1,4 +1,4 @@
-var TICKET_FIELDS = 7;
+
 TicketColl = new Mongo.Collection(null);
 
 Template.etherTickets.helpers({
@@ -8,9 +8,10 @@ Template.etherTickets.helpers({
       var len = ticketArr.length;
       for (var i=0; i < len; i+= TICKET_FIELDS) {
         TicketColl.insert({
-          ticketId: ticketArr[i + 0].toNumber(),
-          bnstrBtcAddr: ticketArr[i + 1].toString(10),
-          numWei: ticketArr[i + 2].toNumber(),
+          ticketId: ticketArr[i + 0],
+          btcAddr: ticketArr[i + 1],
+          numEther: ticketArr[i + 2],
+
           numWeiPerSatoshi: ticketArr[i + 3].negated().toNumber(),  // negated so that sort is ascending
           bnstrWeiPerSatoshi: ticketArr[i + 3].toString(10),
           numClaimExpiry: ticketArr[i + 4].toNumber(),
@@ -27,10 +28,10 @@ Template.etherTickets.helpers({
         showFilter: false,
         fields: [
           { key: 'ticketId', label: 'ID' },
-          { key: 'numWei', label: 'Ethers', sortByValue: true, fn: displayEthers },
+          { key: 'numEther', label: 'Ethers', sortByValue: true },
           { key: 'numWeiPerSatoshi', label: 'Unit Price BTC', sortByValue: true, sort: 'ascending', fn: displayUnitPrice },
           { key: 'numWei', label: 'Total Price BTC', fn: displayTotalPrice },
-          { key: 'bnstrBtcAddr', label: 'Bitcoin address', fn: displayBtcAddr },
+          { key: 'btcAddr', label: 'Bitcoin address' },
           { key: 'numClaimExpiry', label: 'Reservable', sortByValue: true, fn: displayTicketStatus },
           { key: 'numClaimExpiry', label: '', sortByValue: true, fn: displayTicketAction }
         ]
@@ -39,10 +40,10 @@ Template.etherTickets.helpers({
 });
 
 
-function displayEthers(nWei) {
-  var bnEther = toEther(new BigNumber(nWei));
-  return formatEtherAmount(bnEther);
-}
+// function displayEthers(nWei) {
+//   var bnEther = toEther(new BigNumber(nWei));
+//   return formatEtherAmount(bnEther);
+// }
 
 function displayUnitPrice(ignore, object) {
   var bnUnitPrice = toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi));
@@ -55,10 +56,6 @@ function displayTotalPrice(numWei, object) {
     toEther(new BigNumber(numWei)),
     toUnitPrice(new BigNumber(object.bnstrWeiPerSatoshi)));
   return formatTotalPrice(bnTotalPrice);
-}
-
-function displayBtcAddr(bnstr) {
-  return formatBtcAddr(new BigNumber(bnstr));
 }
 
 // Reservable column
