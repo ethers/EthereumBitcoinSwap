@@ -1,0 +1,3 @@
+macro m_isValidPow($txHash, $ticketId, $powNonce): 1
+
+inset('../ethBtcSwap.py')
