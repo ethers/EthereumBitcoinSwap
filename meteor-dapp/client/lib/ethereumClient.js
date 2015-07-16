@@ -366,9 +366,8 @@ function toBtcPrice(bnWei, bnWeiPerSatoshi) {
   return bnWei.div(bnWeiPerSatoshi).div(SATOSHI_PER_BTC).round(8).toString(10);
 }
 
-function toBtcAddr(bn) {
-  // TODO use bignumToHex()
-  var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
+function toBtcAddr(bignum) {
+  var btcAddr = bignumToHex(bignum)
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), versionAddr).toString();
 }
 
@@ -378,6 +377,7 @@ function toHash(bignum) {
 }
 
 
+// needed for handling negative bignums
 // http://stackoverflow.com/questions/3417183/modulo-of-negative-numbers/3417242#3417242
 function bignumToHex(bn) {
   return bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
