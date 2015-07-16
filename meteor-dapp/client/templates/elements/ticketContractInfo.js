@@ -1,5 +1,5 @@
 Template.ticketContractInfo.viewmodel({
-  address: EthBtcSwapClient.ticketContractAddr,
+  address: btcswap.ticketContractAddr,
 
   balanceChanged: true,
 
@@ -13,6 +13,6 @@ Template.ticketContractInfo.viewmodel({
   },
 
   labelNetwork: function() {
-    return EthBtcSwapClient.btcTestnet ? 'TESTNET bitcoins to get ether' : 'production (mainnet)';
+    return btcswap.btcTestnet ? 'TESTNET bitcoins to get ether' : 'production (mainnet)';
   }
 });

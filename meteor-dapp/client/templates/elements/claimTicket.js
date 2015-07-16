@@ -171,7 +171,7 @@ function doLookup(viewm, reset) {
 function lookupTicket(viewm) {
   var ticketId = getTicketId(viewm);
 
-  var ticketInfo = EthBtcSwapClient.lookupTicket(ticketId);
+  var ticketInfo = btcswap.lookupTicket(ticketId);
   console.log('@@@ tinfo: ', ticketInfo);
 
   if (!ticketInfo) {
@@ -226,7 +226,7 @@ function lookupBitcoinTxHash(viewm) {
   }
 
   var urlJsonTx;
-  if (EthBtcSwapClient.btcTestnet) {
+  if (btcswap.btcTestnet) {
       urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/";
   }
   else {
@@ -302,7 +302,7 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
   var blockNum = data.tx.blockhash; // blockr does not easily provide block height
 
   var blockInfoUrl;
-  if (EthBtcSwapClient.btcTestnet) {
+  if (btcswap.btcTestnet) {
       blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
   }
   else {
@@ -343,7 +343,7 @@ function doReserveTicket(viewm) {
 }
 
 function ethReserveTicket(ticketId, txHash, powNonce, viewm) {
-  EthBtcSwapClient.reserveTicket(ticketId, txHash, powNonce, function(err, result) {
+  btcswap.reserveTicket(ticketId, txHash, powNonce, function(err, result) {
     if (err) {
       swal('Ticket could not be reserved', err, 'error');
       return;
@@ -384,7 +384,7 @@ function doClaimTicket(viewm) {
 }
 
 function ethClaimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash) {
-  EthBtcSwapClient.claimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, function(err, result) {
+  btcswap.claimTicket(ticketId, txHex, txHash, txIndex, merkleSibling, txBlockHash, function(err, result) {
     if (err) {
       swal('Ticket could not be claimed', err, 'error');
       return;

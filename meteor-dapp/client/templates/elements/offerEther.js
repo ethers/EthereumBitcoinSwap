@@ -33,7 +33,7 @@ function doSubmitOffer(viewm) {
 
 
 function submitOffer(btcAddress, numEther, btcPrice) {
-  EthBtcSwapClient.createTicket(btcAddress, numEther, btcPrice, function(err, ticketId) {
+  btcswap.createTicket(btcAddress, numEther, btcPrice, function(err, ticketId) {
     if (err) {
       swal('Offer could not be created', err, 'error');
       return;

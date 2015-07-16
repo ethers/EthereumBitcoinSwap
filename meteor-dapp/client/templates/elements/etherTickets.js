@@ -3,7 +3,7 @@ TicketColl = new Mongo.Collection(null);
 
 Template.etherTickets.helpers({
     ticketCollection: function() {
-      var ticketArr = EthBtcSwapClient.getOpenTickets(1, 1000);
+      var ticketArr = btcswap.getOpenTickets(1, 1000);
 
       var len = ticketArr.length;
       for (var i=0; i < len; i++) {

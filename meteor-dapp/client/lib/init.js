@@ -19,7 +19,7 @@ else {
 
 
 // TODO don't forget to update the ABI when needed
-EthBtcSwapClient = new EthereumBitcoinSwapClient({
+btcswap = new EthereumBitcoinSwapClient({
   address: ticketContractAddr,
   abi: externalEthBtcSwapAbi,
   btcTestnet: useBtcTestnet
