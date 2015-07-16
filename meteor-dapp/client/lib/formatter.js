@@ -55,16 +55,6 @@ humanRelativeTime = function(unixTime) {
 }
 
 
-
-
-// formatBtcAddr = function(bn) {
-//   // TODO use bignumToHex()
-//   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
-//   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), gVersionAddr).toString();
-// }
-
-
-
 uiTxProgress = function() {
   swal('Ethereum transaction is in progress...', 'It may take up to a few minutes to get mined');
 }

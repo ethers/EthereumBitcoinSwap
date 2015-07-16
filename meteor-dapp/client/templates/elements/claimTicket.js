@@ -4,6 +4,8 @@ var EMPTY_CLAIMER = '-';
 
 var ANYONE_CAN_CLAIM = 'Anyone';
 
+var SATOSHI_PER_BTC = new BigNumber(10).pow(8);
+
 
 Template.claimTicket.viewmodel(
   'vmClaimTicket', {

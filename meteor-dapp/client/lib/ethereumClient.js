@@ -9,9 +9,12 @@ else {
   versionAddr = 0;
 }
 
+var TWO_POW_256 = new BigNumber(2).pow(256);
+
 var TICKET_FIELDS = 7;
 
 var WEI_PER_SATOSHI = new BigNumber(10).pow(10);
+var SATOSHI_PER_BTC = new BigNumber(10).pow(8);
 
 var RESERVE_FAIL_UNRESERVABLE = -10;
 var RESERVE_FAIL_POW = -11;
