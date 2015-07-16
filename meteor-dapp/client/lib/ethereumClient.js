@@ -35,18 +35,22 @@ EthereumBitcoinSwapClient = function(params) {
     throw new Error('btc testnet flag missing');
   }
 
-  try {
-    web3.eth.defaultAccount = web3.eth.coinbase;  // Olympic needs web3.eth.accounts[1];
+  web3.eth.getCode(params.address, function(err, result) {
+    if (err) {
+      throw err;
+    }
+    if (result === '0x') {
+      throw new Error('btcswap contract not found');
+    }
+  });
 
-    this.ethBtcSwapContract = web3.eth.contract(params.abi).at(params.address);
-    console.log('@@@@ ethBtcSwapContract: ', this.ethBtcSwapContract)
+  web3.eth.defaultAccount = web3.eth.coinbase;  // Olympic needs web3.eth.accounts[1];
 
-    this.btcTestnet = params.btcTestnet;
-    this.versionAddr = this.btcTestnet ? 111 : 0;
-  }
-  catch (err) {
-    console.log('@@@ EthBtcSwapClient err: ', err)
-  }
+  this.ethBtcSwapContract = web3.eth.contract(params.abi).at(params.address);
+  console.log('@@@@ ethBtcSwapContract: ', this.ethBtcSwapContract)
+
+  this.btcTestnet = params.btcTestnet;
+  this.versionAddr = this.btcTestnet ? 111 : 0;
 
 
   this.createTicket = function(btcAddress, numEther, btcPrice, callback) {
