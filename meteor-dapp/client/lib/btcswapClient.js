@@ -26,10 +26,6 @@ EthereumBitcoinSwapClient = function(params) {
     throw new Error('btcswap address missing');
   }
 
-  if (!params.abi) {
-    throw new Error('btcswap abi missing');
-  }
-
   if (params.btcTestnet == null) {
     throw new Error('btc testnet flag missing');
   }
@@ -45,7 +41,7 @@ EthereumBitcoinSwapClient = function(params) {
 
   web3.eth.defaultAccount = web3.eth.coinbase;  // Olympic needs web3.eth.accounts[1];
 
-  this.ethBtcSwapContract = web3.eth.contract(params.abi).at(params.address);
+  this.ethBtcSwapContract = web3.eth.contract(btcswapAbi).at(params.address);
   console.log('@@@@ ethBtcSwapContract: ', this.ethBtcSwapContract)
 
   this.btcTestnet = params.btcTestnet;
