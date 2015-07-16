@@ -1,5 +1,5 @@
 Template.ticketContractInfo.viewmodel({
-  address: btcswap.ticketContractAddr,
+  address: btcswap.address,
 
   balanceChanged: true,
 

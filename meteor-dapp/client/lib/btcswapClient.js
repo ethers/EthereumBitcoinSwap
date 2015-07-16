@@ -44,6 +44,7 @@ EthereumBitcoinSwapClient = function(params) {
   this.ethBtcSwapContract = web3.eth.contract(btcswapAbi).at(params.address);
   console.log('@@@@ ethBtcSwapContract: ', this.ethBtcSwapContract)
 
+  this.address = params.address;
   this.btcTestnet = params.btcTestnet;
   this.versionAddr = this.btcTestnet ? 111 : 0;
 
