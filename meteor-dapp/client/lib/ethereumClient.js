@@ -28,10 +28,13 @@ var CLAIM_FAIL_PROOF = -25;
 var CLAIM_FAIL_WRONG_BTC_ADDR = -26;
 var CLAIM_FAIL_TX_ENCODING = -27;
 
-var EthereumBitcoinSwapClient = function() {
-  try {
-    web3.setProvider(new web3.providers.HttpProvider('http://localhost:8999'));
 
+EthereumBitcoinSwapClient = function(params) {
+  if (!web3.currentProvider) {
+    throw new Error('web3 provider is not set');
+  }
+
+  try {
     web3.eth.defaultAccount = web3.eth.coinbase;  // Olympic needs web3.eth.accounts[1];
 
     var contractAddr;
@@ -352,10 +355,6 @@ var EthereumBitcoinSwapClient = function() {
     return ticket;
   }
 }
-
-
-EthBtcSwapClient = new EthereumBitcoinSwapClient();
-
 
 
 function toEther(bnWei) {
