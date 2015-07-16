@@ -320,7 +320,7 @@ var EthereumBitcoinSwapClient = function() {
 
       retArr.push({
         ticketId: ticketArr[i + 0].toNumber(),
-        btcAddr: formatBtcAddr(ticketArr[i + 1]),
+        btcAddr: toBtcAddr(ticketArr[i + 1]),
         numEther: toEther(bnWei),
         btcPrice: toBtcPrice(bnWei, bnWeiPerSatoshi),
         numClaimExpiry: ticketArr[i + 4].toNumber(),
@@ -336,19 +336,14 @@ var EthereumBitcoinSwapClient = function() {
   this.lookupTicket = function(ticketId) {
     var arr = this.ethBtcSwapContract.lookupTicket.call(ticketId); // default gas, may get OOG
 
-    var bnWei = ticketArr[i + 2];
-    var bnWeiPerSatoshi = ticketArr[i + 3];
-
-
-    var numEther = web3.fromWei(arr[1], 'ether');
+    var bnWei = arr[1];
     var bnWeiPerSatoshi = arr[2];
-    // var bnstrWeiPerSatoshi = arr[2].toString(10);
 
     var ticket = {
       ticketId: ticketId,
-      btcAddr: formatBtcAddr(arr[0]),
+      btcAddr: toBtcAddr(arr[0]),
       numEther: toEther(bnWei),
-      btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
+      btcPrice: toBtcPrice(bnWei, bnWeiPerSatoshi),
       numClaimExpiry: arr[3].toNumber(),
       claimerAddr: toHash(arr[4]),
       claimTxHash: toHash(arr[5])
@@ -371,31 +366,11 @@ function toBtcPrice(bnWei, bnWeiPerSatoshi) {
   return bnWei.div(bnWeiPerSatoshi).div(SATOSHI_PER_BTC).round(8).toString(10);
 }
 
-// returns BigNumber
-function toUnitPrice(bnWeiPerSatoshi) {
-  return WEI_PER_SATOSHI.div(bnWeiPerSatoshi).round(8);
-}
-
-// returns BigNumber
-function toTotalPrice(bnEther, bnUnitPrice) {
-  return bnEther.mul(bnUnitPrice).round(8);
-}
-
-
-function displayTotalPrice(numEther, bnstrWeiPerSatoshi) {
-  var bnTotalPrice = toTotalPrice(
-    new BigNumber(numEther),
-    toUnitPrice(new BigNumber(bnstrWeiPerSatoshi)));
-  return bnTotalPrice.toString(10);
-}
-
-
-function formatBtcAddr(bn) {
+function toBtcAddr(bn) {
   // TODO use bignumToHex()
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), versionAddr).toString();
 }
-
 
 function toHash(bignum) {
   var hash = bignumToHex(bignum);
