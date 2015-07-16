@@ -1,14 +1,3 @@
-
-useBtcTestnet = true;
-
-var versionAddr;
-if (useBtcTestnet) {
-  versionAddr = 111;
-}
-else {
-  versionAddr = 0;
-}
-
 var TWO_POW_256 = new BigNumber(2).pow(256);
 
 var TICKET_FIELDS = 7;
@@ -31,32 +20,29 @@ var CLAIM_FAIL_TX_ENCODING = -27;
 
 EthereumBitcoinSwapClient = function(params) {
   if (!web3.currentProvider) {
-    throw new Error('web3 provider is not set');
+    throw new Error('web3 provider missing');
+  }
+
+  if (!params.address) {
+    throw new Error('btcswap address missing');
+  }
+
+  if (!params.abi) {
+    throw new Error('btcswap abi missing');
+  }
+
+  if (params.btcTestnet == null) {
+    throw new Error('btc testnet flag missing');
   }
 
   try {
     web3.eth.defaultAccount = web3.eth.coinbase;  // Olympic needs web3.eth.accounts[1];
 
-    var contractAddr;
-    if (useBtcTestnet) {
-      this.ticketContractAddr = '0xc53a82b9b7c9af4801c7d8ea531719e7657aff3c';  // private
-      // gTicketContractAddr = '0x8901a2bbf639bfd21a97004ba4d7ae2bd00b8da8';  // reserveFastExpiry
-      // gTicketContractAddr = '0x39dfd4315e8b90488ab57e58e4d8b4597a1511e6';  // Olympic
-      // gTicketContractAddr = '0xb007e8d073af6b6487261bc06660f87ea8740230';
-      //
-      // gOurBtcAddr = 'mvBWJFv8Uc84YEyZKBm8HZQ7qrvmBiH7zR';
-    }
-    else {
-      this.ticketContractAddr = '0x668a7adf4cb288d48b5b23e47fe35e8c14c55a81';
-      // from tx190 of block300K
-      // hex is 956bfc5575c0a7134c7effef268e51d887ba7015
-      // gOurBtcAddr = '1Ed53ZSJiL5hF9qLonNPQ6CAckKYsNeWwJ';
-    }
-
-    // TODO don't forget to update the ABI
-    this.ethBtcSwapContract = web3.eth.contract(externalEthBtcSwapAbi).at(this.ticketContractAddr);
+    this.ethBtcSwapContract = web3.eth.contract(params.abi).at(params.address);
     console.log('@@@@ ethBtcSwapContract: ', this.ethBtcSwapContract)
 
+    this.btcTestnet = params.btcTestnet;
+    this.versionAddr = this.btcTestnet ? 111 : 0;
   }
   catch (err) {
     console.log('@@@ EthBtcSwapClient err: ', err)
@@ -323,7 +309,7 @@ EthereumBitcoinSwapClient = function(params) {
 
       retArr.push({
         ticketId: ticketArr[i + 0].toNumber(),
-        btcAddr: toBtcAddr(ticketArr[i + 1]),
+        btcAddr: toBtcAddr(ticketArr[i + 1], this.versionAddr),
         numEther: toEther(bnWei),
         btcPrice: toBtcPrice(bnWei, bnWeiPerSatoshi),
         numClaimExpiry: ticketArr[i + 4].toNumber(),
@@ -344,7 +330,7 @@ EthereumBitcoinSwapClient = function(params) {
 
     var ticket = {
       ticketId: ticketId,
-      btcAddr: toBtcAddr(arr[0]),
+      btcAddr: toBtcAddr(arr[0], this.versionAddr),
       numEther: toEther(bnWei),
       btcPrice: toBtcPrice(bnWei, bnWeiPerSatoshi),
       numClaimExpiry: arr[3].toNumber(),
@@ -365,7 +351,7 @@ function toBtcPrice(bnWei, bnWeiPerSatoshi) {
   return bnWei.div(bnWeiPerSatoshi).div(SATOSHI_PER_BTC).round(8).toString(10);
 }
 
-function toBtcAddr(bignum) {
+function toBtcAddr(bignum, versionAddr) {
   var btcAddr = bignumToHex(bignum)
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), versionAddr).toString();
 }

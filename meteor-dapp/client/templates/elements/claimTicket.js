@@ -226,7 +226,7 @@ function lookupBitcoinTxHash(viewm) {
   }
 
   var urlJsonTx;
-  if (useBtcTestnet) {
+  if (EthBtcSwapClient.btcTestnet) {
       urlJsonTx = "https://tbtc.blockr.io/api/v1/tx/raw/";
   }
   else {
@@ -302,7 +302,7 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
   var blockNum = data.tx.blockhash; // blockr does not easily provide block height
 
   var blockInfoUrl;
-  if (useBtcTestnet) {
+  if (EthBtcSwapClient.btcTestnet) {
       blockInfoUrl = "http://tbtc.blockr.io/api/v1/block/raw/"+blockNum;
   }
   else {

@@ -13,6 +13,6 @@ Template.ticketContractInfo.viewmodel({
   },
 
   labelNetwork: function() {
-    return useBtcTestnet ? 'TESTNET bitcoins to get ether' : 'production (mainnet)';
+    return EthBtcSwapClient.btcTestnet ? 'TESTNET bitcoins to get ether' : 'production (mainnet)';
   }
 });
