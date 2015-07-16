@@ -314,14 +314,15 @@ var EthereumBitcoinSwapClient = function() {
     var len = ticketArr.length;
 
     for (var i=0; i < len; i+= TICKET_FIELDS) {
-      var numEther = web3.fromWei(ticketArr[i + 2], 'ether');
-      var bnstrWeiPerSatoshi = ticketArr[i + 3].toString(10);
+
+      var bnWei = ticketArr[i + 2];
+      var bnWeiPerSatoshi = ticketArr[i + 3];
 
       retArr.push({
         ticketId: ticketArr[i + 0].toNumber(),
         btcAddr: formatBtcAddr(ticketArr[i + 1]),
-        numEther: numEther.toString(10),
-        btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
+        numEther: toEther(bnWei),
+        btcPrice: toBtcPrice(bnWei, bnWeiPerSatoshi),
         numClaimExpiry: ticketArr[i + 4].toNumber(),
         // bnClaimer: ticketArr[i + 5].toString(10),
         // bnClaimTxHash: ticketArr[i + 6].toString(10)
@@ -335,13 +336,18 @@ var EthereumBitcoinSwapClient = function() {
   this.lookupTicket = function(ticketId) {
     var arr = this.ethBtcSwapContract.lookupTicket.call(ticketId); // default gas, may get OOG
 
+    var bnWei = ticketArr[i + 2];
+    var bnWeiPerSatoshi = ticketArr[i + 3];
+
+
     var numEther = web3.fromWei(arr[1], 'ether');
-    var bnstrWeiPerSatoshi = arr[2].toString(10);
+    var bnWeiPerSatoshi = arr[2];
+    // var bnstrWeiPerSatoshi = arr[2].toString(10);
 
     var ticket = {
       ticketId: ticketId,
       btcAddr: formatBtcAddr(arr[0]),
-      numEther: numEther.toString(10),
+      numEther: toEther(bnWei),
       btcPrice: displayTotalPrice(numEther, bnstrWeiPerSatoshi),
       numClaimExpiry: arr[3].toNumber(),
       claimerAddr: toHash(arr[4]),
@@ -357,6 +363,13 @@ EthBtcSwapClient = new EthereumBitcoinSwapClient();
 
 
 
+function toEther(bnWei) {
+  return web3.fromWei(bnWei, 'ether').toString(10);
+}
+
+function toBtcPrice(bnWei, bnWeiPerSatoshi) {
+  return bnWei.div(bnWeiPerSatoshi).div(SATOSHI_PER_BTC).round(8).toString(10);
+}
 
 // returns BigNumber
 function toUnitPrice(bnWeiPerSatoshi) {
@@ -377,7 +390,7 @@ function displayTotalPrice(numEther, bnstrWeiPerSatoshi) {
 }
 
 
-formatBtcAddr = function(bn) {
+function formatBtcAddr(bn) {
   // TODO use bignumToHex()
   var btcAddr = bn.mod(TWO_POW_256).lt(0) ? bn.add(TWO_POW_256).toString(16) : bn.toString(16);
   return new Bitcoin.Address(Crypto.util.hexToBytes(btcAddr), versionAddr).toString();
