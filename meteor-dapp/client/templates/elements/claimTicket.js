@@ -334,7 +334,7 @@ function setBtcTxExtendedDetails(viewm, txResponse, claimTxHash) {
 
 function doReserveTicket(viewm) {
   var ticketId = getTicketId(viewm);
-  var txHash = '0x' + viewm.btcTxHash();
+  var txHash = viewm.btcTxHash();
   var powNonce = viewm.powNonce();
 
   uiTxProgress();

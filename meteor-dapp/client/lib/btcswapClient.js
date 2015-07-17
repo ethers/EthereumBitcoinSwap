@@ -224,6 +224,8 @@ EthereumBitcoinSwapClient = function(params) {
 
 
   this.reserveTicket = function(ticketId, txHash, powNonce, callback) {
+    txHash = '0x' + txHash;
+
     var objParam = {gas: 500000};
 
     var startTime = Date.now();
