@@ -210,7 +210,7 @@ function lookupBitcoinTxHash(viewm) {
       }
       else {
         var msg = 'btc and claim tx hashes mismatch';
-        swal('Unexepected error', msg, 'error');
+        swal('Unexpected error', msg, 'error');
         throw new Error(msg);
       }
     }
@@ -353,10 +353,10 @@ function ethReserveTicket(ticketId, txHash, powNonce, viewm) {
     swal(result, '', 'success');
 
     // update UI
-    viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
-    viewm.claimTxHash(txHash.substr(2));
-    viewm.claimExpiry(moment().add(4, 'hours').unix());
-    doLookup(viewm);
+    // viewm.claimerAddr(web3.eth.defaultAccount.substr(2));
+    // viewm.claimTxHash(txHash.substr(2));
+    // viewm.claimExpiry(moment().add(4, 'hours').unix());
+    // doLookup(viewm);
   });
 }
 
