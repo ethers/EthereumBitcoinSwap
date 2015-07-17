@@ -1,0 +1,19 @@
+- set:
+    BtcRelay: "0x142f674e911cc55c226af81ac4d6de0a671d4abf"  # Olympic
+
+-
+  deploy:
+    DisablePoW:
+      contract: easierPoW.se
+      gas: 3000000
+      wait: True
+
+-
+  transact:
+    SetTrustedBtcRelay:
+      gas: 900000
+      to: $DisablePoW
+      sig: setTrustedBtcRelay:[int256]:int256
+      data:
+        - $BtcRelay
+      wait: True

@@ -1,0 +1,3 @@
+macro POW_TARGET: 2**235
+
+inset('../ethBtcSwap.py')
